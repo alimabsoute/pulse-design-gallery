@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForkFox Pulse · Node Graphs R5 — Sharp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #09090b;
+    --surface: #18181b;
+    --surface2: #27272a;
+    --border: rgba(255,255,255,.06);
+    --border-md: rgba(255,255,255,.1);
+    --orange: #F97316;
+    --red: #FA2A52;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --text: #e4e4e7;
+    --text-muted: #71717a;
+    --text-dim: rgba(255,255,255,.15);
+    --mono: 'Courier New', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.5; }
+
+  /* NAV */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(9,9,11,.95); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 52px;
+  }
+  .nav-left { display: flex; align-items: center; gap: 0; }
+  .nav-brand { font-family: 'Geologica', sans-serif; font-weight: 900; font-size: 17px; letter-spacing: -.5px; }
+  .nav-brand span { color: var(--orange); }
+  .nav-divider { color: var(--text-muted); margin: 0 10px; font-size: 13px; }
+  .nav-label { color: var(--text-muted); font-size: 12px; font-weight: 500; }
+  .nav-links { display: flex; gap: 2px; }
+  .nav-links a {
+    text-decoration: none; color: var(--text-muted); font-size: 12px; font-weight: 500;
+    padding: 5px 10px; border-radius: 4px; border: 1px solid transparent;
+    transition: all .15s; letter-spacing: .01em;
+  }
+  .nav-links a:hover { color: var(--text); border-color: var(--border); background: var(--surface); }
+
+  /* PAGE HEADER */
+  .page-header {
+    text-align: center; padding: 72px 24px 40px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-eyebrow {
+    display: inline-block; font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--text-muted);
+    border: 1px solid var(--border); border-radius: 4px; padding: 4px 10px;
+    margin-bottom: 20px;
+  }
+  .page-header h1 {
+    font-family: 'Geologica', sans-serif; font-weight: 900;
+    font-size: clamp(32px, 5vw, 60px); letter-spacing: -2px;
+    line-height: 1.05; margin-bottom: 12px;
+  }
+  .page-header h1 span { color: var(--orange); }
+  .page-header p { color: var(--text-muted); font-size: 14px; max-width: 480px; margin-inline: auto; }
+
+  /* DESIGN SECTION */
+  .design-section { padding: 72px 0; border-bottom: 1px solid var(--border); }
+  .section-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  .concept-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: 3px 10px;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--orange); margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Geologica', sans-serif; font-weight: 900;
+    font-size: clamp(24px, 3.5vw, 42px); letter-spacing: -1px; margin-bottom: 8px;
+  }
+  .section-desc { color: var(--text-muted); font-size: 14px; max-width: 560px; margin-bottom: 32px; line-height: 1.6; }
+
+  /* PREVIEW FRAME */
+  .preview-frame {
+    border: 1px solid var(--border); border-radius: 6px;
+    overflow: hidden; position: relative; margin-bottom: 24px;
+  }
+
+  /* BELOW GRAPH */
+  .below-graph { display: grid; gap: 16px; padding: 0; margin-bottom: 24px; }
+  .below-graph.three-col { grid-template-columns: 2fr 1.2fr 1fr; }
+  .bgc {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 18px;
+  }
+  .bgc-title {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 14px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* PROS CONS */
+  .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .pros-cons-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 16px;
+  }
+  .pros-cons-card h4 {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .pros-cons-card.pros h4 { color: var(--green); }
+  .pros-cons-card.cons h4 { color: var(--red); }
+  .pros-cons-card ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .pros-cons-card li { font-size: 12px; color: var(--text-muted); padding-left: 14px; position: relative; line-height: 1.5; }
+  .pros-cons-card li::before { position: absolute; left: 0; font-weight: 700; }
+  .pros-cons-card.pros li::before { content: '+'; color: var(--green); }
+  .pros-cons-card.cons li::before { content: '−'; color: var(--red); }
+
+  /* SHARED STATUS CHIPS */
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase;
+    border-radius: 3px; padding: 2px 6px; font-weight: 700;
+  }
+  .chip.trending { background: rgba(249,115,22,.12); color: var(--orange); }
+  .chip.rising   { background: rgba(52,211,153,.1);  color: var(--green); }
+  .chip.stable   { background: rgba(251,191,36,.1);  color: var(--amber); }
+  .chip.cooling  { background: rgba(250,42,82,.1);   color: var(--red); }
+
+  /* GRAPH HINT */
+  .graph-hint {
+    position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+    font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase;
+    color: rgba(255,255,255,.18); white-space: nowrap; pointer-events: none;
+  }
+
+  /* FLOAT ANIMATIONS (gentle, for NC10) */
+  @keyframes floatA { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-1.5px)} }
+  @keyframes floatB { 0%,100%{transform:translateY(-1px)} 50%{transform:translateY(1.5px)} }
+  @keyframes floatC { 0%,100%{transform:translateY(1px)} 50%{transform:translateY(-1.5px)} }
+  @keyframes floatD { 0%,100%{transform:translateY(-1.5px)} 50%{transform:translateY(1px)} }
+  @keyframes floatE { 0%,100%{transform:translateY(.5px)} 50%{transform:translateY(-1px)} }
+
+  /* DASH FLOW */
+  @keyframes dashflow { to { stroke-dashoffset: -40; } }
+
+  /* ===================== NC8 SPECIFIC ===================== */
+  #nc8-hover-card {
+    position: absolute; width: 228px; pointer-events: none;
+    background: rgba(9,9,11,.97); border: 1px solid rgba(255,255,255,.12);
+    border-radius: 6px; padding: 16px; z-index: 50; opacity: 0;
+    box-shadow: 0 8px 32px rgba(0,0,0,.8);
+    transition: opacity .15s;
+  }
+  #nc8-hover-card.visible { opacity: 1; }
+  .hc-name { font-family: var(--mono); font-size: 11px; color: #e4e4e7; font-weight: 700; margin-bottom: 4px; letter-spacing: .04em; }
+  .hc-score { font-family: var(--mono); font-size: 28px; font-weight: 700; color: var(--orange); line-height: 1; margin-bottom: 6px; }
+  .hc-meta { font-family: var(--mono); font-size: 9px; color: var(--text-muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 2px; }
+  .hc-divider { border: none; border-top: 1px solid rgba(255,255,255,.06); margin: 10px 0; }
+  .hc-conn-title { font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+  .hc-conn-row { display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 9px; color: #a1a1aa; padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+  .hc-conn-row:last-child { border-bottom: none; }
+  .hc-conn-str { color: var(--orange); font-weight: 700; }
+
+  /* NC8 leaderboard */
+  .nc8-lb { display: flex; flex-direction: column; }
+  .nc8-lb-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.04);
+    font-family: var(--mono); font-size: 10px;
+  }
+  .nc8-lb-row:last-child { border-bottom: none; }
+  .nc8-lb-rank { width: 14px; text-align: center; color: #52525b; }
+  .nc8-lb-name { flex: 1; color: #a1a1aa; }
+  .nc8-lb-buzz { color: var(--orange); font-weight: 700; margin-right: 6px; }
+  .nc8-lb-delta { color: var(--green); }
+  .nc8-lb-delta.neg { color: var(--red); }
+  .nc8-lb-delta.flat { color: var(--amber); }
+
+  /* NC8 matrix */
+  .nc8-matrix-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 9px; }
+  .nc8-matrix-table th, .nc8-matrix-table td { text-align: center; padding: 5px 4px; }
+  .nc8-matrix-table th { color: #52525b; letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,.04); }
+  .nc8-matrix-table td.row-label { text-align: right; color: #52525b; padding-right: 8px; }
+  .nc8-matrix-cell { border-radius: 2px; display: inline-block; width: 36px; padding: 4px 0; font-weight: 700; }
+
+  /* NC8 stat blocks */
+  .nc8-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .nc8-stat {
+    background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.05);
+    border-radius: 4px; padding: 10px 12px;
+  }
+  .nc8-stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: #52525b; margin-bottom: 4px; }
+  .nc8-stat-val { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--orange); line-height: 1; }
+  .nc8-stat-sub { font-family: var(--mono); font-size: 8px; color: #52525b; margin-top: 2px; }
+
+  /* ===================== NC9 SPECIFIC ===================== */
+  #nc9 { background: #fafaf9; color: #09090b; }
+  #nc9 .section-title { color: #09090b; }
+  #nc9 .section-desc { color: rgba(0,0,0,.5); }
+  #nc9 .concept-label { background: #f4f4f5; border-color: rgba(0,0,0,.08); color: #ea580c; }
+  #nc9 .preview-frame { background: #ffffff; border-color: rgba(0,0,0,.1); box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  #nc9 .bgc { background: #ffffff; border-color: rgba(0,0,0,.08); box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+  #nc9 .bgc-title { color: rgba(0,0,0,.4); border-bottom-color: rgba(0,0,0,.06); }
+  #nc9 .pros-cons-card { background: #ffffff; border-color: rgba(0,0,0,.08); }
+  #nc9 .pros-cons-card li { color: rgba(0,0,0,.55); }
+
+  #nc9-hover-card {
+    position: absolute; width: 220px; pointer-events: none;
+    background: rgba(255,255,255,.96); border: 1px solid rgba(0,0,0,.1);
+    border-radius: 6px; padding: 14px; z-index: 50; opacity: 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,.12);
+    transition: opacity .15s; color: #09090b;
+  }
+  #nc9-hover-card.visible { opacity: 1; }
+  .nc9-hc-name { font-family: var(--mono); font-size: 11px; font-weight: 700; color: #09090b; margin-bottom: 4px; }
+  .nc9-hc-score { font-family: var(--mono); font-size: 26px; font-weight: 700; color: var(--orange); line-height: 1; margin-bottom: 6px; }
+  .nc9-hc-meta { font-family: var(--mono); font-size: 9px; color: rgba(0,0,0,.4); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px; }
+  .nc9-hc-divider { border: none; border-top: 1px solid rgba(0,0,0,.07); margin: 8px 0; }
+
+  /* NC9 editorial leaderboard */
+  .nc9-lb { display: flex; flex-direction: column; gap: 6px; }
+  .nc9-lb-row { display: flex; align-items: center; gap: 10px; }
+  .nc9-lb-rank { font-family: var(--mono); font-size: 10px; color: rgba(0,0,0,.25); width: 16px; text-align: center; }
+  .nc9-lb-name { flex: 1; }
+  .nc9-lb-rname { font-size: 12px; font-weight: 600; color: #09090b; }
+  .nc9-lb-chef { font-size: 10px; color: rgba(0,0,0,.4); }
+  .nc9-buzz-bar-wrap { width: 64px; }
+  .nc9-buzz-bar-track { height: 4px; background: rgba(0,0,0,.08); border-radius: 99px; overflow: hidden; margin-bottom: 2px; }
+  .nc9-buzz-bar-fill { height: 100%; border-radius: 99px; }
+  .nc9-buzz-val { font-family: var(--mono); font-size: 9px; color: rgba(0,0,0,.4); }
+
+  /* NC9 clusters */
+  .nc9-cluster-list { display: flex; flex-direction: column; gap: 8px; }
+  .nc9-cluster-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,.05); }
+  .nc9-cluster-item:last-child { border-bottom: none; }
+  .nc9-cluster-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .nc9-cluster-hood { font-size: 11px; font-weight: 600; color: #09090b; }
+  .nc9-cluster-count { font-family: var(--mono); font-size: 9px; color: rgba(0,0,0,.4); }
+  .nc9-cluster-density { margin-left: auto; }
+  .nc9-cluster-bar { width: 40px; height: 3px; border-radius: 99px; }
+
+  /* NC9 pull-quote */
+  .nc9-insight-card { position: relative; padding: 20px 20px 20px 28px; }
+  .nc9-insight-card::before {
+    content: ''; position: absolute; left: 0; top: 16px; bottom: 16px;
+    width: 3px; background: var(--orange); border-radius: 99px;
+  }
+  .nc9-insight-eyebrow { font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--orange); margin-bottom: 8px; }
+  .nc9-insight-text { font-size: 13px; color: #27272a; line-height: 1.65; font-style: italic; }
+  .nc9-insight-sig { margin-top: 12px; font-family: var(--mono); font-size: 9px; color: rgba(0,0,0,.35); letter-spacing: .05em; }
+
+  /* ===================== NC10 SPECIFIC ===================== */
+  .nc10-layout { display: flex; min-height: 480px; }
+  .nc10-side-panel {
+    flex: 0 0 27%; background: rgba(12,12,15,.6);
+    backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,.06);
+    padding: 20px 18px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 0;
+  }
+  .nc10-panel-eyebrow {
+    font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase;
+    color: #52525b; margin-bottom: 16px; padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .nc10-graph-area { flex: 1; position: relative; }
+
+  .nc10-stat-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .nc10-stat-item { }
+  .nc10-stat-label { font-family: var(--mono); font-size: 8px; letter-spacing: .08em; text-transform: uppercase; color: #52525b; margin-bottom: 2px; }
+  .nc10-stat-val { font-family: var(--mono); font-size: 20px; font-weight: 700; color: #e4e4e7; line-height: 1; }
+  .nc10-stat-sub { font-family: var(--mono); font-size: 8px; color: #52525b; }
+
+  .nc10-panel-divider { border: none; border-top: 1px solid rgba(255,255,255,.05); margin: 12px 0; }
+
+  /* NC10 restaurant detail in panel */
+  .nc10-detail { display: none; }
+  .nc10-detail.active { display: block; }
+  .nc10-detail-name { font-family: 'Geologica', sans-serif; font-weight: 900; font-size: 15px; line-height: 1.2; color: #e4e4e7; margin-bottom: 4px; }
+  .nc10-detail-hood { font-family: var(--mono); font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 12px; }
+  .nc10-detail-score { font-family: var(--mono); font-size: 36px; font-weight: 700; color: var(--orange); line-height: 1; margin-bottom: 2px; }
+  .nc10-detail-score-label { font-family: var(--mono); font-size: 8px; color: #52525b; letter-spacing: .07em; text-transform: uppercase; margin-bottom: 10px; }
+  .nc10-detail-chef { font-size: 11px; color: #71717a; margin-bottom: 10px; }
+  .nc10-conn-list { display: flex; flex-direction: column; gap: 4px; }
+  .nc10-conn-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 5px 6px; border-radius: 3px;
+    background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.04);
+  }
+  .nc10-conn-item-name { font-family: var(--mono); font-size: 9px; color: #a1a1aa; }
+  .nc10-conn-item-str { font-family: var(--mono); font-size: 9px; color: var(--orange); font-weight: 700; }
+  .nc10-conn-item-reason { font-family: var(--mono); font-size: 8px; color: #52525b; margin-top: 1px; }
+
+  /* NC10 floating node labels */
+  .nc10-node-label {
+    position: absolute; pointer-events: none;
+    background: rgba(12,12,15,.7); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.06); border-radius: 3px;
+    padding: 2px 6px; font-family: var(--mono); font-size: 8px; color: #a1a1aa;
+    letter-spacing: .04em; white-space: nowrap;
+    transform: translate(-50%, -100%); margin-top: -6px;
+  }
+
+  /* NC10 below-graph */
+  .nc10-timeline-item {
+    display: flex; gap: 10px; padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,.04); font-size: 11px;
+  }
+  .nc10-timeline-item:last-child { border-bottom: none; }
+  .nc10-tl-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+  .nc10-tl-text { color: #a1a1aa; line-height: 1.5; }
+  .nc10-tl-date { font-family: var(--mono); font-size: 8px; color: #52525b; margin-top: 2px; }
+
+  .nc10-cluster-stat { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+  .nc10-cluster-stat:last-child { border-bottom: none; }
+  .nc10-cluster-stat-label { font-family: var(--mono); font-size: 9px; color: #71717a; }
+  .nc10-cluster-stat-val { font-family: var(--mono); font-size: 9px; color: #e4e4e7; font-weight: 700; }
+
+  .nc10-emerging-card {
+    background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.05);
+    border-radius: 4px; padding: 10px 12px; margin-bottom: 8px;
+  }
+  .nc10-emerging-card:last-child { margin-bottom: 0; }
+  .nc10-emerging-pair { font-family: var(--mono); font-size: 10px; color: #e4e4e7; font-weight: 700; margin-bottom: 3px; }
+  .nc10-emerging-str { font-family: var(--mono); font-size: 9px; color: var(--orange); }
+  .nc10-emerging-trend { font-family: var(--mono); font-size: 9px; color: var(--green); margin-left: 6px; }
+  .nc10-emerging-reason { font-family: var(--mono); font-size: 8px; color: #52525b; margin-top: 2px; }
+
+  @media (max-width: 680px) {
+    .below-graph.three-col { grid-template-columns: 1fr; }
+    .pros-cons { grid-template-columns: 1fr; }
+    .nc10-layout { flex-direction: column; }
+    .nc10-side-panel { flex: none; border-right: none; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .nav-label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-left">
+    <span class="nav-brand">Fork<span>Fox</span></span>
+    <span class="nav-divider"> · </span>
+    <span class="nav-label">Node Graphs R5 — Sharp</span>
+  </div>
+  <div class="nav-links">
+    <a href="node-gallery-r4.html">← R4</a>
+    <a href="node-gallery.html">Node Gallery</a>
+    <a href="chart-gallery.html">Charts</a>
+    <a href="index.html">Hub</a>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-eyebrow">Round 5 · Sharper Variants</div>
+  <h1>Fork<span>Fox</span> Pulse</h1>
+  <p>Three shadcn-inspired graph explorations. Less cartoonish, more clinical. Monospace data, thin borders, subtle glass — product-ready.</p>
+</div>
+
+<!-- ================================================================
+     NC8 — THE GRID
+     ================================================================ -->
+<section class="design-section" id="nc8">
+  <div class="section-inner">
+    <div class="concept-label">NC8</div>
+    <h2 class="section-title">The Grid</h2>
+    <p class="section-desc">Bloomberg terminal meets restaurant data. Square nodes, hairline connections, faint grid background. Hover reveals a sharp dropdown with connection details. Maximum information density, zero decoration.</p>
+
+    <div class="preview-frame" style="background:#09090b;" id="nc8-frame">
+
+      <!-- SVG GRAPH NC8 -->
+      <svg id="nc8-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"
+        style="width:100%;height:460px;display:block;cursor:default;">
+
+        <defs>
+          <!-- subtle grid pattern -->
+          <pattern id="nc8-grid" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M10 0 L0 0 0 10" fill="none" stroke="rgba(255,255,255,.015)" stroke-width=".08"/>
+          </pattern>
+        </defs>
+
+        <!-- GRID BG -->
+        <rect width="100" height="100" fill="url(#nc8-grid)"/>
+
+        <!-- NEIGHBORHOOD LABELS -->
+        <text x="10" y="8" font-family="Courier New,monospace" font-size="2.4" fill="rgba(255,255,255,.04)" letter-spacing=".6">FISHTOWN</text>
+        <text x="46" y="48" font-family="Courier New,monospace" font-size="2.2" fill="rgba(255,255,255,.04)" letter-spacing=".5">CTR CITY</text>
+        <text x="63" y="35" font-family="Courier New,monospace" font-size="2.2" fill="rgba(255,255,255,.04)" letter-spacing=".5">OLD CITY</text>
+        <text x="10" y="80" font-family="Courier New,monospace" font-size="2.2" fill="rgba(255,255,255,.04)" letter-spacing=".5">S.PHILLY</text>
+        <text x="64" y="80" font-family="Courier New,monospace" font-size="2.2" fill="rgba(255,255,255,.04)" letter-spacing=".5">KENSINGTON</text>
+
+        <!-- CONNECTIONS -->
+        <g id="nc8-edges">
+          <line id="nc8-e-0-1" x1="22" y1="28" x2="30" y2="20" stroke="rgba(255,255,255,.1)" stroke-width=".25"/>
+          <line id="nc8-e-1-5" x1="30" y1="20" x2="66" y2="38" stroke="rgba(255,255,255,.12)" stroke-width=".3"/>
+          <line id="nc8-e-0-3" x1="22" y1="28" x2="18" y2="42" stroke="rgba(255,255,255,.09)" stroke-width=".22"/>
+          <line id="nc8-e-1-7" x1="30" y1="20" x2="12" y2="35" stroke="rgba(255,255,255,.08)" stroke-width=".18"/>
+          <line id="nc8-e-4-5" x1="52" y1="52" x2="66" y2="38" stroke="rgba(255,255,255,.09)" stroke-width=".22"/>
+          <line id="nc8-e-4-6" x1="52" y1="52" x2="58" y2="62" stroke="rgba(255,255,255,.08)" stroke-width=".18"/>
+          <line id="nc8-e-2-8" x1="20" y1="72" x2="68" y2="72" stroke="rgba(255,255,255,.08)" stroke-width=".18"/>
+          <line id="nc8-e-2-4" x1="20" y1="72" x2="52" y2="52" stroke="rgba(255,255,255,.07)" stroke-width=".16"/>
+        </g>
+
+        <!-- NODES as rounded rects -->
+        <!-- 0 Vernick Fish r=3.5 trending orange -->
+        <g class="nc8-node" data-idx="0" style="cursor:pointer">
+          <rect id="nc8-n0" x="18.5" y="24.5" width="7" height="7" rx="0.8"
+            fill="rgba(249,115,22,.12)" stroke="#F97316" stroke-width=".15"/>
+          <text x="22" y="34.2" text-anchor="middle" font-family="Courier New,monospace" font-size="2" fill="rgba(255,255,255,.45)" letter-spacing=".04em">Vernick</text>
+        </g>
+        <!-- 1 Laser Wolf r=3.0 rising green -->
+        <g class="nc8-node" data-idx="1" style="cursor:pointer">
+          <rect id="nc8-n1" x="27" y="17" width="6" height="6" rx="0.8"
+            fill="rgba(52,211,153,.1)" stroke="#34d399" stroke-width=".15"/>
+          <text x="30" y="26" text-anchor="middle" font-family="Courier New,monospace" font-size="2" fill="rgba(255,255,255,.45)" letter-spacing=".04em">L.Wolf</text>
+        </g>
+        <!-- 2 Kalaya r=2.5 rising green -->
+        <g class="nc8-node" data-idx="2" style="cursor:pointer">
+          <rect id="nc8-n2" x="17" y="69" width="6" height="6" rx="0.8"
+            fill="rgba(52,211,153,.1)" stroke="#34d399" stroke-width=".15"/>
+          <text x="20" y="78.5" text-anchor="middle" font-family="Courier New,monospace" font-size="2" fill="rgba(255,255,255,.45)" letter-spacing=".04em">Kalaya</text>
+        </g>
+        <!-- 3 Suraya r=2.5 stable amber -->
+        <g class="nc8-node" data-idx="3" style="cursor:pointer">
+          <rect id="nc8-n3" x="15" y="39" width="5.5" height="5.5" rx="0.8"
+            fill="rgba(251,191,36,.1)" stroke="#fbbf24" stroke-width=".15"/>
+          <text x="17.75" y="47.8" text-anchor="middle" font-family="Courier New,monospace" font-size="2" fill="rgba(255,255,255,.45)" letter-spacing=".04em">Suraya</text>
+        </g>
+        <!-- 4 Friday Saturday Sunday r=2.5 rising green -->
+        <g class="nc8-node" data-idx="4" style="cursor:pointer">
+          <rect id="nc8-n4" x="49.5" y="49.5" width="5.5" height="5.5" rx="0.8"
+            fill="rgba(52,211,153,.1)" stroke="#34d399" stroke-width=".15"/>
+          <text x="52.25" y="58.3" text-anchor="middle" font-family="Courier New,monospace" font-size="2" fill="rgba(255,255,255,.45)" letter-spacing=".04em">FriSatSun</text>
+        </g>
+        <!-- 5 Zahav r=1.8 cooling red -->
+        <g class="nc8-node" data-idx="5" style="cursor:pointer">
+          <rect id="nc8-n5" x="62.6" y="34.6" width="4.8" height="4.8" rx="0.8"
+            fill="rgba(250,42,82,.1)" stroke="#FA2A52" stroke-width=".15"/>
+          <text x="66" y="42.6" text-anchor="middle" font-family="Courier New,monospace" font-size="2" fill="rgba(255,255,255,.45)" letter-spacing=".04em">Zahav</text>
+        </g>
+        <!-- 6 Parc r=1.8 cooling red -->
+        <g class="nc8-node" data-idx="6" style="cursor:pointer">
+          <rect id="nc8-n6" x="55.1" y="59.1" width="4.8" height="4.8" rx="0.8"
+            fill="rgba(250,42,82,.1)" stroke="#FA2A52" stroke-width=".15"/>
+          <text x="57.5" y="67" text-anchor="middle" font-family="Courier New,monospace" font-size="2" fill="rgba(255,255,255,.45)" letter-spacing=".04em">Parc</text>
+        </g>
+        <!-- 7 Pizzeria Beddia r=1.8 stable amber -->
+        <g class="nc8-node" data-idx="7" style="cursor:pointer">
+          <rect id="nc8-n7" x="9.1" y="32.1" width="4.8" height="4.8" rx="0.8"
+            fill="rgba(251,191,36,.1)" stroke="#fbbf24" stroke-width=".15"/>
+          <text x="11.5" y="40.2" text-anchor="middle" font-family="Courier New,monospace" font-size="2" fill="rgba(255,255,255,.45)" letter-spacing=".04em">Beddia</text>
+        </g>
+        <!-- 8 Cheik r=2.5 rising green -->
+        <g class="nc8-node" data-idx="8" style="cursor:pointer">
+          <rect id="nc8-n8" x="65" y="69" width="5.5" height="5.5" rx="0.8"
+            fill="rgba(52,211,153,.1)" stroke="#34d399" stroke-width=".15"/>
+          <text x="67.75" y="77.8" text-anchor="middle" font-family="Courier New,monospace" font-size="2" fill="rgba(255,255,255,.45)" letter-spacing=".04em">Cheik</text>
+        </g>
+      </svg>
+
+      <!-- HOVER CARD NC8 -->
+      <div id="nc8-hover-card">
+        <div class="hc-name" id="nc8-hc-name">—</div>
+        <div class="hc-score" id="nc8-hc-score">—</div>
+        <div class="hc-meta" id="nc8-hc-hood">—</div>
+        <div class="hc-meta" id="nc8-hc-chef">—</div>
+        <div class="hc-meta" id="nc8-hc-price">—</div>
+        <hr class="hc-divider">
+        <div class="hc-conn-title">Connections</div>
+        <div id="nc8-hc-conns"></div>
+      </div>
+
+      <div class="graph-hint" id="nc8-hint">hover node to inspect</div>
+    </div><!-- /preview-frame -->
+
+    <!-- BELOW GRAPH NC8 -->
+    <div class="below-graph three-col">
+      <!-- Col 1: Data table leaderboard -->
+      <div class="bgc">
+        <div class="bgc-title">Buzz Leaderboard</div>
+        <div class="nc8-lb">
+          <div class="nc8-lb-row">
+            <span class="nc8-lb-rank">1</span>
+            <span class="nc8-lb-name">Vernick Fish</span>
+            <span class="nc8-lb-buzz">94</span>
+            <span class="nc8-lb-delta">▲ 4</span>
+            <span class="chip trending" style="margin-left:4px">trend</span>
+          </div>
+          <div class="nc8-lb-row">
+            <span class="nc8-lb-rank">2</span>
+            <span class="nc8-lb-name">Laser Wolf</span>
+            <span class="nc8-lb-buzz">88</span>
+            <span class="nc8-lb-delta">▲ 2</span>
+            <span class="chip rising" style="margin-left:4px">rise</span>
+          </div>
+          <div class="nc8-lb-row">
+            <span class="nc8-lb-rank">3</span>
+            <span class="nc8-lb-name">Kalaya</span>
+            <span class="nc8-lb-buzz">82</span>
+            <span class="nc8-lb-delta">▲ 3</span>
+            <span class="chip rising" style="margin-left:4px">rise</span>
+          </div>
+          <div class="nc8-lb-row">
+            <span class="nc8-lb-rank">4</span>
+            <span class="nc8-lb-name">Cheik</span>
+            <span class="nc8-lb-buzz">83</span>
+            <span class="nc8-lb-delta">▲ 6</span>
+            <span class="chip rising" style="margin-left:4px">rise</span>
+          </div>
+          <div class="nc8-lb-row">
+            <span class="nc8-lb-rank">5</span>
+            <span class="nc8-lb-name">Fri Sat Sun</span>
+            <span class="nc8-lb-buzz">79</span>
+            <span class="nc8-lb-delta">▲ 1</span>
+            <span class="chip rising" style="margin-left:4px">rise</span>
+          </div>
+          <div class="nc8-lb-row">
+            <span class="nc8-lb-rank">6</span>
+            <span class="nc8-lb-name">Suraya</span>
+            <span class="nc8-lb-buzz">76</span>
+            <span class="nc8-lb-delta flat">— 0</span>
+            <span class="chip stable" style="margin-left:4px">stbl</span>
+          </div>
+          <div class="nc8-lb-row">
+            <span class="nc8-lb-rank">7</span>
+            <span class="nc8-lb-name">Pizzeria Beddia</span>
+            <span class="nc8-lb-buzz">71</span>
+            <span class="nc8-lb-delta flat">— 0</span>
+            <span class="chip stable" style="margin-left:4px">stbl</span>
+          </div>
+          <div class="nc8-lb-row">
+            <span class="nc8-lb-rank">8</span>
+            <span class="nc8-lb-name">Zahav</span>
+            <span class="nc8-lb-buzz">61</span>
+            <span class="nc8-lb-delta neg">▼ 3</span>
+            <span class="chip cooling" style="margin-left:4px">cool</span>
+          </div>
+          <div class="nc8-lb-row">
+            <span class="nc8-lb-rank">9</span>
+            <span class="nc8-lb-name">Parc</span>
+            <span class="nc8-lb-buzz">58</span>
+            <span class="nc8-lb-delta neg">▼ 2</span>
+            <span class="chip cooling" style="margin-left:4px">cool</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 2: Connection matrix -->
+      <div class="bgc">
+        <div class="bgc-title">Relation Matrix</div>
+        <p style="font-family:var(--mono);font-size:9px;color:#52525b;margin-bottom:12px;line-height:1.6;">Top-3 restaurant pair strengths. Higher = deeper supply chain, chef, or guest overlap.</p>
+        <table class="nc8-matrix-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Vernick</th>
+              <th>L.Wolf</th>
+              <th>Zahav</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="row-label">Vernick</td>
+              <td><span class="nc8-matrix-cell" style="background:rgba(249,115,22,.15);color:#F97316">—</span></td>
+              <td><span class="nc8-matrix-cell" style="background:rgba(249,115,22,.18);color:#F97316">87</span></td>
+              <td><span class="nc8-matrix-cell" style="background:rgba(52,211,153,.1);color:#34d399">44</span></td>
+            </tr>
+            <tr>
+              <td class="row-label">L.Wolf</td>
+              <td><span class="nc8-matrix-cell" style="background:rgba(249,115,22,.18);color:#F97316">87</span></td>
+              <td><span class="nc8-matrix-cell" style="background:rgba(249,115,22,.15);color:#F97316">—</span></td>
+              <td><span class="nc8-matrix-cell" style="background:rgba(249,115,22,.25);color:#F97316">92</span></td>
+            </tr>
+            <tr>
+              <td class="row-label">Zahav</td>
+              <td><span class="nc8-matrix-cell" style="background:rgba(52,211,153,.1);color:#34d399">44</span></td>
+              <td><span class="nc8-matrix-cell" style="background:rgba(249,115,22,.25);color:#F97316">92</span></td>
+              <td><span class="nc8-matrix-cell" style="background:rgba(249,115,22,.15);color:#F97316">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-family:var(--mono);font-size:8px;color:#3f3f46;margin-top:10px;line-height:1.5;">Laser Wolf ↔ Zahav at 92 is the strongest link: both are CookNSolo restaurants — same owner, same supply chain.</p>
+      </div>
+
+      <!-- Col 3: Signal summary -->
+      <div class="bgc">
+        <div class="bgc-title">Signal Summary</div>
+        <div class="nc8-stat-grid">
+          <div class="nc8-stat">
+            <div class="nc8-stat-label">Nodes</div>
+            <div class="nc8-stat-val">09</div>
+            <div class="nc8-stat-sub">active</div>
+          </div>
+          <div class="nc8-stat">
+            <div class="nc8-stat-label">Edges</div>
+            <div class="nc8-stat-val">08</div>
+            <div class="nc8-stat-sub">connections</div>
+          </div>
+          <div class="nc8-stat">
+            <div class="nc8-stat-label">Top Link</div>
+            <div class="nc8-stat-val" style="font-size:14px;line-height:1.2;">92</div>
+            <div class="nc8-stat-sub">L.Wolf ↔ Zahav</div>
+          </div>
+          <div class="nc8-stat">
+            <div class="nc8-stat-label">Density</div>
+            <div class="nc8-stat-val">22%</div>
+            <div class="nc8-stat-sub">of max edges</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /below-graph nc8 -->
+
+    <div class="pros-cons">
+      <div class="pros-cons-card pros">
+        <h4>Strengths</h4>
+        <ul>
+          <li>Highest information density of any variant</li>
+          <li>Monospace data reads like a terminal — authoritative</li>
+          <li>Grid background adds structure without visual noise</li>
+          <li>Square nodes differentiate from typical social graphs</li>
+          <li>Hover card is surgical — only what matters</li>
+        </ul>
+      </div>
+      <div class="pros-cons-card cons">
+        <h4>Tradeoffs</h4>
+        <ul>
+          <li>Cold aesthetic may alienate casual food consumers</li>
+          <li>Square nodes reduce node-size meaning vs circles</li>
+          <li>Grid background can feel corporate vs culinary</li>
+          <li>Dense information requires user investment to parse</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     NC9 — STONE (LIGHT MODE)
+     ================================================================ -->
+<section class="design-section" id="nc9">
+  <div class="section-inner">
+    <div class="concept-label">NC9</div>
+    <h2 class="section-title">Stone</h2>
+    <p class="section-desc">The editorial day-mode. Stone-50 background, dark text, minimal shadows. Feels like a premium design tool or magazine research view — professional, grown-up, at home on a MacBook in daylight.</p>
+
+    <div class="preview-frame" style="background:#fafaf9;border-color:rgba(0,0,0,.1);" id="nc9-frame">
+
+      <!-- SVG GRAPH NC9 -->
+      <svg id="nc9-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"
+        style="width:100%;height:460px;display:block;cursor:default;">
+
+        <!-- NEIGHBORHOOD LABELS -->
+        <text x="10" y="8" font-family="Inter,sans-serif" font-size="2.6" font-weight="700" fill="rgba(0,0,0,.05)" letter-spacing=".5">FISHTOWN</text>
+        <text x="46" y="48" font-family="Inter,sans-serif" font-size="2.4" font-weight="700" fill="rgba(0,0,0,.05)" letter-spacing=".5">CTR CITY</text>
+        <text x="63" y="35" font-family="Inter,sans-serif" font-size="2.4" font-weight="700" fill="rgba(0,0,0,.05)" letter-spacing=".5">OLD CITY</text>
+        <text x="10" y="80" font-family="Inter,sans-serif" font-size="2.4" font-weight="700" fill="rgba(0,0,0,.05)" letter-spacing=".5">S. PHILLY</text>
+        <text x="64" y="80" font-family="Inter,sans-serif" font-size="2.4" font-weight="700" fill="rgba(0,0,0,.05)" letter-spacing=".5">KENSINGTON</text>
+
+        <!-- CONNECTIONS light mode -->
+        <g id="nc9-edges">
+          <line id="nc9-e-0-1" x1="22" y1="28" x2="30" y2="20" stroke="rgba(0,0,0,.07)" stroke-width=".2"/>
+          <line id="nc9-e-1-5" x1="30" y1="20" x2="66" y2="38" stroke="rgba(0,0,0,.08)" stroke-width=".22"/>
+          <line id="nc9-e-0-3" x1="22" y1="28" x2="18" y2="42" stroke="rgba(0,0,0,.06)" stroke-width=".18"/>
+          <line id="nc9-e-1-7" x1="30" y1="20" x2="12" y2="35" stroke="rgba(0,0,0,.06)" stroke-width=".16"/>
+          <line id="nc9-e-4-5" x1="52" y1="52" x2="66" y2="38" stroke="rgba(0,0,0,.06)" stroke-width=".18"/>
+          <line id="nc9-e-4-6" x1="52" y1="52" x2="58" y2="62" stroke="rgba(0,0,0,.06)" stroke-width=".16"/>
+          <line id="nc9-e-2-8" x1="20" y1="72" x2="68" y2="72" stroke="rgba(0,0,0,.05)" stroke-width=".16"/>
+          <line id="nc9-e-2-4" x1="20" y1="72" x2="52" y2="52" stroke="rgba(0,0,0,.05)" stroke-width=".14"/>
+        </g>
+
+        <!-- NODES circles light mode -->
+        <!-- 0 Vernick Fish -->
+        <g class="nc9-node" data-idx="0" style="cursor:pointer">
+          <circle id="nc9-n0" cx="22" cy="28" r="3.5"
+            fill="rgba(249,115,22,.1)" stroke="#F97316" stroke-width=".2" stroke-opacity=".65"/>
+          <text x="22" y="34.8" text-anchor="middle" font-family="Inter,sans-serif" font-size="2" fill="rgba(0,0,0,.5)" font-weight="500">Vernick</text>
+        </g>
+        <!-- 1 Laser Wolf -->
+        <g class="nc9-node" data-idx="1" style="cursor:pointer">
+          <circle id="nc9-n1" cx="30" cy="20" r="3.0"
+            fill="rgba(52,211,153,.1)" stroke="#34d399" stroke-width=".2" stroke-opacity=".65"/>
+          <text x="30" y="26.2" text-anchor="middle" font-family="Inter,sans-serif" font-size="2" fill="rgba(0,0,0,.5)" font-weight="500">L.Wolf</text>
+        </g>
+        <!-- 2 Kalaya -->
+        <g class="nc9-node" data-idx="2" style="cursor:pointer">
+          <circle id="nc9-n2" cx="20" cy="72" r="2.5"
+            fill="rgba(52,211,153,.1)" stroke="#34d399" stroke-width=".2" stroke-opacity=".65"/>
+          <text x="20" y="77.6" text-anchor="middle" font-family="Inter,sans-serif" font-size="2" fill="rgba(0,0,0,.5)" font-weight="500">Kalaya</text>
+        </g>
+        <!-- 3 Suraya -->
+        <g class="nc9-node" data-idx="3" style="cursor:pointer">
+          <circle id="nc9-n3" cx="18" cy="42" r="2.5"
+            fill="rgba(251,191,36,.1)" stroke="#fbbf24" stroke-width=".2" stroke-opacity=".65"/>
+          <text x="18" y="47.6" text-anchor="middle" font-family="Inter,sans-serif" font-size="2" fill="rgba(0,0,0,.5)" font-weight="500">Suraya</text>
+        </g>
+        <!-- 4 Friday Saturday Sunday -->
+        <g class="nc9-node" data-idx="4" style="cursor:pointer">
+          <circle id="nc9-n4" cx="52" cy="52" r="2.5"
+            fill="rgba(52,211,153,.1)" stroke="#34d399" stroke-width=".2" stroke-opacity=".65"/>
+          <text x="52" y="57.6" text-anchor="middle" font-family="Inter,sans-serif" font-size="2" fill="rgba(0,0,0,.5)" font-weight="500">FriSatSun</text>
+        </g>
+        <!-- 5 Zahav -->
+        <g class="nc9-node" data-idx="5" style="cursor:pointer">
+          <circle id="nc9-n5" cx="66" cy="38" r="1.8"
+            fill="rgba(250,42,82,.1)" stroke="#FA2A52" stroke-width=".2" stroke-opacity=".65"/>
+          <text x="66" y="43" text-anchor="middle" font-family="Inter,sans-serif" font-size="2" fill="rgba(0,0,0,.5)" font-weight="500">Zahav</text>
+        </g>
+        <!-- 6 Parc -->
+        <g class="nc9-node" data-idx="6" style="cursor:pointer">
+          <circle id="nc9-n6" cx="58" cy="62" r="1.8"
+            fill="rgba(250,42,82,.1)" stroke="#FA2A52" stroke-width=".2" stroke-opacity=".65"/>
+          <text x="58" y="67" text-anchor="middle" font-family="Inter,sans-serif" font-size="2" fill="rgba(0,0,0,.5)" font-weight="500">Parc</text>
+        </g>
+        <!-- 7 Pizzeria Beddia -->
+        <g class="nc9-node" data-idx="7" style="cursor:pointer">
+          <circle id="nc9-n7" cx="12" cy="35" r="1.8"
+            fill="rgba(251,191,36,.1)" stroke="#fbbf24" stroke-width=".2" stroke-opacity=".65"/>
+          <text x="12" y="40" text-anchor="middle" font-family="Inter,sans-serif" font-size="2" fill="rgba(0,0,0,.5)" font-weight="500">Beddia</text>
+        </g>
+        <!-- 8 Cheik -->
+        <g class="nc9-node" data-idx="8" style="cursor:pointer">
+          <circle id="nc9-n8" cx="68" cy="72" r="2.5"
+            fill="rgba(52,211,153,.1)" stroke="#34d399" stroke-width=".2" stroke-opacity=".65"/>
+          <text x="68" y="77.6" text-anchor="middle" font-family="Inter,sans-serif" font-size="2" fill="rgba(0,0,0,.5)" font-weight="500">Cheik</text>
+        </g>
+      </svg>
+
+      <!-- HOVER CARD NC9 -->
+      <div id="nc9-hover-card">
+        <div class="nc9-hc-name" id="nc9-hc-name">—</div>
+        <div class="nc9-hc-score" id="nc9-hc-score">—</div>
+        <div class="nc9-hc-meta" id="nc9-hc-hood">—</div>
+        <div class="nc9-hc-meta" id="nc9-hc-chef">—</div>
+        <hr class="nc9-hc-divider">
+        <div id="nc9-hc-chip"></div>
+      </div>
+
+      <div class="graph-hint" style="color:rgba(0,0,0,.2)" id="nc9-hint">hover node to inspect</div>
+    </div><!-- /preview-frame nc9 -->
+
+    <!-- BELOW GRAPH NC9 -->
+    <div class="below-graph three-col">
+      <!-- Col 1: Editorial leaderboard -->
+      <div class="bgc" style="background:#fff;border-color:rgba(0,0,0,.08);">
+        <div class="bgc-title" style="color:rgba(0,0,0,.4);border-bottom-color:rgba(0,0,0,.06);">Buzz Leaderboard</div>
+        <div class="nc9-lb">
+          <div class="nc9-lb-row">
+            <span class="nc9-lb-rank">1</span>
+            <div class="nc9-lb-name">
+              <div class="nc9-lb-rname">Vernick Fish</div>
+              <div class="nc9-lb-chef">Greg Vernick · Fishtown</div>
+            </div>
+            <div class="nc9-buzz-bar-wrap">
+              <div class="nc9-buzz-bar-track"><div class="nc9-buzz-bar-fill" style="width:94%;background:#F97316"></div></div>
+              <div class="nc9-buzz-val" style="color:rgba(0,0,0,.4)">94</div>
+            </div>
+          </div>
+          <div class="nc9-lb-row" style="margin-top:8px">
+            <span class="nc9-lb-rank">2</span>
+            <div class="nc9-lb-name">
+              <div class="nc9-lb-rname">Cheik</div>
+              <div class="nc9-lb-chef">Cheik Mbaye · Kensington</div>
+            </div>
+            <div class="nc9-buzz-bar-wrap">
+              <div class="nc9-buzz-bar-track"><div class="nc9-buzz-bar-fill" style="width:83%;background:#34d399"></div></div>
+              <div class="nc9-buzz-val" style="color:rgba(0,0,0,.4)">83</div>
+            </div>
+          </div>
+          <div class="nc9-lb-row" style="margin-top:8px">
+            <span class="nc9-lb-rank">3</span>
+            <div class="nc9-lb-name">
+              <div class="nc9-lb-rname">Laser Wolf</div>
+              <div class="nc9-lb-chef">Andrew Henshaw · Fishtown</div>
+            </div>
+            <div class="nc9-buzz-bar-wrap">
+              <div class="nc9-buzz-bar-track"><div class="nc9-buzz-bar-fill" style="width:88%;background:#34d399"></div></div>
+              <div class="nc9-buzz-val" style="color:rgba(0,0,0,.4)">88</div>
+            </div>
+          </div>
+          <div class="nc9-lb-row" style="margin-top:8px">
+            <span class="nc9-lb-rank">4</span>
+            <div class="nc9-lb-name">
+              <div class="nc9-lb-rname">Kalaya</div>
+              <div class="nc9-lb-chef">Nok Suntaranon · S. Philly</div>
+            </div>
+            <div class="nc9-buzz-bar-wrap">
+              <div class="nc9-buzz-bar-track"><div class="nc9-buzz-bar-fill" style="width:82%;background:#34d399"></div></div>
+              <div class="nc9-buzz-val" style="color:rgba(0,0,0,.4)">82</div>
+            </div>
+          </div>
+          <div class="nc9-lb-row" style="margin-top:8px">
+            <span class="nc9-lb-rank">5</span>
+            <div class="nc9-lb-name">
+              <div class="nc9-lb-rname">Fri Sat Sun</div>
+              <div class="nc9-lb-chef">Chad Williams · Rittenhouse</div>
+            </div>
+            <div class="nc9-buzz-bar-wrap">
+              <div class="nc9-buzz-bar-track"><div class="nc9-buzz-bar-fill" style="width:79%;background:#34d399"></div></div>
+              <div class="nc9-buzz-val" style="color:rgba(0,0,0,.4)">79</div>
+            </div>
+          </div>
+          <div class="nc9-lb-row" style="margin-top:8px">
+            <span class="nc9-lb-rank">6</span>
+            <div class="nc9-lb-name">
+              <div class="nc9-lb-rname">Suraya</div>
+              <div class="nc9-lb-chef">Nick Kennedy · Fishtown</div>
+            </div>
+            <div class="nc9-buzz-bar-wrap">
+              <div class="nc9-buzz-bar-track"><div class="nc9-buzz-bar-fill" style="width:76%;background:#fbbf24"></div></div>
+              <div class="nc9-buzz-val" style="color:rgba(0,0,0,.4)">76</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 2: Neighborhood Clusters -->
+      <div class="bgc" style="background:#fff;border-color:rgba(0,0,0,.08);">
+        <div class="bgc-title" style="color:rgba(0,0,0,.4);border-bottom-color:rgba(0,0,0,.06);">Neighborhood Clusters</div>
+        <div class="nc9-cluster-list">
+          <div class="nc9-cluster-item">
+            <div class="nc9-cluster-dot" style="background:#F97316"></div>
+            <div>
+              <div class="nc9-cluster-hood" style="color:#09090b">Fishtown</div>
+              <div class="nc9-cluster-count" style="color:rgba(0,0,0,.4)">4 restaurants · 5 edges</div>
+            </div>
+            <div class="nc9-cluster-density">
+              <div class="nc9-cluster-bar" style="background:rgba(249,115,22,.7);width:52px"></div>
+            </div>
+          </div>
+          <div class="nc9-cluster-item">
+            <div class="nc9-cluster-dot" style="background:#34d399"></div>
+            <div>
+              <div class="nc9-cluster-hood" style="color:#09090b">Rittenhouse</div>
+              <div class="nc9-cluster-count" style="color:rgba(0,0,0,.4)">2 restaurants · 1 edge</div>
+            </div>
+            <div class="nc9-cluster-density">
+              <div class="nc9-cluster-bar" style="background:rgba(52,211,153,.6);width:28px"></div>
+            </div>
+          </div>
+          <div class="nc9-cluster-item">
+            <div class="nc9-cluster-dot" style="background:#34d399"></div>
+            <div>
+              <div class="nc9-cluster-hood" style="color:#09090b">Kensington</div>
+              <div class="nc9-cluster-count" style="color:rgba(0,0,0,.4)">1 restaurant · 2 edges</div>
+            </div>
+            <div class="nc9-cluster-density">
+              <div class="nc9-cluster-bar" style="background:rgba(52,211,153,.5);width:20px"></div>
+            </div>
+          </div>
+          <div class="nc9-cluster-item">
+            <div class="nc9-cluster-dot" style="background:#FA2A52"></div>
+            <div>
+              <div class="nc9-cluster-hood" style="color:#09090b">Old City</div>
+              <div class="nc9-cluster-count" style="color:rgba(0,0,0,.4)">1 restaurant · 2 edges</div>
+            </div>
+            <div class="nc9-cluster-density">
+              <div class="nc9-cluster-bar" style="background:rgba(250,42,82,.5);width:16px"></div>
+            </div>
+          </div>
+          <div class="nc9-cluster-item" style="border:none">
+            <div class="nc9-cluster-dot" style="background:#34d399"></div>
+            <div>
+              <div class="nc9-cluster-hood" style="color:#09090b">South Philly</div>
+              <div class="nc9-cluster-count" style="color:rgba(0,0,0,.4)">1 restaurant · 2 edges</div>
+            </div>
+            <div class="nc9-cluster-density">
+              <div class="nc9-cluster-bar" style="background:rgba(52,211,153,.45);width:16px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 3: Editorial insight -->
+      <div class="bgc" style="background:#fff;border-color:rgba(0,0,0,.08);">
+        <div class="bgc-title" style="color:rgba(0,0,0,.4);border-bottom-color:rgba(0,0,0,.06);">This Week's Signal</div>
+        <div class="nc9-insight-card">
+          <div class="nc9-insight-eyebrow">Network Pulse · May 16</div>
+          <p class="nc9-insight-text">Fishtown continues to dominate Philly's connection density. The Vernick–Laser Wolf–Suraya triangle accounts for nearly half of all tracked relationships — reinforcing that the neighborhood functions as a self-referencing dining ecosystem where chef networks, suppliers, and regulars all overlap.</p>
+          <div class="nc9-insight-sig">— ForkFox Intelligence Engine</div>
+        </div>
+      </div>
+    </div><!-- /below-graph nc9 -->
+
+    <div class="pros-cons">
+      <div class="pros-cons-card pros" style="background:#fff;border-color:rgba(0,0,0,.08);">
+        <h4>Strengths</h4>
+        <ul>
+          <li>Most accessible — works in daylight, on editorial sites</li>
+          <li>Light bg signals trustworthiness and editorial quality</li>
+          <li>Pull-quote section elevates brand voice</li>
+          <li>Buzz bars are intuitive and instantly scannable</li>
+          <li>Clean contrast makes data hierarchy crisp</li>
+        </ul>
+      </div>
+      <div class="pros-cons-card cons" style="background:#fff;border-color:rgba(0,0,0,.08);">
+        <h4>Tradeoffs</h4>
+        <ul>
+          <li>Light mode fights the "intelligence dashboard" brand expectation</li>
+          <li>Node colors are less dramatic on white</li>
+          <li>Connection lines can get lost on light background</li>
+          <li>Less differentiated from generic charting tools</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     NC10 — ONYX
+     ================================================================ -->
+<section class="design-section" id="nc10">
+  <div class="section-inner">
+    <div class="concept-label">NC10</div>
+    <h2 class="section-title">Onyx</h2>
+    <p class="section-desc">The most premium variant. Node-color gradient connections, always-visible glass side panel, subtle float animation. Feels like a luxury data product — dark Apple, linear.app, or a Bloomberg terminal in a Michelin kitchen.</p>
+
+    <div class="preview-frame" style="background:#0c0c0f;border-color:rgba(255,255,255,.05);" id="nc10-frame">
+      <div class="nc10-layout">
+
+        <!-- SIDE PANEL -->
+        <div class="nc10-side-panel" id="nc10-panel">
+          <div class="nc10-panel-eyebrow">Network Intelligence</div>
+
+          <!-- Overview stats (shown by default) -->
+          <div id="nc10-overview" class="nc10-stat-row">
+            <div class="nc10-stat-item">
+              <div class="nc10-stat-label">Total Nodes</div>
+              <div class="nc10-stat-val">09</div>
+              <div class="nc10-stat-sub">restaurants tracked</div>
+            </div>
+            <div class="nc10-stat-item">
+              <div class="nc10-stat-label">Trending</div>
+              <div class="nc10-stat-val" style="color:#F97316">01</div>
+              <div class="nc10-stat-sub">Vernick Fish ↑</div>
+            </div>
+            <div class="nc10-stat-item">
+              <div class="nc10-stat-label">Rising</div>
+              <div class="nc10-stat-val" style="color:#34d399">04</div>
+              <div class="nc10-stat-sub">L.Wolf, Kalaya, Cheik, FSS</div>
+            </div>
+            <div class="nc10-stat-item">
+              <div class="nc10-stat-label">Network Energy</div>
+              <div class="nc10-stat-val">78</div>
+              <div class="nc10-stat-sub">weighted avg buzz</div>
+            </div>
+          </div>
+          <hr class="nc10-panel-divider">
+          <div style="font-family:var(--mono);font-size:8px;color:#3f3f46;line-height:1.6;">
+            Click any node to explore its restaurant profile and connections.
+          </div>
+
+          <!-- Restaurant detail (hidden until click) -->
+          <div id="nc10-detail" class="nc10-detail" style="margin-top:12px">
+            <div class="nc10-detail-name" id="nc10-d-name">—</div>
+            <div class="nc10-detail-hood" id="nc10-d-hood">—</div>
+            <div class="nc10-detail-score" id="nc10-d-score">—</div>
+            <div class="nc10-detail-score-label">Buzz Score</div>
+            <div class="nc10-detail-chef" id="nc10-d-chef">—</div>
+            <div id="nc10-d-chip" style="margin-bottom:12px"></div>
+            <div style="font-family:var(--mono);font-size:9px;color:#52525b;margin-bottom:6px;letter-spacing:.06em;text-transform:uppercase">Connections</div>
+            <div class="nc10-conn-list" id="nc10-d-conns"></div>
+            <button onclick="nc10ClearSelection()" style="margin-top:14px;font-family:var(--mono);font-size:8px;color:#52525b;background:none;border:1px solid rgba(255,255,255,.05);border-radius:3px;padding:4px 8px;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;">← Overview</button>
+          </div>
+        </div>
+
+        <!-- GRAPH AREA -->
+        <div class="nc10-graph-area">
+          <svg id="nc10-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"
+            style="width:100%;height:480px;display:block;cursor:default;">
+
+            <defs>
+              <!-- Radial glow overlay -->
+              <radialGradient id="nc10-bg-glow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(249,115,22,.03)"/>
+                <stop offset="100%" stop-color="transparent"/>
+              </radialGradient>
+              <!-- Per-connection gradient defs -->
+              <linearGradient id="grad-0-1" x1="22%" y1="28%" x2="30%" y2="20%" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#F97316"/>
+                <stop offset="100%" stop-color="#34d399"/>
+              </linearGradient>
+              <linearGradient id="grad-1-5" x1="30%" y1="20%" x2="66%" y2="38%" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#34d399"/>
+                <stop offset="100%" stop-color="#FA2A52"/>
+              </linearGradient>
+              <linearGradient id="grad-0-3" x1="22%" y1="28%" x2="18%" y2="42%" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#F97316"/>
+                <stop offset="100%" stop-color="#fbbf24"/>
+              </linearGradient>
+              <linearGradient id="grad-1-7" x1="30%" y1="20%" x2="12%" y2="35%" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#34d399"/>
+                <stop offset="100%" stop-color="#fbbf24"/>
+              </linearGradient>
+              <linearGradient id="grad-4-5" x1="52%" y1="52%" x2="66%" y2="38%" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#34d399"/>
+                <stop offset="100%" stop-color="#FA2A52"/>
+              </linearGradient>
+              <linearGradient id="grad-4-6" x1="52%" y1="52%" x2="58%" y2="62%" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#34d399"/>
+                <stop offset="100%" stop-color="#FA2A52"/>
+              </linearGradient>
+              <linearGradient id="grad-2-8" x1="20%" y1="72%" x2="68%" y2="72%" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#34d399"/>
+                <stop offset="100%" stop-color="#34d399"/>
+              </linearGradient>
+              <linearGradient id="grad-2-4" x1="20%" y1="72%" x2="52%" y2="52%" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#34d399"/>
+                <stop offset="100%" stop-color="#34d399"/>
+              </linearGradient>
+            </defs>
+
+            <!-- BG glow -->
+            <ellipse cx="50" cy="50" rx="50" ry="40" fill="url(#nc10-bg-glow)"/>
+
+            <!-- NEIGHBORHOOD LABELS -->
+            <text x="10" y="8" font-family="Courier New,monospace" font-size="2.2" fill="rgba(255,255,255,.035)" letter-spacing=".5">FISHTOWN</text>
+            <text x="46" y="48" font-family="Courier New,monospace" font-size="2" fill="rgba(255,255,255,.035)" letter-spacing=".4">CTR CITY</text>
+            <text x="63" y="35" font-family="Courier New,monospace" font-size="2" fill="rgba(255,255,255,.035)" letter-spacing=".4">OLD CITY</text>
+            <text x="10" y="80" font-family="Courier New,monospace" font-size="2" fill="rgba(255,255,255,.035)" letter-spacing=".4">S.PHILLY</text>
+            <text x="64" y="80" font-family="Courier New,monospace" font-size="2" fill="rgba(255,255,255,.035)" letter-spacing=".4">KENSINGTON</text>
+
+            <!-- CONNECTIONS with gradient stroke and dashflow animation -->
+            <line x1="22" y1="28" x2="30" y2="20" stroke="url(#grad-0-1)" stroke-width=".55" stroke-opacity=".42"
+              stroke-dasharray="3 2" style="animation:dashflow 4s linear infinite"/>
+            <line x1="30" y1="20" x2="66" y2="38" stroke="url(#grad-1-5)" stroke-width=".58" stroke-opacity=".46"
+              stroke-dasharray="3 2" style="animation:dashflow 3.5s linear infinite"/>
+            <line x1="22" y1="28" x2="18" y2="42" stroke="url(#grad-0-3)" stroke-width=".48" stroke-opacity=".38"
+              stroke-dasharray="3 2" style="animation:dashflow 5s linear infinite"/>
+            <line x1="30" y1="20" x2="12" y2="35" stroke="url(#grad-1-7)" stroke-width=".44" stroke-opacity=".34"
+              stroke-dasharray="3 2" style="animation:dashflow 4.5s linear infinite"/>
+            <line x1="52" y1="52" x2="66" y2="38" stroke="url(#grad-4-5)" stroke-width=".48" stroke-opacity=".36"
+              stroke-dasharray="3 2" style="animation:dashflow 5.5s linear infinite"/>
+            <line x1="52" y1="52" x2="58" y2="62" stroke="url(#grad-4-6)" stroke-width=".42" stroke-opacity=".3"
+              stroke-dasharray="3 2" style="animation:dashflow 6s linear infinite"/>
+            <line x1="20" y1="72" x2="68" y2="72" stroke="url(#grad-2-8)" stroke-width=".46" stroke-opacity=".34"
+              stroke-dasharray="3 2" style="animation:dashflow 4.2s linear infinite"/>
+            <line x1="20" y1="72" x2="52" y2="52" stroke="url(#grad-2-4)" stroke-width=".43" stroke-opacity=".3"
+              stroke-dasharray="3 2" style="animation:dashflow 5.8s linear infinite"/>
+
+            <!-- NODES with float animations -->
+            <!-- 0 Vernick Fish trending orange -->
+            <g class="nc10-node" data-idx="0" style="cursor:pointer;animation:floatA 4.2s ease-in-out infinite">
+              <circle cx="22" cy="28" r="3.5" fill="rgba(249,115,22,.18)" stroke="#F97316" stroke-width=".2" stroke-opacity=".6"
+                filter="drop-shadow(0 0 3px rgba(249,115,22,.25))"/>
+            </g>
+            <!-- 1 Laser Wolf rising green -->
+            <g class="nc10-node" data-idx="1" style="cursor:pointer;animation:floatB 3.8s ease-in-out infinite">
+              <circle cx="30" cy="20" r="3.0" fill="rgba(52,211,153,.15)" stroke="#34d399" stroke-width=".2" stroke-opacity=".55"
+                filter="drop-shadow(0 0 3px rgba(52,211,153,.2))"/>
+            </g>
+            <!-- 2 Kalaya rising green -->
+            <g class="nc10-node" data-idx="2" style="cursor:pointer;animation:floatC 4.6s ease-in-out infinite">
+              <circle cx="20" cy="72" r="2.5" fill="rgba(52,211,153,.15)" stroke="#34d399" stroke-width=".2" stroke-opacity=".55"
+                filter="drop-shadow(0 0 2.5px rgba(52,211,153,.2))"/>
+            </g>
+            <!-- 3 Suraya stable amber -->
+            <g class="nc10-node" data-idx="3" style="cursor:pointer;animation:floatD 5.1s ease-in-out infinite">
+              <circle cx="18" cy="42" r="2.5" fill="rgba(251,191,36,.15)" stroke="#fbbf24" stroke-width=".2" stroke-opacity=".55"
+                filter="drop-shadow(0 0 2.5px rgba(251,191,36,.18))"/>
+            </g>
+            <!-- 4 Friday Saturday Sunday rising green -->
+            <g class="nc10-node" data-idx="4" style="cursor:pointer;animation:floatE 4.0s ease-in-out infinite">
+              <circle cx="52" cy="52" r="2.5" fill="rgba(52,211,153,.15)" stroke="#34d399" stroke-width=".2" stroke-opacity=".55"
+                filter="drop-shadow(0 0 2.5px rgba(52,211,153,.2))"/>
+            </g>
+            <!-- 5 Zahav cooling red -->
+            <g class="nc10-node" data-idx="5" style="cursor:pointer;animation:floatA 5.4s ease-in-out infinite">
+              <circle cx="66" cy="38" r="1.8" fill="rgba(250,42,82,.15)" stroke="#FA2A52" stroke-width=".2" stroke-opacity=".55"
+                filter="drop-shadow(0 0 2px rgba(250,42,82,.2))"/>
+            </g>
+            <!-- 6 Parc cooling red -->
+            <g class="nc10-node" data-idx="6" style="cursor:pointer;animation:floatB 4.8s ease-in-out infinite">
+              <circle cx="58" cy="62" r="1.8" fill="rgba(250,42,82,.15)" stroke="#FA2A52" stroke-width=".2" stroke-opacity=".55"
+                filter="drop-shadow(0 0 2px rgba(250,42,82,.2))"/>
+            </g>
+            <!-- 7 Beddia stable amber -->
+            <g class="nc10-node" data-idx="7" style="cursor:pointer;animation:floatC 3.5s ease-in-out infinite">
+              <circle cx="12" cy="35" r="1.8" fill="rgba(251,191,36,.15)" stroke="#fbbf24" stroke-width=".2" stroke-opacity=".55"
+                filter="drop-shadow(0 0 2px rgba(251,191,36,.18))"/>
+            </g>
+            <!-- 8 Cheik rising green -->
+            <g class="nc10-node" data-idx="8" style="cursor:pointer;animation:floatD 4.3s ease-in-out infinite">
+              <circle cx="68" cy="72" r="2.5" fill="rgba(52,211,153,.15)" stroke="#34d399" stroke-width=".2" stroke-opacity=".55"
+                filter="drop-shadow(0 0 2.5px rgba(52,211,153,.2))"/>
+            </g>
+
+            <!-- Floating monospace labels rendered via HTML overlay (set by JS) -->
+          </svg>
+
+          <!-- Floating labels overlay (positioned by JS) -->
+          <div id="nc10-labels" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></div>
+
+          <div class="graph-hint" style="bottom:10px">click node to explore</div>
+        </div>
+      </div>
+    </div><!-- /preview-frame nc10 -->
+
+    <!-- BELOW GRAPH NC10 -->
+    <div class="below-graph three-col">
+      <!-- Col 1: Network Activity timeline -->
+      <div class="bgc">
+        <div class="bgc-title">Network Activity</div>
+        <div>
+          <div class="nc10-timeline-item">
+            <div class="nc10-tl-dot" style="background:#F97316"></div>
+            <div>
+              <div class="nc10-tl-text"><strong style="color:#e4e4e7">Vernick Fish ↔ Laser Wolf</strong> — strength up +3pts. New shared sommelier hire confirmed.</div>
+              <div class="nc10-tl-date">May 12, 2026</div>
+            </div>
+          </div>
+          <div class="nc10-timeline-item">
+            <div class="nc10-tl-dot" style="background:#34d399"></div>
+            <div>
+              <div class="nc10-tl-text"><strong style="color:#e4e4e7">Kalaya ↔ Cheik</strong> — new connection detected. Both featured in same spice-forward Inquirer piece.</div>
+              <div class="nc10-tl-date">May 10, 2026</div>
+            </div>
+          </div>
+          <div class="nc10-timeline-item">
+            <div class="nc10-tl-dot" style="background:#FA2A52"></div>
+            <div>
+              <div class="nc10-tl-text"><strong style="color:#e4e4e7">Zahav</strong> — buzz dipped 3pts. Extended renovation closure dampening guest cadence.</div>
+              <div class="nc10-tl-date">May 8, 2026</div>
+            </div>
+          </div>
+          <div class="nc10-timeline-item" style="border:none">
+            <div class="nc10-tl-dot" style="background:#fbbf24"></div>
+            <div>
+              <div class="nc10-tl-text"><strong style="color:#e4e4e7">Suraya ↔ Vernick</strong> — Iovine Bros supply chain co-op formalized. Link strength +5pts.</div>
+              <div class="nc10-tl-date">May 5, 2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Col 2: Strongest Cluster -->
+      <div class="bgc">
+        <div class="bgc-title">Fishtown Cluster</div>
+        <p style="font-family:var(--mono);font-size:9px;color:#52525b;margin-bottom:14px;line-height:1.6;">The tightest sub-network in PHL — 4 restaurants, 5 edges, 78% internal connection rate.</p>
+        <div style="font-family:var(--mono);font-size:10px;color:#e4e4e7;margin-bottom:12px;font-weight:700;">Vernick · Laser Wolf · Suraya · Beddia</div>
+        <div class="nc10-cluster-stat">
+          <span class="nc10-cluster-stat-label">Avg Buzz</span>
+          <span class="nc10-cluster-stat-val">82.3</span>
+        </div>
+        <div class="nc10-cluster-stat">
+          <span class="nc10-cluster-stat-label">Internal Edges</span>
+          <span class="nc10-cluster-stat-val">5 / 6 max</span>
+        </div>
+        <div class="nc10-cluster-stat">
+          <span class="nc10-cluster-stat-label">Strongest Link</span>
+          <span class="nc10-cluster-stat-val" style="color:#F97316">87 (V↔LW)</span>
+        </div>
+        <div class="nc10-cluster-stat">
+          <span class="nc10-cluster-stat-label">Chef Overlap</span>
+          <span class="nc10-cluster-stat-val">3 / 4 JBF alumni</span>
+        </div>
+        <div class="nc10-cluster-stat" style="border:none">
+          <span class="nc10-cluster-stat-label">Supplier Overlap</span>
+          <span class="nc10-cluster-stat-val">Iovine Bros shared</span>
+        </div>
+      </div>
+
+      <!-- Col 3: Emerging Links -->
+      <div class="bgc">
+        <div class="bgc-title">Emerging Links</div>
+        <div class="nc10-emerging-card">
+          <div class="nc10-emerging-pair">Kalaya ↔ Cheik</div>
+          <div>
+            <span class="nc10-emerging-str">76</span>
+            <span class="nc10-emerging-trend">▲ +8</span>
+          </div>
+          <div class="nc10-emerging-reason">Diaspora cooking, spice-forward menus — editorial pairing gaining traction</div>
+        </div>
+        <div class="nc10-emerging-card">
+          <div class="nc10-emerging-pair">Fri Sat Sun ↔ Zahav</div>
+          <div>
+            <span class="nc10-emerging-str">78</span>
+            <span class="nc10-emerging-trend">▲ +5</span>
+          </div>
+          <div class="nc10-emerging-reason">Both top James Beard winners — guest crossover increasing on OpenTable</div>
+        </div>
+        <div class="nc10-emerging-card">
+          <div class="nc10-emerging-pair">Suraya ↔ Vernick</div>
+          <div>
+            <span class="nc10-emerging-str">79</span>
+            <span class="nc10-emerging-trend">▲ +5</span>
+          </div>
+          <div class="nc10-emerging-reason">Supply chain co-op formalized — Iovine Bros link now structural</div>
+        </div>
+      </div>
+    </div><!-- /below-graph nc10 -->
+
+    <div class="pros-cons">
+      <div class="pros-cons-card pros">
+        <h4>Strengths</h4>
+        <ul>
+          <li>Most visually premium of all variants — luxury product feel</li>
+          <li>Gradient connections are unique — no other food data product does this</li>
+          <li>Always-visible panel eliminates click-to-discover friction</li>
+          <li>Float animation adds life without being distracting</li>
+          <li>Click-to-select is intuitive and instantly informative</li>
+        </ul>
+      </div>
+      <div class="pros-cons-card cons">
+        <h4>Tradeoffs</h4>
+        <ul>
+          <li>Most complex to build and maintain of the three variants</li>
+          <li>Float animation may distract analytical users</li>
+          <li>Side panel takes graph horizontal space on narrow viewports</li>
+          <li>Gradient edges harder to distinguish at small sizes</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     JS
+     ================================================================ -->
+<script>
+// ── SHARED DATA ──────────────────────────────────────────────────
+const RESTAURANTS = [
+  { idx:0, name:"Vernick Fish",           short:"Vernick",    cx:22, cy:28, r:3.5, status:"trending", color:"#F97316", buzz:94, hood:"Fishtown",    price:"$$$$", chef:"Greg Vernick" },
+  { idx:1, name:"Laser Wolf",             short:"L.Wolf",     cx:30, cy:20, r:3.0, status:"rising",   color:"#34d399", buzz:88, hood:"Fishtown",    price:"$$$",  chef:"Andrew Henshaw" },
+  { idx:2, name:"Kalaya",                 short:"Kalaya",     cx:20, cy:72, r:2.5, status:"rising",   color:"#34d399", buzz:82, hood:"S. Philly",   price:"$$$",  chef:"Nok Suntaranon" },
+  { idx:3, name:"Suraya",                 short:"Suraya",     cx:18, cy:42, r:2.5, status:"stable",   color:"#fbbf24", buzz:76, hood:"Fishtown",    price:"$$$",  chef:"Nick Kennedy" },
+  { idx:4, name:"Friday Saturday Sunday", short:"FriSatSun",  cx:52, cy:52, r:2.5, status:"rising",   color:"#34d399", buzz:79, hood:"Rittenhouse", price:"$$$$", chef:"Chad Williams" },
+  { idx:5, name:"Zahav",                  short:"Zahav",      cx:66, cy:38, r:1.8, status:"cooling",  color:"#FA2A52", buzz:61, hood:"Old City",    price:"$$$$", chef:"Michael Solomonov" },
+  { idx:6, name:"Parc",                   short:"Parc",       cx:58, cy:62, r:1.8, status:"cooling",  color:"#FA2A52", buzz:58, hood:"Rittenhouse", price:"$$$",  chef:"Stephen Starr" },
+  { idx:7, name:"Pizzeria Beddia",        short:"Beddia",     cx:12, cy:35, r:1.8, status:"stable",   color:"#fbbf24", buzz:71, hood:"Fishtown",    price:"$$",   chef:"Joe Beddia" },
+  { idx:8, name:"Cheik",                  short:"Cheik",      cx:68, cy:72, r:2.5, status:"rising",   color:"#34d399", buzz:83, hood:"Kensington",  price:"$$",   chef:"Cheik Mbaye" },
+];
+
+const CONNECTIONS = [
+  { a:0, b:1, strength:87, topReason:'Chef Network',    detail:'Both James Beard Philly alumni' },
+  { a:1, b:5, strength:92, topReason:'Restaurant Group',detail:'Both CookNSolo — same owner, supply chain' },
+  { a:0, b:3, strength:79, topReason:'Shared Suppliers',detail:'Iovine Bros and Fishtown co-ops' },
+  { a:1, b:7, strength:74, topReason:'Guest Overlap',   detail:'Fishtown crowd bounces between both' },
+  { a:4, b:5, strength:78, topReason:'Chef Network',    detail:"Philly's two top James Beard winners" },
+  { a:4, b:6, strength:69, topReason:'Guest Overlap',   detail:'Rittenhouse regulars split between both' },
+  { a:2, b:8, strength:76, topReason:'Menu Philosophy', detail:'Diaspora cooking, spice-forward' },
+  { a:2, b:4, strength:71, topReason:'Chef Network',    detail:'Co-taught at James Beard Benefit Dinner' },
+];
+
+function getConnections(idx) {
+  return CONNECTIONS.filter(c => c.a === idx || c.b === idx).map(c => {
+    const other = c.a === idx ? c.b : c.a;
+    return { restaurant: RESTAURANTS[other], strength: c.strength, reason: c.topReason, detail: c.detail };
+  });
+}
+
+// ── NC8 INTERACTIONS ──────────────────────────────────────────────
+(function() {
+  const frame   = document.getElementById('nc8-frame');
+  const svg     = document.getElementById('nc8-svg');
+  const card    = document.getElementById('nc8-hover-card');
+  const hint    = document.getElementById('nc8-hint');
+  const nodes   = document.querySelectorAll('.nc8-node');
+
+  // Node rect element refs
+  const rects = [0,1,2,3,4,5,6,7,8].map(i => document.getElementById('nc8-n'+i));
+
+  // Original strokes
+  const origStrokes = RESTAURANTS.map(r => ({ stroke: r.color, opacity: '0.8', fill: r.color.replace('#','rgba(').replace(')',', .12)') }));
+
+  function showCard(r, x, y) {
+    document.getElementById('nc8-hc-name').textContent = r.name;
+    document.getElementById('nc8-hc-score').textContent = r.buzz;
+    document.getElementById('nc8-hc-hood').textContent = r.hood + '  ·  ' + r.price;
+    document.getElementById('nc8-hc-chef').textContent = r.chef;
+    document.getElementById('nc8-hc-price').textContent = r.status.toUpperCase();
+
+    const conns = getConnections(r.idx);
+    const connEl = document.getElementById('nc8-hc-conns');
+    connEl.innerHTML = conns.map(c =>
+      `<div class="hc-conn-row">
+        <span>${c.restaurant.short}</span>
+        <span class="hc-conn-str">${c.strength}</span>
+        <span style="font-family:var(--mono);font-size:8px;color:#52525b">${c.reason}</span>
+      </div>`
+    ).join('');
+
+    // Position
+    const frameRect = frame.getBoundingClientRect();
+    const svgRect   = svg.getBoundingClientRect();
+    const scaleX    = svgRect.width  / 100;
+    const scaleY    = svgRect.height / 100;
+    let px = svgRect.left - frameRect.left + r.cx * scaleX + 12;
+    let py = svgRect.top  - frameRect.top  + r.cy * scaleY - 20;
+
+    // Clamp
+    const cardW = 228, cardH = 200;
+    const fw = frame.offsetWidth, fh = frame.offsetHeight;
+    if (px + cardW > fw - 8) px = fw - cardW - 8;
+    if (py + cardH > fh - 8) py = fh - cardH - 8;
+    if (py < 8) py = 8;
+
+    card.style.left = px + 'px';
+    card.style.top  = py + 'px';
+    card.classList.add('visible');
+    hint.style.opacity = '0';
+  }
+
+  function hideCard() {
+    card.classList.remove('visible');
+    hint.style.opacity = '1';
+  }
+
+  function highlightNode(rect, r) {
+    rect.setAttribute('stroke-width', '.35');
+    rect.setAttribute('fill', r.color + '33');
+    rect.style.filter = 'drop-shadow(0 0 2px ' + r.color + '55)';
+  }
+
+  function resetNode(rect, r) {
+    rect.setAttribute('stroke-width', '.15');
+    rect.setAttribute('fill', r.color + '1e');
+    rect.style.filter = 'none';
+  }
+
+  nodes.forEach((g, i) => {
+    const r = RESTAURANTS[i];
+    const rect = rects[i];
+    g.addEventListener('mouseenter', function(e) {
+      highlightNode(rect, r);
+      showCard(r, r.cx, r.cy);
+    });
+    g.addEventListener('mouseleave', function() {
+      resetNode(rect, r);
+      hideCard();
+    });
+  });
+})();
+
+// ── NC9 INTERACTIONS ──────────────────────────────────────────────
+(function() {
+  const frame  = document.getElementById('nc9-frame');
+  const svg    = document.getElementById('nc9-svg');
+  const card   = document.getElementById('nc9-hover-card');
+  const hint   = document.getElementById('nc9-hint');
+  const nodes  = document.querySelectorAll('.nc9-node');
+  const circles = [0,1,2,3,4,5,6,7,8].map(i => document.getElementById('nc9-n'+i));
+
+  const STATUS_COLORS = { trending:'#F97316', rising:'#34d399', stable:'#fbbf24', cooling:'#FA2A52' };
+
+  function showCard(r) {
+    document.getElementById('nc9-hc-name').textContent  = r.name;
+    document.getElementById('nc9-hc-score').textContent = r.buzz;
+    document.getElementById('nc9-hc-hood').textContent  = r.hood + '  ·  ' + r.price;
+    document.getElementById('nc9-hc-chef').textContent  = r.chef;
+    const chipEl = document.getElementById('nc9-d-chip') || document.getElementById('nc9-hc-chip');
+    document.getElementById('nc9-hc-chip').innerHTML =
+      `<span class="chip ${r.status}">${r.status}</span>`;
+
+    const svgRect   = svg.getBoundingClientRect();
+    const frameRect = frame.getBoundingClientRect();
+    const scaleX = svgRect.width  / 100;
+    const scaleY = svgRect.height / 100;
+    let px = svgRect.left - frameRect.left + r.cx * scaleX + 14;
+    let py = svgRect.top  - frameRect.top  + r.cy * scaleY - 16;
+
+    const cardW = 220, cardH = 160;
+    const fw = frame.offsetWidth, fh = frame.offsetHeight;
+    if (px + cardW > fw - 8) px = fw - cardW - 8;
+    if (py + cardH > fh - 8) py = fh - cardH - 8;
+    if (py < 8) py = 8;
+
+    card.style.left = px + 'px';
+    card.style.top  = py + 'px';
+    card.classList.add('visible');
+    hint.style.opacity = '0';
+  }
+
+  function hideCard() {
+    card.classList.remove('visible');
+    hint.style.opacity = '1';
+  }
+
+  nodes.forEach((g, i) => {
+    const r   = RESTAURANTS[i];
+    const cir = circles[i];
+    g.addEventListener('mouseenter', function() {
+      cir.setAttribute('fill', r.color + '28');
+      cir.setAttribute('stroke-opacity', '.9');
+      cir.style.filter = 'drop-shadow(0 1px 4px rgba(0,0,0,.15))';
+      showCard(r);
+    });
+    g.addEventListener('mouseleave', function() {
+      cir.setAttribute('fill', r.color + '1a');
+      cir.setAttribute('stroke-opacity', '.65');
+      cir.style.filter = 'none';
+      hideCard();
+    });
+  });
+})();
+
+// ── NC10 INTERACTIONS ─────────────────────────────────────────────
+(function() {
+  const svg       = document.getElementById('nc10-svg');
+  const frame     = document.getElementById('nc10-frame');
+  const graphArea = document.querySelector('.nc10-graph-area');
+  const labelsDiv = document.getElementById('nc10-labels');
+  const nodes     = document.querySelectorAll('.nc10-node');
+  const circles   = nodes;
+
+  let selectedIdx = null;
+
+  // Build floating labels
+  function buildLabels() {
+    labelsDiv.innerHTML = '';
+    RESTAURANTS.forEach(r => {
+      const svgRect   = svg.getBoundingClientRect();
+      const gaRect    = graphArea.getBoundingClientRect();
+      const scaleX = svgRect.width  / 100;
+      const scaleY = svgRect.height / 100;
+      const px = svgRect.left - gaRect.left + r.cx * scaleX;
+      const py = svgRect.top  - gaRect.top  + r.cy * scaleY - r.r * scaleY - 8;
+
+      const lbl = document.createElement('div');
+      lbl.className = 'nc10-node-label';
+      lbl.textContent = r.short;
+      lbl.style.left = px + 'px';
+      lbl.style.top  = py + 'px';
+      labelsDiv.appendChild(lbl);
+    });
+  }
+
+  // Debounced resize
+  let resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(buildLabels, 150);
+  });
+
+  // Init labels after a small delay to let layout settle
+  setTimeout(buildLabels, 100);
+
+  function showDetail(r) {
+    document.getElementById('nc10-overview').style.display = 'none';
+    document.getElementById('nc10-detail').style.display = 'block';
+    document.getElementById('nc10-detail').classList.add('active');
+    document.getElementById('nc10-d-name').textContent = r.name;
+    document.getElementById('nc10-d-hood').textContent = r.hood + ' · ' + r.price;
+    document.getElementById('nc10-d-score').textContent = r.buzz;
+    document.getElementById('nc10-d-chef').textContent = r.chef;
+    document.getElementById('nc10-d-chip').innerHTML = `<span class="chip ${r.status}">${r.status}</span>`;
+
+    const conns = getConnections(r.idx);
+    document.getElementById('nc10-d-conns').innerHTML = conns.map(c =>
+      `<div class="nc10-conn-item">
+        <div>
+          <div class="nc10-conn-item-name">${c.restaurant.short}</div>
+          <div class="nc10-conn-item-reason">${c.reason}</div>
+        </div>
+        <div class="nc10-conn-item-str">${c.strength}</div>
+      </div>`
+    ).join('');
+  }
+
+  window.nc10ClearSelection = function() {
+    selectedIdx = null;
+    document.getElementById('nc10-overview').style.display = 'flex';
+    document.getElementById('nc10-detail').style.display = 'none';
+    document.getElementById('nc10-detail').classList.remove('active');
+    // Reset all node opacities
+    nodes.forEach(g => {
+      const cir = g.querySelector('circle');
+      if (cir) { cir.setAttribute('stroke-opacity', '.6'); cir.setAttribute('fill-opacity', '1'); }
+    });
+  };
+
+  nodes.forEach((g, i) => {
+    const r = RESTAURANTS[i];
+    const cir = g.querySelector('circle');
+
+    g.addEventListener('click', function(e) {
+      e.stopPropagation();
+      selectedIdx = i;
+      showDetail(r);
+      // Dim other nodes
+      nodes.forEach((ng, ni) => {
+        const nc = ng.querySelector('circle');
+        if (!nc) return;
+        if (ni === i) {
+          nc.setAttribute('stroke-opacity', '.9');
+        } else {
+          nc.setAttribute('stroke-opacity', '.25');
+        }
+      });
+    });
+
+    g.addEventListener('mouseenter', function() {
+      if (selectedIdx !== i) {
+        cir.setAttribute('stroke-opacity', '.85');
+        cir.style.cursor = 'pointer';
+      }
+    });
+
+    g.addEventListener('mouseleave', function() {
+      if (selectedIdx !== i) {
+        cir.setAttribute('stroke-opacity', selectedIdx === null ? '.6' : '.25');
+      }
+    });
+  });
+
+  // Click outside to deselect
+  svg.addEventListener('click', function(e) {
+    if (!e.target.closest('.nc10-node')) {
+      nc10ClearSelection();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

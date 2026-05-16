@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForkFox Pulse · Trend Chart Gallery R2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --border: rgba(255,255,255,.08);
+  --orange: #F97316;
+  --red: #FA2A52;
+  --green: #34d399;
+  --amber: #fbbf24;
+  --blue: #60a5fa;
+  --purple: #a855f7;
+  --text: #e5e5e5;
+  --text-muted: rgba(255,255,255,.4);
+  --text-dim: rgba(255,255,255,.22);
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; min-height: 100vh; }
+
+/* NAV */
+.sticky-nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(10,10,10,.92); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 52px;
+}
+.nav-brand { font-family: 'Geologica', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: -.02em; white-space: nowrap; }
+.nav-brand span { color: var(--orange); }
+.nav-center { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+.nav-links { display: flex; gap: 6px; list-style: none; }
+.nav-links a { display: inline-block; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); color: var(--text-muted); text-decoration: none; font-size: 12px; font-weight: 500; letter-spacing: .02em; transition: all .2s ease; }
+.nav-links a:hover { color: var(--text); border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.04); }
+
+/* PAGE */
+.page-wrap { max-width: 1140px; margin: 0 auto; padding: 64px 24px 120px; }
+.page-header { margin-bottom: 72px; }
+.page-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--orange); margin-bottom: 12px; }
+.page-title { font-family: 'Geologica', sans-serif; font-size: clamp(28px,4vw,42px); font-weight: 800; letter-spacing: -.03em; line-height: 1.15; margin-bottom: 16px; }
+.page-desc { font-size: 15px; color: var(--text-muted); max-width: 560px; line-height: 1.7; }
+
+/* SECTION */
+.chart-section { margin-bottom: 100px; scroll-margin-top: 68px; }
+.section-label { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; }
+.section-label .tag { font-family: 'Geologica', sans-serif; font-weight: 700; font-size: 12px; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,.06); border: 1px solid var(--border); color: var(--text-muted); letter-spacing: .04em; }
+.section-label .updated-chip { font-size: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(249,115,22,.12); border: 1px solid rgba(249,115,22,.3); color: var(--orange); letter-spacing: .06em; }
+.section-title { font-family: 'Geologica', sans-serif; font-size: clamp(20px,2.5vw,28px); font-weight: 700; letter-spacing: -.025em; margin-bottom: 8px; }
+.section-desc { font-size: 14px; color: var(--text-muted); max-width: 620px; line-height: 1.7; margin-bottom: 28px; }
+
+.preview-frame { border-radius: 16px; border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px; position: relative; }
+.chart-svg-wrap { position: relative; width: 100%; }
+
+/* EVENT CARD */
+.event-card {
+  position: absolute; pointer-events: none; z-index: 100;
+  background: rgba(10,10,14,.88); backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,.1); border-radius: 8px;
+  padding: 10px 14px; max-width: 200px; min-width: 160px;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity .2s ease, transform .2s ease;
+  box-shadow: 0 8px 32px rgba(0,0,0,.6);
+}
+.event-card.visible { opacity: 1; transform: translateY(0); }
+.event-card-stem { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 1px; height: 8px; background: rgba(255,255,255,.2); }
+.event-card-type { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 2px 6px; border-radius: 10px; margin-bottom: 6px; }
+.event-card-week { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
+.event-card-headline { font-size: 11px; font-weight: 600; line-height: 1.4; color: var(--text); margin-bottom: 6px; }
+.event-card-impact { font-size: 12px; font-weight: 700; }
+.event-card-restaurants { font-size: 10px; color: var(--text-muted); margin-top: 4px; line-height: 1.3; }
+
+/* CROSSHAIR */
+.crosshair-line { stroke: rgba(255,255,255,.15); stroke-width: 1; stroke-dasharray: 4,3; pointer-events: none; }
+
+/* BELOW CHART GRID */
+.below-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; padding: 0 4px; }
+.below-col { }
+.below-col-title { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+
+/* metric chips */
+.city-metrics { display: flex; flex-direction: column; gap: 8px; }
+.city-block { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.city-block-name { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
+.metric-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.metric-chip { font-size: 10px; padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,.04); border: 1px solid var(--border); color: var(--text-muted); }
+.metric-chip.highlight { color: var(--text); }
+
+/* event timeline */
+.event-list { display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; }
+.event-list::-webkit-scrollbar { width: 3px; }
+.event-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+.event-item { display: flex; gap: 8px; align-items: flex-start; }
+.event-dot-sm { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.event-item-content { flex: 1; }
+.event-item-type { font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 2px; }
+.event-item-text { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+
+/* insights */
+.insight-list { display: flex; flex-direction: column; gap: 10px; }
+.insight-item { font-size: 12px; color: var(--text-muted); line-height: 1.6; padding-left: 12px; border-left: 2px solid rgba(255,255,255,.08); }
+.insight-item.accent { border-left-color: var(--orange); color: var(--text); }
+
+/* pulse log */
+.pulse-log { display: flex; flex-direction: column; gap: 6px; }
+.log-row { display: flex; align-items: center; gap: 8px; font-size: 11px; padding: 6px 10px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); }
+.log-day { font-size: 10px; color: var(--text-dim); width: 44px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.log-buzz { font-size: 12px; font-weight: 700; color: #00ff88; width: 28px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.log-text { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
+
+/* momentum */
+.momentum-block { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 10px; }
+.momentum-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
+.momentum-values { display: flex; gap: 16px; align-items: center; }
+.momentum-num { font-size: 24px; font-weight: 800; font-family: 'Geologica', sans-serif; color: #00ff88; }
+.momentum-sub { font-size: 11px; color: var(--text-muted); }
+
+/* needle rank */
+.needle-list { display: flex; flex-direction: column; gap: 8px; }
+.needle-row { display: flex; align-items: center; gap: 10px; }
+.needle-type { font-size: 10px; font-weight: 600; width: 70px; }
+.needle-bar-wrap { flex: 1; height: 4px; background: rgba(255,255,255,.06); border-radius: 2px; }
+.needle-bar { height: 4px; border-radius: 2px; }
+.needle-val { font-size: 11px; font-weight: 700; width: 32px; text-align: right; }
+
+/* layer table */
+.layer-table { width: 100%; border-collapse: collapse; }
+.layer-table th { font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--border); }
+.layer-table td { font-size: 11px; padding: 7px 6px; border-bottom: 1px solid rgba(255,255,255,.04); vertical-align: top; }
+.layer-name { font-weight: 600; }
+
+/* stacked breakdown */
+.stacked-breakdown { display: flex; flex-direction: column; gap: 10px; }
+.stacked-day { }
+.stacked-day-label { font-size: 10px; color: var(--text-dim); margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+.stacked-bars { display: flex; height: 14px; border-radius: 3px; overflow: hidden; gap: 1px; }
+.stacked-bar { height: 100%; }
+
+/* metric summaries */
+.metric-sum-table { display: flex; flex-direction: column; gap: 8px; }
+.metric-sum-row { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; }
+.metric-sum-name { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
+.metric-sum-values { display: flex; gap: 12px; }
+.metric-sum-kv { text-align: center; }
+.metric-sum-k { font-size: 9px; color: var(--text-dim); display: block; }
+.metric-sum-v { font-size: 13px; font-weight: 700; display: block; font-variant-numeric: tabular-nums; }
+
+/* lag card */
+.lag-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin-bottom: 10px; }
+.lag-bars { display: flex; gap: 6px; margin: 12px 0 8px; }
+.lag-bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.lag-bar-fill { width: 28px; border-radius: 3px; }
+.lag-bar-label { font-size: 9px; color: var(--text-dim); }
+
+/* sentiment */
+.sentiment-list { display: flex; flex-direction: column; gap: 10px; }
+.sentiment-item { padding: 8px 10px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); }
+.sentiment-date { font-size: 9px; color: var(--text-dim); margin-bottom: 4px; }
+.sentiment-text { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+
+/* TC5-TC7 shadcn style */
+.shadcn-frame { border-radius: 12px; border: 1px solid rgba(255,255,255,.07); overflow: hidden; margin-bottom: 24px; position: relative; }
+.stat-strip { display: flex; gap: 0; }
+.stat-strip-item { flex: 1; padding: 14px 18px; border-right: 1px solid rgba(255,255,255,.06); }
+.stat-strip-item:last-child { border-right: none; }
+.stat-strip-label { font-size: 9px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.3); margin-bottom: 4px; font-family: 'Inter', monospace; }
+.stat-strip-value { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.02em; font-family: monospace; }
+.stat-strip-value.orange { color: #F97316; }
+
+.shadcn-event-log { display: flex; flex-direction: column; gap: 0; }
+.shadcn-log-row { display: flex; gap: 0; align-items: stretch; padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,.04); }
+.shadcn-log-row:last-child { border-bottom: none; }
+.shadcn-log-accent { width: 2px; border-radius: 1px; flex-shrink: 0; margin-right: 10px; }
+.shadcn-log-text { flex: 1; }
+.shadcn-log-rest { font-size: 10px; color: rgba(255,255,255,.3); font-variant-numeric: tabular-nums; margin-bottom: 2px; font-family: monospace; }
+.shadcn-log-headline { font-size: 11px; color: rgba(255,255,255,.7); line-height: 1.3; margin-bottom: 2px; }
+.shadcn-log-impact { font-size: 11px; font-weight: 700; font-family: monospace; }
+
+.analyst-note { font-size: 12px; color: rgba(255,255,255,.5); line-height: 1.7; font-style: italic; }
+
+/* TC6 momentum card */
+.momentum-hero { background: #0d0d12; border: 1px solid rgba(255,255,255,.07); border-radius: 8px; padding: 20px; margin-bottom: 10px; }
+.momentum-hero-num { font-size: 56px; font-weight: 900; font-family: 'Geologica', sans-serif; color: #F97316; line-height: 1; margin-bottom: 4px; }
+.momentum-hero-label { font-size: 12px; color: rgba(255,255,255,.4); }
+.momentum-arrow { display: inline-block; color: #34d399; margin-right: 4px; }
+
+.top-events-list { display: flex; flex-direction: column; gap: 10px; }
+.top-event-card { background: #0d0d12; border: 1px solid rgba(255,255,255,.07); border-radius: 8px; padding: 12px; }
+.top-event-type { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; }
+.top-event-num { font-size: 22px; font-weight: 800; font-family: 'Geologica', sans-serif; line-height: 1; margin-bottom: 4px; }
+.top-event-text { font-size: 11px; color: rgba(255,255,255,.5); line-height: 1.3; }
+
+.bullet-insights { display: flex; flex-direction: column; gap: 8px; }
+.bullet-insight { display: flex; gap: 8px; font-size: 12px; color: rgba(255,255,255,.55); line-height: 1.5; }
+.bullet-dot { width: 4px; height: 4px; border-radius: 50%; background: #F97316; flex-shrink: 0; margin-top: 8px; }
+
+/* TC7 city legend strip */
+.city-legend-strip { display: flex; gap: 8px; padding: 8px 12px; background: rgba(255,255,255,.02); border-top: 1px solid rgba(255,255,255,.05); }
+.city-pill { font-size: 10px; font-family: monospace; font-weight: 600; padding: 3px 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,.08); }
+
+/* TC7 below */
+.city-compare-table { width: 100%; border-collapse: collapse; }
+.city-compare-table th { font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.25); text-align: left; padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,.06); }
+.city-compare-table td { font-size: 11px; padding: 7px 6px; border-bottom: 1px solid rgba(255,255,255,.03); font-variant-numeric: tabular-nums; }
+
+.ranking-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 4px; }
+.ranking-header { font-size: 9px; color: rgba(255,255,255,.25); text-align: center; padding: 4px 2px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.ranking-cell { font-size: 11px; font-family: monospace; font-weight: 600; text-align: center; padding: 5px 2px; border-radius: 3px; background: rgba(255,255,255,.03); }
+
+.phl-thesis { display: flex; flex-direction: column; gap: 10px; }
+.phl-thesis-item { font-size: 12px; line-height: 1.6; color: rgba(255,255,255,.6); padding: 10px 12px; border-left: 2px solid #F97316; background: rgba(249,115,22,.04); border-radius: 0 6px 6px 0; }
+
+/* shadcn event cards */
+.shadcn-event-card {
+  position: absolute; pointer-events: none; z-index: 100;
+  background: #18181b; border: 1px solid rgba(255,255,255,.1); border-radius: 6px;
+  padding: 8px 12px; max-width: 190px; min-width: 150px;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity .2s ease, transform .2s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,.6);
+}
+.shadcn-event-card.visible { opacity: 1; transform: translateY(0); }
+.shadcn-event-card .event-card-type { border-radius: 3px; }
+.shadcn-event-card .event-card-impact { font-family: monospace; }
+
+/* DIVIDERS */
+.r2-divider { border: none; border-top: 1px solid var(--border); margin: 60px 0; }
+
+/* TC2U pulse counter */
+.pulse-counter-wrap { position: absolute; top: 16px; right: 60px; text-align: right; pointer-events: none; }
+.pulse-counter-label { font-size: 9px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: rgba(0,255,136,.5); }
+.pulse-counter-num { font-family: 'Geologica', sans-serif; font-size: 36px; font-weight: 900; color: #00ff88; letter-spacing: -.04em; line-height: 1; }
+
+/* layer toggles */
+.layer-toggles { display: flex; gap: 8px; margin-bottom: 12px; }
+.layer-toggle-btn { padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--text-muted); font-size: 11px; font-weight: 500; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 6px; }
+.layer-toggle-btn.active { color: var(--text); border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.08); }
+.layer-toggle-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* scrollable below */
+@media (max-width: 768px) {
+  .below-grid { grid-template-columns: 1fr; }
+  .sticky-nav { padding: 0 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="sticky-nav">
+  <div class="nav-brand">Fork<span>Fox</span> Pulse</div>
+  <div class="nav-center">Trend Charts R2</div>
+  <ul class="nav-links">
+    <li><a href="chart-gallery.html">Chart Gallery</a></li>
+    <li><a href="node-gallery-r5.html">Node Graphs</a></li>
+    <li><a href="index.html">Hub</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+
+<div class="page-header">
+  <div class="page-eyebrow">ForkFox Pulse · Design System</div>
+  <h1 class="page-title">Trend Chart Gallery — Round 2</h1>
+  <p class="page-desc">Intelligent data points: every dot now carries context. Hover any event marker to see the story behind the movement — who opened, what won, why the city buzzed. Plus three new shadcn-sharp charts for TC5–TC7.</p>
+</div>
+
+<!-- ═══════════════════════════════ TC1U ═══════════════════════════════ -->
+<section class="chart-section" id="tc1u">
+  <div class="section-label">
+    <span class="tag">TC1U</span>
+    <span class="updated-chip">UPDATED</span>
+    City Lines Updated
+  </div>
+  <h2 class="section-title">Three Cities, Every Story</h2>
+  <p class="section-desc">PHL, SF, NYC trend lines. Hover any colored event dot to reveal what moved the market that week. Crosshair shows all three city values in real time.</p>
+
+  <div class="preview-frame">
+    <div class="chart-svg-wrap" id="tc1u-wrap" style="background:#111;">
+      <svg id="tc1u-svg" viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;"></svg>
+      <div id="tc1u-card" class="event-card"></div>
+    </div>
+  </div>
+
+  <div class="below-grid">
+    <div class="below-col">
+      <div class="below-col-title">City Comparison</div>
+      <div class="city-metrics">
+        <div class="city-block">
+          <div class="city-block-name" style="color:#22d3ee;">Philadelphia</div>
+          <div class="metric-chips">
+            <div class="metric-chip highlight">Buzz 88</div>
+            <div class="metric-chip highlight" style="color:#34d399;">+46 pts</div>
+            <div class="metric-chip">Laser Wolf opens</div>
+          </div>
+        </div>
+        <div class="city-block">
+          <div class="city-block-name" style="color:#a855f7;">San Francisco</div>
+          <div class="metric-chips">
+            <div class="metric-chip highlight">Buzz 48</div>
+            <div class="metric-chip" style="color:#FA2A52;">+10 pts</div>
+            <div class="metric-chip">Omakase boom</div>
+          </div>
+        </div>
+        <div class="city-block">
+          <div class="city-block-name" style="color:#60a5fa;">New York</div>
+          <div class="metric-chips">
+            <div class="metric-chip highlight">Buzz 80</div>
+            <div class="metric-chip highlight" style="color:#34d399;">+15 pts</div>
+            <div class="metric-chip">Le Bernardin surge</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="below-col">
+      <div class="below-col-title">Event Timeline</div>
+      <div class="event-list">
+        <div class="event-item">
+          <div class="event-dot-sm" style="background:#34d399;"></div>
+          <div class="event-item-content">
+            <div class="event-item-type" style="color:#34d399;">Opening · Day 14 · PHL</div>
+            <div class="event-item-text">Laser Wolf Kensington opens to sold-out reservations</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-dot-sm" style="background:#fbbf24;"></div>
+          <div class="event-item-content">
+            <div class="event-item-type" style="color:#fbbf24;">Award · Day 28 · PHL</div>
+            <div class="event-item-text">Vernick Fish named Bon Appétit Restaurant of the Year</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-dot-sm" style="background:#60a5fa;"></div>
+          <div class="event-item-content">
+            <div class="event-item-type" style="color:#60a5fa;">Trend · Day 35 · SF</div>
+            <div class="event-item-text">Japanese-omakase boom: 7 new spots in 30 days</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-dot-sm" style="background:#60a5fa;"></div>
+          <div class="event-item-content">
+            <div class="event-item-type" style="color:#60a5fa;">Trend · Day 42 · PHL</div>
+            <div class="event-item-text">Natural wine BYOB surge across Fishtown</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-dot-sm" style="background:#60a5fa;"></div>
+          <div class="event-item-content">
+            <div class="event-item-type" style="color:#60a5fa;">Opening · Day 42 · NYC</div>
+            <div class="event-item-text">Le Bernardin reservation surge post-Michelin</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-dot-sm" style="background:#34d399;"></div>
+          <div class="event-item-content">
+            <div class="event-item-type" style="color:#34d399;">Opening · Day 63 · PHL</div>
+            <div class="event-item-text">Cheik opens second location on Washington Ave</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-dot-sm" style="background:#FA2A52;"></div>
+          <div class="event-item-content">
+            <div class="event-item-type" style="color:#FA2A52;">Closure · Day 70 · SF</div>
+            <div class="event-item-text">Noma pop-up closes, SF dining scene resets</div>
+          </div>
+        </div>
+        <div class="event-item">
+          <div class="event-dot-sm" style="background:#fbbf24;"></div>
+          <div class="event-item-content">
+            <div class="event-item-type" style="color:#fbbf24;">James Beard · Day 77 · PHL</div>
+            <div class="event-item-text">Friday Saturday Sunday wins Best New Restaurant</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="below-col">
+      <div class="below-col-title">Trend Insights</div>
+      <div class="insight-list">
+        <div class="insight-item accent">Philadelphia's 2026 surge is event-driven, not organic growth — all five spikes trace directly to openings or awards. Remove those catalyst weeks and the city's baseline sits at a flat 44–46.</div>
+        <div class="insight-item">San Francisco's omakase boom was the quarter's highest single-event impact (+18 buzz pts), but the Noma pop-up closure erased nearly half of those gains within six weeks. Volatility cuts both ways.</div>
+        <div class="insight-item">New York is the slow burn: no single spike above +8 pts, but the 90-day baseline has climbed every fortnight without interruption. A less dramatic story, but a more durable one.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="r2-divider">
+
+<!-- ═══════════════════════════════ TC2U ═══════════════════════════════ -->
+<section class="chart-section" id="tc2u">
+  <div class="section-label">
+    <span class="tag">TC2U</span>
+    <span class="updated-chip">UPDATED</span>
+    Heartbeat Updated
+  </div>
+  <h2 class="section-title">Philadelphia's Pulse, Beat by Beat</h2>
+  <p class="section-desc">ECG-style readout for PHL only. Each glowing tick on the baseline marks a city-defining event. Hover the dot to hear the story. Watch the buzz counter tick up on load.</p>
+
+  <div class="preview-frame">
+    <div class="chart-svg-wrap" id="tc2u-wrap" style="background:#0d0d10;position:relative;">
+      <svg id="tc2u-svg" viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;"></svg>
+      <div class="pulse-counter-wrap">
+        <div class="pulse-counter-label">Live Buzz</div>
+        <div class="pulse-counter-num" id="tc2u-counter">0</div>
+      </div>
+      <div id="tc2u-card" class="event-card"></div>
+    </div>
+  </div>
+
+  <div class="below-grid">
+    <div class="below-col">
+      <div class="below-col-title">Pulse Log</div>
+      <div class="pulse-log">
+        <div class="log-row"><div class="log-day">Day 0</div><div class="log-buzz">42</div><div class="log-text">Baseline reading — PHL dining season opens quietly</div></div>
+        <div class="log-row"><div class="log-day">Day 14</div><div class="log-buzz">55</div><div class="log-text">Laser Wolf opens in Kensington — spike begins</div></div>
+        <div class="log-row"><div class="log-day">Day 28</div><div class="log-buzz">51</div><div class="log-text">Vernick Fish earns Bon Appétit top nod</div></div>
+        <div class="log-row"><div class="log-day">Day 42</div><div class="log-buzz">52</div><div class="log-text">Fishtown BYOB wine movement breaks into editorial</div></div>
+        <div class="log-row"><div class="log-day">Day 63</div><div class="log-buzz">74</div><div class="log-text">Cheik expansion signals S. Philly renaissance</div></div>
+        <div class="log-row"><div class="log-day">Day 77</div><div class="log-buzz">78</div><div class="log-text">Friday Saturday Sunday wins James Beard — media blitz</div></div>
+        <div class="log-row"><div class="log-day">Day 90</div><div class="log-buzz">88</div><div class="log-text">Quarter closes at cycle high — no sign of reversal</div></div>
+      </div>
+    </div>
+
+    <div class="below-col">
+      <div class="below-col-title">Momentum</div>
+      <div class="momentum-block">
+        <div class="momentum-label">Last 30 Days (Raw Score)</div>
+        <div class="momentum-values">
+          <div class="momentum-num">88</div>
+          <div class="momentum-sub">Peak reading — quarter-high set Day 90</div>
+        </div>
+      </div>
+      <div class="momentum-block">
+        <div class="momentum-label">30-Day Rolling Average</div>
+        <div class="momentum-values">
+          <div class="momentum-num" style="font-size:20px;">79.2</div>
+          <div class="momentum-sub">Consistently above 70 for 5 consecutive weeks</div>
+        </div>
+      </div>
+      <div class="insight-item" style="margin-top:10px;padding-left:10px;border-left:2px solid #00ff88;font-size:11px;">The gap between rolling avg (79.2) and raw score (88) is narrowing — PHL is not just spiking, it's sustaining.</div>
+    </div>
+
+    <div class="below-col">
+      <div class="below-col-title">What Moves the Needle</div>
+      <div class="needle-list">
+        <div class="needle-row">
+          <div class="needle-type" style="color:#fbbf24;">Awards</div>
+          <div class="needle-bar-wrap"><div class="needle-bar" style="width:90%;background:#fbbf24;"></div></div>
+          <div class="needle-val" style="color:#fbbf24;">+11</div>
+        </div>
+        <div class="needle-row">
+          <div class="needle-type" style="color:#34d399;">Openings</div>
+          <div class="needle-bar-wrap"><div class="needle-bar" style="width:75%;background:#34d399;"></div></div>
+          <div class="needle-val" style="color:#34d399;">+9</div>
+        </div>
+        <div class="needle-row">
+          <div class="needle-type" style="color:#60a5fa;">Trends</div>
+          <div class="needle-bar-wrap"><div class="needle-bar" style="width:58%;background:#60a5fa;"></div></div>
+          <div class="needle-val" style="color:#60a5fa;">+7</div>
+        </div>
+        <div class="needle-row">
+          <div class="needle-type" style="color:#FA2A52;">Closures</div>
+          <div class="needle-bar-wrap"><div class="needle-bar" style="width:30%;background:#FA2A52;"></div></div>
+          <div class="needle-val" style="color:#FA2A52;">−7</div>
+        </div>
+      </div>
+      <div class="insight-item" style="margin-top:12px;font-size:11px;">James Beard recognition is PHL's single most reliable buzz catalyst — every award in the data window produced a multi-week halo effect, not just a one-day spike.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="r2-divider">
+
+<!-- ═══════════════════════════════ TC3U ═══════════════════════════════ -->
+<section class="chart-section" id="tc3u">
+  <div class="section-label">
+    <span class="tag">TC3U</span>
+    <span class="updated-chip">UPDATED</span>
+    Signal Layers Updated
+  </div>
+  <h2 class="section-title">Stacked Signal: What's Really Driving Buzz</h2>
+  <p class="section-desc">Three stacked layers reveal the anatomy of Philadelphia's buzz. Toggle layers to isolate signals. Hover crosshair shows each layer's live contribution.</p>
+
+  <div class="layer-toggles" id="tc3u-toggles">
+    <button class="layer-toggle-btn active" data-layer="base" onclick="toggleLayer('base',this)">
+      <div class="layer-toggle-dot" style="background:rgba(99,102,241,.7);"></div> Baseline
+    </button>
+    <button class="layer-toggle-btn active" data-layer="open" onclick="toggleLayer('open',this)">
+      <div class="layer-toggle-dot" style="background:#34d399;"></div> Openings
+    </button>
+    <button class="layer-toggle-btn active" data-layer="award" onclick="toggleLayer('award',this)">
+      <div class="layer-toggle-dot" style="background:#fbbf24;"></div> Awards
+    </button>
+  </div>
+
+  <div class="preview-frame">
+    <div class="chart-svg-wrap" id="tc3u-wrap" style="background:#0f0f14;">
+      <svg id="tc3u-svg" viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;"></svg>
+      <div id="tc3u-tooltip" style="position:absolute;pointer-events:none;z-index:100;display:none;background:rgba(10,10,14,.88);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 12px;min-width:130px;"></div>
+    </div>
+  </div>
+
+  <div class="below-grid">
+    <div class="below-col">
+      <div class="below-col-title">Layer Breakdown</div>
+      <table class="layer-table">
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>Avg</th>
+            <th>Peak</th>
+            <th>Best Week</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="layer-name" style="color:rgba(129,140,248,1);">Baseline</span></td>
+            <td>42</td>
+            <td>46</td>
+            <td>Day 90</td>
+          </tr>
+          <tr>
+            <td><span class="layer-name" style="color:#34d399;">Openings</span></td>
+            <td>9</td>
+            <td>18</td>
+            <td>Day 14</td>
+          </tr>
+          <tr>
+            <td><span class="layer-name" style="color:#fbbf24;">Awards</span></td>
+            <td>5</td>
+            <td>10</td>
+            <td>Day 77</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="below-col">
+      <div class="below-col-title">Layer Correlations</div>
+      <div class="insight-list">
+        <div class="insight-item accent">Award events amplify baseline by an average of 2.3× in the two weeks that follow — the Vernick Fish and Friday Saturday Sunday data points confirm this pattern without exception.</div>
+        <div class="insight-item">Opening buzz tends to front-load: the spike peaks in the first 7 days, then decays toward baseline over 3–4 weeks. Laser Wolf is the textbook example, shedding 13 points between Day 14 and Day 21.</div>
+        <div class="insight-item">When openings and awards stack in the same window, the combined lift is non-linear — closer to 1.8× the sum of parts rather than additive. That scenario hasn't fired yet in 2026, but the conditions are building.</div>
+      </div>
+    </div>
+
+    <div class="below-col">
+      <div class="below-col-title">Stacked Total by Checkpoint</div>
+      <div class="stacked-breakdown">
+        <div class="stacked-day">
+          <div class="stacked-day-label">Day 14 — Total: 73</div>
+          <div class="stacked-bars">
+            <div class="stacked-bar" style="flex:42;background:rgba(99,102,241,.6);"></div>
+            <div class="stacked-bar" style="flex:18;background:#34d399;"></div>
+            <div class="stacked-bar" style="flex:2;background:#fbbf24;"></div>
+          </div>
+        </div>
+        <div class="stacked-day">
+          <div class="stacked-day-label">Day 42 — Total: 63</div>
+          <div class="stacked-bars">
+            <div class="stacked-bar" style="flex:40;background:rgba(99,102,241,.6);"></div>
+            <div class="stacked-bar" style="flex:8;background:#34d399;"></div>
+            <div class="stacked-bar" style="flex:3;background:#fbbf24;"></div>
+          </div>
+        </div>
+        <div class="stacked-day">
+          <div class="stacked-day-label">Day 63 — Total: 96</div>
+          <div class="stacked-bars">
+            <div class="stacked-bar" style="flex:44;background:rgba(99,102,241,.6);"></div>
+            <div class="stacked-bar" style="flex:14;background:#34d399;"></div>
+            <div class="stacked-bar" style="flex:8;background:#fbbf24;"></div>
+          </div>
+        </div>
+        <div class="stacked-day">
+          <div class="stacked-day-label">Day 90 — Total: 56</div>
+          <div class="stacked-bars">
+            <div class="stacked-bar" style="flex:46;background:rgba(99,102,241,.6);"></div>
+            <div class="stacked-bar" style="flex:6;background:#34d399;"></div>
+            <div class="stacked-bar" style="flex:4;background:#fbbf24;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="r2-divider">
+
+<!-- ═══════════════════════════════ TC4U ═══════════════════════════════ -->
+<section class="chart-section" id="tc4u">
+  <div class="section-label">
+    <span class="tag">TC4U</span>
+    <span class="updated-chip">UPDATED</span>
+    Three Metrics Updated
+  </div>
+  <h2 class="section-title">Buzz, Coverage, Sentiment — One Shared Story</h2>
+  <p class="section-desc">Three stacked charts share a single crosshair. Vertical event pins fire across all three simultaneously. Hover to see the correlated story at any moment in time.</p>
+
+  <div class="preview-frame">
+    <div class="chart-svg-wrap" id="tc4u-wrap" style="background:#0f0f14;position:relative;">
+      <svg id="tc4u-svg" viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;"></svg>
+      <div id="tc4u-card" class="event-card"></div>
+    </div>
+  </div>
+
+  <div class="below-grid">
+    <div class="below-col">
+      <div class="below-col-title">Metric Summaries</div>
+      <div class="metric-sum-table">
+        <div class="metric-sum-row">
+          <div class="metric-sum-name" style="color:#22d3ee;">Buzz Score</div>
+          <div class="metric-sum-values">
+            <div class="metric-sum-kv"><span class="metric-sum-k">Current</span><span class="metric-sum-v" style="color:#22d3ee;">88</span></div>
+            <div class="metric-sum-kv"><span class="metric-sum-k">Peak</span><span class="metric-sum-v" style="color:var(--orange);">88</span></div>
+            <div class="metric-sum-kv"><span class="metric-sum-k">Avg</span><span class="metric-sum-v">62</span></div>
+            <div class="metric-sum-kv"><span class="metric-sum-k">Low</span><span class="metric-sum-v">42</span></div>
+          </div>
+        </div>
+        <div class="metric-sum-row">
+          <div class="metric-sum-name" style="color:var(--purple);">Article Volume</div>
+          <div class="metric-sum-values">
+            <div class="metric-sum-kv"><span class="metric-sum-k">Current</span><span class="metric-sum-v" style="color:var(--purple);">19</span></div>
+            <div class="metric-sum-kv"><span class="metric-sum-k">Peak</span><span class="metric-sum-v" style="color:var(--orange);">31</span></div>
+            <div class="metric-sum-kv"><span class="metric-sum-k">Avg</span><span class="metric-sum-v">17</span></div>
+            <div class="metric-sum-kv"><span class="metric-sum-k">Low</span><span class="metric-sum-v">8</span></div>
+          </div>
+        </div>
+        <div class="metric-sum-row">
+          <div class="metric-sum-name" style="color:#34d399;">Sentiment</div>
+          <div class="metric-sum-values">
+            <div class="metric-sum-kv"><span class="metric-sum-k">Current</span><span class="metric-sum-v" style="color:#34d399;">81</span></div>
+            <div class="metric-sum-kv"><span class="metric-sum-k">Peak</span><span class="metric-sum-v" style="color:var(--orange);">81</span></div>
+            <div class="metric-sum-kv"><span class="metric-sum-k">Avg</span><span class="metric-sum-v">69</span></div>
+            <div class="metric-sum-kv"><span class="metric-sum-k">Low</span><span class="metric-sum-v">58</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="below-col">
+      <div class="below-col-title">Article → Buzz Lag</div>
+      <div class="lag-card">
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">Editorial coverage consistently precedes buzz movement by <strong style="color:var(--text);">2–3 days</strong>. When article volume spikes, watch for buzz to follow within the same week.</div>
+        <div class="lag-bars">
+          <div class="lag-bar-item">
+            <div class="lag-bar-fill" style="height:48px;background:rgba(168,85,247,.5);"></div>
+            <div class="lag-bar-label">Articles</div>
+          </div>
+          <div class="lag-bar-item">
+            <div style="display:flex;align-items:center;height:48px;font-size:18px;color:var(--text-dim);">→</div>
+          </div>
+          <div class="lag-bar-item">
+            <div class="lag-bar-fill" style="height:36px;background:rgba(34,211,238,.5);margin-top:12px;"></div>
+            <div class="lag-bar-label">Buzz (+3d)</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--text-dim);">Correlation coefficient r = 0.81 (3-day lag model)</div>
+      </div>
+      <div class="insight-item" style="font-size:11px;">Day 63 is the cleanest example: article volume hit 31 on Tuesday, buzz crossed 74 by Friday — a textbook 3-day transfer.</div>
+    </div>
+
+    <div class="below-col">
+      <div class="below-col-title">Sentiment Signals</div>
+      <div class="sentiment-list">
+        <div class="sentiment-item">
+          <div class="sentiment-date">Day 42 — Divergence: Buzz Up, Sentiment Flat</div>
+          <div class="sentiment-text">Natural wine BYOB trend drove buzz to 52 while sentiment held at 68. Interpretation: the trend was exciting but polarizing — not everyone in the editorial community was enthused about BYOB culture as a "scene."</div>
+        </div>
+        <div class="sentiment-item">
+          <div class="sentiment-date">Day 70 — Sentiment Leads Buzz Recovery</div>
+          <div class="sentiment-text">Sentiment climbed from 70 to 74 before buzz resumed its rise (Day 77). A rare leading indicator moment — positive editorial tone preceded the James Beard announcement by days, suggesting insider awareness.</div>
+        </div>
+        <div class="sentiment-item">
+          <div class="sentiment-date">Day 90 — All Three Converge at Highs</div>
+          <div class="sentiment-text">Quarter ends with buzz, articles, and sentiment all at or near their 90-day peaks simultaneously. This triple-high convergence has historically preceded sustained breakout periods in comparable markets.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="r2-divider">
+
+<!-- ═══════════════════════════════ TC5 ═══════════════════════════════ -->
+<section class="chart-section" id="tc5">
+  <div class="section-label">
+    <span class="tag">TC5</span>
+    Meridian
+  </div>
+  <h2 class="section-title">Meridian — Terminal Precision</h2>
+  <p class="section-desc">Bloomberg-meets-Linear aesthetic. Clean orange line, hollow event dots, no glow. Every point is annotated, every axis label is monospaced. This is intelligence, not decoration.</p>
+
+  <div class="shadcn-frame">
+    <div class="chart-svg-wrap" id="tc5-wrap" style="background:#09090b;position:relative;">
+      <svg id="tc5-svg" viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;"></svg>
+      <div id="tc5-card" class="shadcn-event-card"></div>
+    </div>
+  </div>
+
+  <!-- Stat strip -->
+  <div style="background:#09090b;border:1px solid rgba(255,255,255,.07);border-radius:8px;margin-bottom:24px;">
+    <div class="stat-strip">
+      <div class="stat-strip-item">
+        <div class="stat-strip-label">Start</div>
+        <div class="stat-strip-value">42</div>
+      </div>
+      <div class="stat-strip-item">
+        <div class="stat-strip-label">End</div>
+        <div class="stat-strip-value" style="color:#F97316;">88</div>
+      </div>
+      <div class="stat-strip-item">
+        <div class="stat-strip-label">Peak</div>
+        <div class="stat-strip-value orange">88</div>
+      </div>
+      <div class="stat-strip-item">
+        <div class="stat-strip-label">Bottom</div>
+        <div class="stat-strip-value">42</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="below-grid">
+    <div class="below-col">
+      <div class="below-col-title">Event Log</div>
+      <div class="shadcn-event-log" style="background:#09090b;border:1px solid rgba(255,255,255,.06);border-radius:8px;">
+        <div class="shadcn-log-row">
+          <div class="shadcn-log-accent" style="background:#34d399;"></div>
+          <div class="shadcn-log-text">
+            <div class="shadcn-log-rest">Day 14 · Laser Wolf · Opening</div>
+            <div class="shadcn-log-headline">Kensington debut sells out first month</div>
+            <div class="shadcn-log-impact" style="color:#34d399;">+13 pts</div>
+          </div>
+        </div>
+        <div class="shadcn-log-row">
+          <div class="shadcn-log-accent" style="background:#fbbf24;"></div>
+          <div class="shadcn-log-text">
+            <div class="shadcn-log-rest">Day 28 · Vernick Fish · Award</div>
+            <div class="shadcn-log-headline">Bon Appétit Restaurant of the Year</div>
+            <div class="shadcn-log-impact" style="color:#fbbf24;">+7 pts</div>
+          </div>
+        </div>
+        <div class="shadcn-log-row">
+          <div class="shadcn-log-accent" style="background:#60a5fa;"></div>
+          <div class="shadcn-log-text">
+            <div class="shadcn-log-rest">Day 42 · Fishtown · Trend</div>
+            <div class="shadcn-log-headline">Natural wine BYOB movement goes national</div>
+            <div class="shadcn-log-impact" style="color:#60a5fa;">+9 pts</div>
+          </div>
+        </div>
+        <div class="shadcn-log-row">
+          <div class="shadcn-log-accent" style="background:#34d399;"></div>
+          <div class="shadcn-log-text">
+            <div class="shadcn-log-rest">Day 63 · Cheik · Opening</div>
+            <div class="shadcn-log-headline">Washington Ave second location opens</div>
+            <div class="shadcn-log-impact" style="color:#34d399;">+16 pts</div>
+          </div>
+        </div>
+        <div class="shadcn-log-row">
+          <div class="shadcn-log-accent" style="background:#fbbf24;"></div>
+          <div class="shadcn-log-text">
+            <div class="shadcn-log-rest">Day 77 · Fri Sat Sun · James Beard</div>
+            <div class="shadcn-log-headline">Best New Restaurant win triggers media blitz</div>
+            <div class="shadcn-log-impact" style="color:#fbbf24;">+11 pts</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="below-col"><!-- empty spacer --></div>
+
+    <div class="below-col">
+      <div class="below-col-title">90-Day Summary</div>
+      <p class="analyst-note">Philadelphia's Q1 2026 arc is the story of a dining scene graduating from regional darling to national conversation. The CookNSolo network — Laser Wolf, Zahav, Condesa — functions as a kind of gravitational center: when one property moves, the entire constellation follows. The James Beard win for Friday Saturday Sunday accelerated what was already an inevitable recognition. By Day 90, Philly isn't chasing New York. It's running its own race.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="r2-divider">
+
+<!-- ═══════════════════════════════ TC6 ═══════════════════════════════ -->
+<section class="chart-section" id="tc6">
+  <div class="section-label">
+    <span class="tag">TC6</span>
+    Gradient Tide
+  </div>
+  <h2 class="section-title">Gradient Tide — Area with Impact</h2>
+  <p class="section-desc">Rich gradient fill that breathes with the data. Line draws first, then the tide comes in. Glass event cards. The most visually striking chart in the suite.</p>
+
+  <div class="shadcn-frame">
+    <div class="chart-svg-wrap" id="tc6-wrap" style="background:#0d0d12;position:relative;">
+      <svg id="tc6-svg" viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;"></svg>
+      <div id="tc6-card" class="event-card"></div>
+    </div>
+  </div>
+
+  <div class="below-grid">
+    <div class="below-col">
+      <div class="below-col-title">Momentum Score</div>
+      <div class="momentum-hero">
+        <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;">Current Buzz · Philadelphia</div>
+        <div class="momentum-hero-num">88</div>
+        <div class="momentum-hero-label"><span class="momentum-arrow">↑</span> vs. 42 at period open · +109% gain</div>
+      </div>
+    </div>
+
+    <div class="below-col">
+      <div class="below-col-title">Top 3 Events by Impact</div>
+      <div class="top-events-list">
+        <div class="top-event-card">
+          <div class="top-event-type" style="color:#34d399;">Opening</div>
+          <div class="top-event-num" style="color:#34d399;">+16</div>
+          <div class="top-event-text">Cheik opens on Washington Ave — the biggest single-event move of the quarter</div>
+        </div>
+        <div class="top-event-card">
+          <div class="top-event-type" style="color:#34d399;">Opening</div>
+          <div class="top-event-num" style="color:#34d399;">+13</div>
+          <div class="top-event-text">Laser Wolf Kensington — sold-out first month, social eruption</div>
+        </div>
+        <div class="top-event-card">
+          <div class="top-event-type" style="color:#fbbf24;">James Beard</div>
+          <div class="top-event-num" style="color:#fbbf24;">+11</div>
+          <div class="top-event-text">Friday Saturday Sunday — 3-week national spotlight follows</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="below-col">
+      <div class="below-col-title">What's Driving PHL</div>
+      <div class="bullet-insights">
+        <div class="bullet-insight"><div class="bullet-dot"></div><div>Every major buzz spike in the last 90 days traces to a CookNSolo property or an alumni chef — this network doesn't just make noise, it moves markets.</div></div>
+        <div class="bullet-insight"><div class="bullet-dot"></div><div>The Kensington and Washington Ave openings confirm that Philly's dining expansion is moving into neighborhoods the national press had barely mapped six months ago.</div></div>
+        <div class="bullet-insight"><div class="bullet-dot"></div><div>Fishtown's BYOB culture is now a national editorial narrative, not just a local quirk — the Inquirer piece that triggered the Day 42 spike was syndicated to four other publications.</div></div>
+        <div class="bullet-insight"><div class="bullet-dot"></div><div>Philly is the only tracked market where award buzz and opening buzz are compounding rather than competing — both metrics rose in the same 30-day window twice this quarter.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="r2-divider">
+
+<!-- ═══════════════════════════════ TC7 ═══════════════════════════════ -->
+<section class="chart-section" id="tc7">
+  <div class="section-label">
+    <span class="tag">TC7</span>
+    Strata
+  </div>
+  <h2 class="section-title">Strata — Three Cities, One Story</h2>
+  <p class="section-desc">Editorial-grade multi-city comparison. PHL (solid), SF (dashed), NYC (dotted). Joint crosshair tooltip shows all three city values simultaneously. Persistent legend with live buzz readings.</p>
+
+  <div class="shadcn-frame">
+    <div class="chart-svg-wrap" id="tc7-wrap" style="background:#09090b;position:relative;">
+      <svg id="tc7-svg" viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;"></svg>
+      <div id="tc7-tooltip" style="position:absolute;pointer-events:none;z-index:100;display:none;background:#18181b;border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:8px 12px;font-family:monospace;font-size:11px;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.6);"></div>
+    </div>
+    <div class="city-legend-strip">
+      <div class="city-pill" style="color:#F97316;border-color:rgba(249,115,22,.3);">PHL 88</div>
+      <div class="city-pill" style="color:#a855f7;border-color:rgba(168,85,247,.3);">SF 48</div>
+      <div class="city-pill" style="color:#60a5fa;border-color:rgba(96,165,250,.3);">NYC 80</div>
+    </div>
+  </div>
+
+  <div class="below-grid">
+    <div class="below-col">
+      <div class="below-col-title">City Comparison</div>
+      <table class="city-compare-table">
+        <thead>
+          <tr><th>Market</th><th>Buzz</th><th>90d Δ</th><th>Events</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:#F97316;font-weight:600;">PHL</td>
+            <td style="color:#F97316;">88</td>
+            <td style="color:#34d399;">+46</td>
+            <td>5</td>
+          </tr>
+          <tr>
+            <td style="color:#a855f7;font-weight:600;">SF</td>
+            <td style="color:#a855f7;">48</td>
+            <td style="color:#FA2A52;">+10</td>
+            <td>2</td>
+          </tr>
+          <tr>
+            <td style="color:#60a5fa;font-weight:600;">NYC</td>
+            <td style="color:#60a5fa;">80</td>
+            <td style="color:#34d399;">+15</td>
+            <td>1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="below-col">
+      <div class="below-col-title">City Rankings</div>
+      <div class="ranking-grid">
+        <div class="ranking-header"></div>
+        <div class="ranking-header" style="color:#F97316;">PHL</div>
+        <div class="ranking-header" style="color:#a855f7;">SF</div>
+        <div class="ranking-header" style="color:#60a5fa;">NYC</div>
+        <div class="ranking-header" style="text-align:left;color:rgba(255,255,255,.25);">Momentum</div>
+        <div class="ranking-cell" style="color:#F97316;">A+</div>
+        <div class="ranking-cell" style="color:#a855f7;">C</div>
+        <div class="ranking-cell" style="color:#60a5fa;">B+</div>
+        <div class="ranking-header" style="text-align:left;color:rgba(255,255,255,.25);">Events</div>
+        <div class="ranking-cell" style="color:#F97316;">A</div>
+        <div class="ranking-cell" style="color:#a855f7;">B−</div>
+        <div class="ranking-cell" style="color:#60a5fa;">C+</div>
+        <div class="ranking-header" style="text-align:left;color:rgba(255,255,255,.25);">Volatility</div>
+        <div class="ranking-cell" style="color:#F97316;">High</div>
+        <div class="ranking-cell" style="color:#a855f7;">High</div>
+        <div class="ranking-cell" style="color:#60a5fa;">Low</div>
+        <div class="ranking-header" style="text-align:left;color:rgba(255,255,255,.25);">Ceiling</div>
+        <div class="ranking-cell" style="color:#F97316;">100</div>
+        <div class="ranking-cell" style="color:#a855f7;">72</div>
+        <div class="ranking-cell" style="color:#60a5fa;">90</div>
+      </div>
+    </div>
+
+    <div class="below-col">
+      <div class="below-col-title">The PHL Thesis</div>
+      <div class="phl-thesis">
+        <div class="phl-thesis-item">Philadelphia is the only market where a single chef network — CookNSolo — can move citywide buzz by double digits on a single announcement. That's not a scene. That's a franchise with editorial leverage.</div>
+        <div class="phl-thesis-item">San Francisco peaked higher on a single event (the omakase boom at +18), but couldn't hold it. Philadelphia's gains are stair-stepping — each event leaves the floor higher than before, which is the only kind of growth that compounds.</div>
+        <div class="phl-thesis-item">New York is the mature market: deep, stable, hard to move. Philadelphia is where the action is. The delta between PHL's Day 0 and Day 90 (+46 pts) is the largest of any tracked city this quarter, and the quarter isn't even an outlier — it's becoming the new baseline.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- end page-wrap -->
+
+<script>
+// ─── SHARED DATA ───────────────────────────────────────────────────────────
+const PHL_PTS = [[0,42],[7,45],[14,55],[21,51],[28,48],[35,44],[42,52],[49,58],[56,62],[63,74],[70,68],[77,78],[84,85],[90,88]];
+const SF_PTS  = [[0,38],[14,42],[28,55],[35,60],[42,58],[56,62],[70,55],[84,50],[90,48]];
+const NYC_PTS = [[0,65],[14,68],[28,62],[42,70],[56,72],[70,75],[84,78],[90,80]];
+const ARTICLE_VOL = [[0,8],[7,10],[14,24],[21,12],[28,9],[35,11],[42,18],[49,14],[56,16],[63,31],[70,20],[77,28],[84,22],[90,19]];
+const SENTIMENT   = [[0,58],[14,62],[28,61],[35,65],[42,68],[56,71],[63,74],[70,70],[77,76],[84,79],[90,81]];
+const BASE_PTS  = [[0,38],[20,42],[40,40],[60,44],[80,45],[90,46]];
+const OPEN_PTS  = [[0,5],[14,18],[28,4],[42,8],[63,14],[77,12],[90,6]];
+const AWRD_PTS  = [[0,2],[28,6],[42,3],[63,8],[77,10],[90,4]];
+
+const EVENTS = [
+  { day:14, city:'PHL', type:'opening', label:'New Opening', headline:'Laser Wolf Kensington opens to sold-out reservations', impact:'+13 buzz pts', impactNum:13, week:'Week of Mar 1', restaurants:'Laser Wolf, Zahav, Condesa', why:'High-profile CookNSolo sibling opens in Kensington' },
+  { day:28, city:'PHL', type:'award', label:'Award', headline:'Vernick Fish named Bon Appétit Restaurant of the Year', impact:'+7 buzz pts', impactNum:7, week:'Week of Mar 15', restaurants:'Vernick Fish, Vernick F&D', why:'National recognition lifts all Greg Vernick properties' },
+  { day:42, city:'PHL', type:'trend', label:'Trend', headline:'Natural wine BYOB movement surges across Fishtown', impact:'+9 buzz pts', impactNum:9, week:'Week of Mar 29', restaurants:'Suraya, Pizzeria Beddia, Laser Wolf', why:'Philly Inquirer feature gets national pickup' },
+  { day:63, city:'PHL', type:'opening', label:'New Opening', headline:'Cheik opens second location on Washington Ave', impact:'+16 buzz pts', impactNum:16, week:'Week of Apr 19', restaurants:'Cheik, Kalaya', why:'Senegalese-American fine dining expands into S. Philly' },
+  { day:77, city:'PHL', type:'award', label:'James Beard', headline:'Friday Saturday Sunday wins Best New Restaurant', impact:'+11 buzz pts', impactNum:11, week:'Week of May 3', restaurants:'Friday Saturday Sunday, Laurel', why:'James Beard win triggers 3-week national spotlight' },
+  { day:35, city:'SF', type:'trend', label:'Trend', headline:'SF Japanese-omakase boom: 7 new spots in 30 days', impact:'+18 buzz pts', impactNum:18, week:'Week of Mar 22', restaurants:'Omakase Room, Rintaro', why:'Eater SF devotes full week of coverage to omakase craze' },
+  { day:70, city:'SF', type:'closure', label:'Closure', headline:'Noma pop-up closes, SF dining scene resets', impact:'−7 buzz pts', impactNum:-7, week:'Week of May 3', restaurants:'Multiple Mission District spots', why:'End of Noma pop-up leaves a void in the scene' },
+  { day:42, city:'NYC', type:'opening', label:'Opening', headline:'Le Bernardin announces 3-month reservation surge', impact:'+8 buzz pts', impactNum:8, week:'Week of Mar 29', restaurants:'Le Bernardin, Masa, Per Se', why:'Post-Michelin announcement drives high-end NYC dining to highs' },
+];
+
+const EVENT_COLORS = { opening:'#34d399', award:'#fbbf24', trend:'#60a5fa', closure:'#FA2A52' };
+
+// ─── HELPERS ───────────────────────────────────────────────────────────────
+function dayToX(day, padX, W){ return padX + (day/90)*(W - padX*2); }
+function valToY(val, padY, H, minV, maxV){ return H - padY - ((val - minV)/(maxV - minV))*(H - padY*2); }
+function linePath(pts, padX, padY, W, H, minV=30, maxV=100){
+  return pts.map((p,i)=> (i===0?'M':'L') + dayToX(p[0],padX,W).toFixed(1)+','+valToY(p[1],padY,H,minV,maxV).toFixed(1)).join(' ');
+}
+function svgEl(tag, attrs){
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for(const [k,v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+function animateDash(path, duration, delay=0){
+  const len = path.getTotalLength();
+  path.style.strokeDasharray = len;
+  path.style.strokeDashoffset = len;
+  path.style.transition = 'none';
+  setTimeout(()=>{ path.style.transition = `stroke-dashoffset ${duration}ms ease`; path.style.strokeDashoffset = 0; }, delay);
+}
+
+function showEventCard(card, ev, dotEl, svgEl_wrap, isShadcn=false){
+  const color = EVENT_COLORS[ev.type] || '#aaa';
+  const impactColor = ev.impactNum < 0 ? '#FA2A52' : color;
+  card.innerHTML = `
+    <div class="event-card-type" style="background:${color}22;color:${color};border:1px solid ${color}44;">${ev.label}</div>
+    <div class="event-card-week">${ev.week}</div>
+    <div class="event-card-headline">${ev.headline}</div>
+    <div class="event-card-impact" style="color:${impactColor};">${ev.impact}</div>
+    <div class="event-card-restaurants">${ev.restaurants}</div>
+    <div class="event-card-stem"></div>`;
+
+  const wrapRect = svgEl_wrap.getBoundingClientRect();
+  const dotRect  = dotEl.getBoundingClientRect();
+  const relLeft  = dotRect.left - wrapRect.left + dotRect.width/2;
+  const relTop   = dotRect.top  - wrapRect.top;
+
+  card.style.left = (relLeft - 100) + 'px';
+  card.style.top  = (relTop - 10) + 'px';
+  card.style.transform = 'translateY(-100%) translateY(-8px)';
+  card.classList.add('visible');
+}
+function hideEventCard(card){ card.classList.remove('visible'); }
+
+// ─── TC1U: CITY LINES ──────────────────────────────────────────────────────
+(function(){
+  const svg = document.getElementById('tc1u-svg');
+  const wrap = document.getElementById('tc1u-wrap');
+  const card = document.getElementById('tc1u-card');
+  const W=900, H=320, padX=52, padY=28;
+
+  // defs
+  const defs = svgEl('defs',{});
+  svg.appendChild(defs);
+
+  // grid
+  for(let v of [40,60,80,100]){
+    const y = valToY(v,padY,H,30,100);
+    svg.appendChild(Object.assign(svgEl('line',{x1:padX,y1:y,x2:W-padX,y2:y,stroke:'rgba(255,255,255,.05)',strokeWidth:'.5'}),{}));
+    const t = svgEl('text',{x:padX-8,y:y+4,'text-anchor':'end',fill:'rgba(255,255,255,.25)',fontSize:'10','font-family':'monospace'});
+    t.textContent = v;
+    svg.appendChild(t);
+  }
+  // x-axis labels
+  for(let d of [0,15,30,45,60,75,90]){
+    const x = dayToX(d,padX,W);
+    const t = svgEl('text',{x,y:H-8,'text-anchor':'middle',fill:'rgba(255,255,255,.25)',fontSize:'10','font-family':'monospace'});
+    t.textContent = 'D'+d;
+    svg.appendChild(t);
+  }
+
+  const cities = [
+    { pts: PHL_PTS, color:'#22d3ee', name:'PHL', delay:0 },
+    { pts: SF_PTS,  color:'#a855f7', name:'SF',  delay:400 },
+    { pts: NYC_PTS, color:'#60a5fa', name:'NYC', delay:800 },
+  ];
+
+  cities.forEach(c=>{
+    const p = svgEl('path',{ d:linePath(c.pts,padX,padY,W,H), fill:'none', stroke:c.color, strokeWidth:'2', strokeLinecap:'round', strokeLinejoin:'round' });
+    svg.appendChild(p);
+    setTimeout(()=>animateDash(p,1200,0), c.delay);
+
+    // endpoint glow
+    const last = c.pts[c.pts.length-1];
+    const ex = dayToX(last[0],padX,W), ey = valToY(last[1],padY,H,30,100);
+    const glowCirc = svgEl('circle',{cx:ex,cy:ey,r:'8',fill:c.color,opacity:'.12'});
+    const endCirc  = svgEl('circle',{cx:ex,cy:ey,r:'4',fill:c.color});
+    const endLabel = svgEl('text',{x:ex+7,y:ey+4,fill:c.color,fontSize:'10',fontWeight:'600','font-family':'monospace'});
+    endLabel.textContent = last[1];
+    svg.appendChild(glowCirc); svg.appendChild(endCirc); svg.appendChild(endLabel);
+  });
+
+  // Event dots on PHL
+  EVENTS.forEach(ev=>{
+    const pts = ev.city==='PHL' ? PHL_PTS : ev.city==='SF' ? SF_PTS : NYC_PTS;
+    const cityColor = ev.city==='PHL' ? '#22d3ee' : ev.city==='SF' ? '#a855f7' : '#60a5fa';
+    const closestPt = pts.reduce((a,b)=> Math.abs(b[0]-ev.day)<Math.abs(a[0]-ev.day)?b:a);
+    const dx = dayToX(ev.day,padX,W), dy = valToY(closestPt[1],padY,H,30,100);
+    const evColor = EVENT_COLORS[ev.type];
+
+    const outerRing = svgEl('circle',{cx:dx,cy:dy,r:'9',fill:'none',stroke:evColor,strokeWidth:'.8',opacity:'.4'});
+    const dot = svgEl('circle',{cx:dx,cy:dy,r:'5',fill:evColor,stroke:'#111',strokeWidth:'1.5',style:'cursor:pointer;'});
+    svg.appendChild(outerRing); svg.appendChild(dot);
+
+    dot.addEventListener('mouseenter',()=> showEventCard(card,ev,dot,wrap));
+    dot.addEventListener('mouseleave',()=> hideEventCard(card));
+  });
+
+  // Crosshair
+  const xline = svgEl('line',{x1:0,y1:padY,x2:0,y2:H-padY,stroke:'rgba(255,255,255,.2)',strokeWidth:'1',strokeDasharray:'3,3','pointer-events':'none'});
+  svg.appendChild(xline);
+  const hitArea = svgEl('rect',{x:padX,y:0,width:W-padX*2,height:H,fill:'transparent'});
+  svg.appendChild(hitArea);
+
+  function interpolate(pts, day){
+    for(let i=1;i<pts.length;i++){
+      if(day<=pts[i][0]){
+        const t=(day-pts[i-1][0])/(pts[i][0]-pts[i-1][0]);
+        return pts[i-1][1]+t*(pts[i][1]-pts[i-1][1]);
+      }
+    }
+    return pts[pts.length-1][1];
+  }
+
+  hitArea.addEventListener('mousemove',e=>{
+    const rect = svg.getBoundingClientRect();
+    const svgX = (e.clientX - rect.left) * (W/rect.width);
+    const day = Math.max(0,Math.min(90, (svgX-padX)/(W-padX*2)*90));
+    xline.setAttribute('x1',svgX); xline.setAttribute('x2',svgX);
+  });
+  hitArea.addEventListener('mouseleave',()=>{ xline.setAttribute('x1',-10); xline.setAttribute('x2',-10); });
+})();
+
+// ─── TC2U: HEARTBEAT ────────────────────────────────────────────────────────
+(function(){
+  const svg = document.getElementById('tc2u-svg');
+  const wrap = document.getElementById('tc2u-wrap');
+  const card = document.getElementById('tc2u-card');
+  const W=900, H=300, padX=52, padY=32;
+
+  // green glow filter
+  const defs = svgEl('defs',{});
+  const filter = svgEl('filter',{id:'greenGlow',x:'-30%',y:'-30%',width:'160%',height:'160%'});
+  const fe1 = svgEl('feGaussianBlur',{stdDeviation:'3',result:'blur'});
+  const fe2 = svgEl('feComposite',{in:'SourceGraphic',in2:'blur',operator:'over'});
+  filter.appendChild(fe1); filter.appendChild(fe2); defs.appendChild(filter);
+  svg.appendChild(defs);
+
+  // grid
+  for(let v of [40,60,80,100]){
+    const y=valToY(v,padY,H,30,100);
+    svg.appendChild(svgEl('line',{x1:padX,y1:y,x2:W-padX,y2:y,stroke:'rgba(0,255,136,.05)',strokeWidth:'.5'}));
+    const t=svgEl('text',{x:padX-8,y:y+4,'text-anchor':'end',fill:'rgba(0,255,136,.25)',fontSize:'10','font-family':'monospace'});
+    t.textContent=v; svg.appendChild(t);
+  }
+
+  // Area fill
+  const areaPath = PHL_PTS.map((p,i)=>(i===0?'M':'L')+dayToX(p[0],padX,W).toFixed(1)+','+valToY(p[1],padY,H,30,100).toFixed(1)).join(' ')
+    + ` L${dayToX(90,padX,W)},${H-padY} L${padX},${H-padY} Z`;
+  const aFill = svgEl('path',{d:areaPath,fill:'rgba(0,255,136,.04)'});
+  svg.appendChild(aFill);
+
+  // Main line
+  const path = svgEl('path',{ d:linePath(PHL_PTS,padX,padY,W,H), fill:'none', stroke:'#00ff88', strokeWidth:'2', strokeLinecap:'round', strokeLinejoin:'round', filter:'url(#greenGlow)' });
+  svg.appendChild(path);
+  animateDash(path, 1600, 200);
+
+  // Event dots + baseline ticks
+  EVENTS.filter(e=>e.city==='PHL').forEach(ev=>{
+    const closestPt = PHL_PTS.reduce((a,b)=>Math.abs(b[0]-ev.day)<Math.abs(a[0]-ev.day)?b:a);
+    const dx = dayToX(ev.day,padX,W), dy = valToY(closestPt[1],padY,H,30,100);
+    const evColor = EVENT_COLORS[ev.type];
+
+    // baseline tick
+    const tickY = H - padY;
+    const tick = svgEl('line',{x1:dx,y1:tickY-6,x2:dx,y2:tickY+4,stroke:evColor,strokeWidth:'2',opacity:'.8'});
+    svg.appendChild(tick);
+    const tickGlow = svgEl('circle',{cx:dx,cy:tickY,r:'6',fill:evColor,opacity:'.15'});
+    svg.appendChild(tickGlow);
+
+    // event dot
+    const dot = svgEl('circle',{cx:dx,cy:dy,r:'5',fill:evColor,stroke:'#0d0d10',strokeWidth:'1.5',style:'cursor:pointer;'});
+    svg.appendChild(dot);
+    dot.addEventListener('mouseenter',()=>showEventCard(card,ev,dot,wrap));
+    dot.addEventListener('mouseleave',()=>hideEventCard(card));
+  });
+
+  // Pulse counter animation
+  const counter = document.getElementById('tc2u-counter');
+  let cur=0;
+  const interval = setInterval(()=>{ cur=Math.min(88,cur+3); counter.textContent=cur; if(cur>=88) clearInterval(interval); }, 30);
+})();
+
+// ─── TC3U: SIGNAL LAYERS ────────────────────────────────────────────────────
+(function(){
+  const svg = document.getElementById('tc3u-svg');
+  const wrap = document.getElementById('tc3u-wrap');
+  const tooltip = document.getElementById('tc3u-tooltip');
+  const W=900, H=300, padX=52, padY=28;
+
+  let layerVisible = { base:true, open:true, award:true };
+  let layers = {};
+
+  function buildStacked(basePts, openPts, awrdPts){
+    const days = Array.from(new Set([...basePts,...openPts,...awrdPts].map(p=>p[0]))).sort((a,b)=>a-b);
+    function interp(pts,d){ for(let i=1;i<pts.length;i++) if(d<=pts[i][0]){ const t=(d-pts[i-1][0])/(pts[i][0]-pts[i-1][0]); return pts[i-1][1]+t*(pts[i][1]-pts[i-1][1]); } return pts[pts.length-1][1]; }
+    return days.map(d=>({ d, base:interp(basePts,d), open:interp(openPts,d), award:interp(awrdPts,d) }));
+  }
+
+  const stacked = buildStacked(BASE_PTS, OPEN_PTS, AWRD_PTS);
+  const maxTotal = Math.max(...stacked.map(s=>s.base+s.open+s.award));
+
+  function stackPath(stacked, getTop, getBottom){
+    const fwd = stacked.map(s=>{ const x=dayToX(s.d,padX,W), y=valToY(getTop(s),padY,H,0,maxTotal+5); return {x,y}; });
+    const bwd = [...stacked].reverse().map(s=>{ const x=dayToX(s.d,padX,W), y=valToY(getBottom(s),padY,H,0,maxTotal+5); return {x,y}; });
+    return fwd.map((p,i)=>(i===0?'M':'L')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ')
+      + bwd.map(p=>'L'+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ')+'Z';
+  }
+
+  // grid
+  for(let v of [20,40,60]){
+    const y=valToY(v,padY,H,0,maxTotal+5);
+    svg.appendChild(svgEl('line',{x1:padX,y1:y,x2:W-padX,y2:y,stroke:'rgba(255,255,255,.04)',strokeWidth:'.5'}));
+  }
+
+  // base area
+  const baseD = stackPath(stacked, s=>s.base, ()=>0);
+  const baseEl = svgEl('path',{d:baseD,fill:'rgba(99,102,241,.25)',stroke:'rgba(129,140,248,.6)',strokeWidth:'1.2',id:'tc3u-base'});
+  svg.appendChild(baseEl);
+  layers.base = baseEl;
+
+  // open area (base + open)
+  const openD = stackPath(stacked, s=>s.base+s.open, s=>s.base);
+  const openEl = svgEl('path',{d:openD,fill:'rgba(52,211,153,.2)',stroke:'#34d399',strokeWidth:'1.2',id:'tc3u-open'});
+  svg.appendChild(openEl);
+  layers.open = openEl;
+
+  // award area (base + open + award)
+  const awardD = stackPath(stacked, s=>s.base+s.open+s.award, s=>s.base+s.open);
+  const awardEl = svgEl('path',{d:awardD,fill:'rgba(251,191,36,.2)',stroke:'#fbbf24',strokeWidth:'1.2',id:'tc3u-award'});
+  svg.appendChild(awardEl);
+  layers.award = awardEl;
+
+  // Total annotation at peak
+  const peakS = stacked.reduce((a,b)=>(a.base+a.open+a.award)>(b.base+b.open+b.award)?a:b);
+  const px=dayToX(peakS.d,padX,W), py=valToY(peakS.base+peakS.open+peakS.award,padY,H,0,maxTotal+5);
+  const ann = svgEl('text',{x:px,y:py-10,'text-anchor':'middle',fill:'rgba(255,255,255,.6)',fontSize:'11',fontWeight:'600'});
+  ann.textContent='Total '+(peakS.base+peakS.open+peakS.award).toFixed(0);
+  svg.appendChild(ann);
+
+  // Crosshair + tooltip
+  const xline = svgEl('line',{x1:0,y1:padY,x2:0,y2:H-padY,stroke:'rgba(255,255,255,.15)',strokeWidth:'1',strokeDasharray:'3,3'});
+  svg.appendChild(xline);
+  const hitArea = svgEl('rect',{x:padX,y:0,width:W-padX*2,height:H,fill:'transparent'});
+  svg.appendChild(hitArea);
+
+  function interp(pts,d){ for(let i=1;i<pts.length;i++) if(d<=pts[i][0]){ const t=(d-pts[i-1][0])/(pts[i][0]-pts[i-1][0]); return pts[i-1][1]+t*(pts[i][1]-pts[i-1][1]); } return pts[pts.length-1][1]; }
+
+  hitArea.addEventListener('mousemove',e=>{
+    const rect=svg.getBoundingClientRect();
+    const svgX=(e.clientX-rect.left)*(W/rect.width);
+    const day=Math.max(0,Math.min(90,(svgX-padX)/(W-padX*2)*90));
+    xline.setAttribute('x1',svgX); xline.setAttribute('x2',svgX);
+    const b=interp(BASE_PTS,day).toFixed(1), o=interp(OPEN_PTS,day).toFixed(1), a=interp(AWRD_PTS,day).toFixed(1);
+    tooltip.style.display='block';
+    tooltip.style.left=(e.clientX-wrap.getBoundingClientRect().left+12)+'px';
+    tooltip.style.top=(e.clientY-wrap.getBoundingClientRect().top-40)+'px';
+    tooltip.innerHTML=`<div style="font-size:9px;color:rgba(255,255,255,.3);margin-bottom:6px;font-family:monospace;">Day ${Math.round(day)}</div>
+      <div style="display:flex;gap:10px;">
+        <div><div style="font-size:9px;color:rgba(129,140,248,.8);">BASE</div><div style="font-family:monospace;font-size:12px;font-weight:700;color:rgba(129,140,248,1);">${b}</div></div>
+        <div><div style="font-size:9px;color:#34d399;">OPEN</div><div style="font-family:monospace;font-size:12px;font-weight:700;color:#34d399;">${o}</div></div>
+        <div><div style="font-size:9px;color:#fbbf24;">AWRD</div><div style="font-family:monospace;font-size:12px;font-weight:700;color:#fbbf24;">${a}</div></div>
+      </div>`;
+  });
+  hitArea.addEventListener('mouseleave',()=>{ xline.setAttribute('x1',-10); xline.setAttribute('x2',-10); tooltip.style.display='none'; });
+
+  window.toggleLayer = function(key, btn){
+    layerVisible[key] = !layerVisible[key];
+    btn.classList.toggle('active', layerVisible[key]);
+    if(layers[key]){
+      layers[key].style.transition = 'opacity .3s ease';
+      layers[key].style.opacity = layerVisible[key] ? '1' : '0';
+    }
+  };
+})();
+
+// ─── TC4U: THREE METRICS ─────────────────────────────────────────────────────
+(function(){
+  const svg = document.getElementById('tc4u-svg');
+  const wrap = document.getElementById('tc4u-wrap');
+  const card = document.getElementById('tc4u-card');
+  const W=900, padX=52;
+
+  const CHARTS = [
+    { pts:PHL_PTS,     label:'Buzz Score',     color:'#22d3ee', minV:30, maxV:100, H:160, offsetY:0   },
+    { pts:ARTICLE_VOL, label:'Article Volume', color:'#a855f7', minV:0,  maxV:36,  H:160, offsetY:175 },
+    { pts:SENTIMENT,   label:'Sentiment',      color:'#34d399', minV:50, maxV:90,  H:160, offsetY:350 },
+  ];
+
+  const totalH = 510;
+  svg.setAttribute('viewBox',`0 0 900 ${totalH}`);
+
+  // Shared vertical crosshair
+  const xline = svgEl('line',{x1:-10,y1:0,x2:-10,y2:totalH,stroke:'rgba(255,255,255,.12)',strokeWidth:'1',strokeDasharray:'4,3','pointer-events':'none'});
+  svg.appendChild(xline);
+
+  function interp(pts,d){ for(let i=1;i<pts.length;i++) if(d<=pts[i][0]){ const t=(d-pts[i-1][0])/(pts[i][0]-pts[i-1][0]); return pts[i-1][1]+t*(pts[i][1]-pts[i-1][1]); } return pts[pts.length-1][1]; }
+
+  CHARTS.forEach((ch,ci)=>{
+    const padY=20, H=ch.H, oY=ch.offsetY;
+
+    // chart bg
+    const bg = svgEl('rect',{x:0,y:oY,width:W,height:H,fill:ci%2===0?'rgba(255,255,255,.01)':'transparent'});
+    svg.appendChild(bg);
+
+    // label
+    const lbl = svgEl('text',{x:padX,y:oY+14,fill:ch.color,fontSize:'10',fontWeight:'600',letterSpacing:'.1em','text-transform':'uppercase','font-family':'Inter'});
+    lbl.textContent=ch.label.toUpperCase();
+    svg.appendChild(lbl);
+
+    // grid
+    const steps = [.25,.5,.75];
+    steps.forEach(s=>{
+      const v = ch.minV+(ch.maxV-ch.minV)*s;
+      const y = oY + padY + ((ch.maxV-v)/(ch.maxV-ch.minV))*(H-padY*2);
+      svg.appendChild(svgEl('line',{x1:padX,y1:y,x2:W-padX,y2:y,stroke:'rgba(255,255,255,.04)',strokeWidth:'.5'}));
+    });
+
+    // path
+    const vToY2 = (v)=> oY + padY + ((ch.maxV-v)/(ch.maxV-ch.minV))*(H-padY*2);
+    const d = ch.pts.map((p,i)=>(i===0?'M':'L')+dayToX(p[0],padX,W).toFixed(1)+','+vToY2(p[1]).toFixed(1)).join(' ');
+    const path = svgEl('path',{d,fill:'none',stroke:ch.color,strokeWidth:'1.8',strokeLinecap:'round',strokeLinejoin:'round'});
+    svg.appendChild(path);
+    animateDash(path, 1400, ci*300);
+
+    // event pins (PHL events only, across all charts)
+    const phlEvents = EVENTS.filter(e=>e.city==='PHL');
+    phlEvents.forEach(ev=>{
+      const evColor=EVENT_COLORS[ev.type];
+      const ex=dayToX(ev.day,padX,W);
+      // pin line
+      const pin=svgEl('line',{x1:ex,y1:oY+padY,x2:ex,y2:oY+H-padY,stroke:evColor,strokeWidth:'1',strokeDasharray:'2,3',opacity:'.5'});
+      svg.appendChild(pin);
+      // pin top marker
+      const pm=svgEl('circle',{cx:ex,cy:oY+padY+2,r:'3',fill:evColor,style:'cursor:pointer;'});
+      svg.appendChild(pm);
+
+      if(ci===0){
+        pm.addEventListener('mouseenter',()=>showEventCard(card,ev,pm,wrap));
+        pm.addEventListener('mouseleave',()=>hideEventCard(card));
+      }
+    });
+
+    // dots
+    ch.pts.forEach(p=>{
+      const cx=dayToX(p[0],padX,W), cy=vToY2(p[1]);
+      svg.appendChild(svgEl('circle',{cx,cy,r:'3',fill:ch.color,opacity:'.7'}));
+    });
+  });
+
+  // Hit overlay for shared crosshair
+  const hitArea = svgEl('rect',{x:padX,y:0,width:W-padX*2,height:totalH,fill:'transparent'});
+  svg.appendChild(hitArea);
+
+  hitArea.addEventListener('mousemove',e=>{
+    const rect=svg.getBoundingClientRect();
+    const svgX=(e.clientX-rect.left)*(W/rect.width);
+    xline.setAttribute('x1',svgX); xline.setAttribute('x2',svgX);
+  });
+  hitArea.addEventListener('mouseleave',()=>{ xline.setAttribute('x1',-10); xline.setAttribute('x2',-10); });
+})();
+
+// ─── TC5: MERIDIAN ───────────────────────────────────────────────────────────
+(function(){
+  const svg = document.getElementById('tc5-svg');
+  const wrap = document.getElementById('tc5-wrap');
+  const card = document.getElementById('tc5-card');
+  const W=900, H=300, padX=52, padY=28;
+
+  const defs = svgEl('defs',{});
+  const grad = svgEl('linearGradient',{id:'tc5-area-grad',x1:'0',y1:'0',x2:'0',y2:'1'});
+  const s1 = svgEl('stop',{'offset':'0%','stop-color':'rgba(249,115,22,.04)'});
+  const s2 = svgEl('stop',{'offset':'100%','stop-color':'rgba(249,115,22,0)'});
+  grad.appendChild(s1); grad.appendChild(s2); defs.appendChild(grad); svg.appendChild(defs);
+
+  // Grid lines (very subtle)
+  for(let v of [40,60,80,100]){
+    const y=valToY(v,padY,H,30,100);
+    svg.appendChild(svgEl('line',{x1:padX,y1:y,x2:W-padX,y2:y,stroke:'rgba(255,255,255,.03)',strokeWidth:'.5'}));
+    const t=svgEl('text',{x:padX-6,y:y+4,'text-anchor':'end',fill:'rgba(161,161,170,.5)',fontSize:'9','font-family':'monospace'});
+    t.textContent=v; svg.appendChild(t);
+  }
+  for(let d of [0,15,30,45,60,75,90]){
+    const x=dayToX(d,padX,W);
+    const t=svgEl('text',{x,y:H-8,'text-anchor':'middle',fill:'rgba(161,161,170,.4)',fontSize:'9','font-family':'monospace'});
+    t.textContent='D'+d; svg.appendChild(t);
+  }
+
+  // Area fill
+  const areaPath = PHL_PTS.map((p,i)=>(i===0?'M':'L')+dayToX(p[0],padX,W).toFixed(1)+','+valToY(p[1],padY,H,30,100).toFixed(1)).join(' ')
+    + ` L${dayToX(90,padX,W)},${H-padY} L${padX},${H-padY} Z`;
+  const aEl = svgEl('path',{d:areaPath,fill:'url(#tc5-area-grad)'});
+  svg.appendChild(aEl);
+
+  // Main line
+  const path = svgEl('path',{d:linePath(PHL_PTS,padX,padY,W,H),fill:'none',stroke:'#F97316',strokeWidth:'2.5',strokeLinecap:'round',strokeLinejoin:'round'});
+  svg.appendChild(path);
+  animateDash(path,1400,100);
+
+  // Regular hollow dots
+  PHL_PTS.forEach(p=>{
+    const cx=dayToX(p[0],padX,W), cy=valToY(p[1],padY,H,30,100);
+    svg.appendChild(svgEl('circle',{cx,cy,r:'4',fill:'#09090b',stroke:'#F97316',strokeWidth:'2'}));
+  });
+
+  // Event dots (larger, colored)
+  EVENTS.filter(e=>e.city==='PHL').forEach(ev=>{
+    const closestPt=PHL_PTS.reduce((a,b)=>Math.abs(b[0]-ev.day)<Math.abs(a[0]-ev.day)?b:a);
+    const cx=dayToX(ev.day,padX,W), cy=valToY(closestPt[1],padY,H,30,100);
+    const evColor=EVENT_COLORS[ev.type];
+    const outer=svgEl('circle',{cx,cy,r:'6',fill:'#09090b',stroke:evColor,strokeWidth:'2',style:'cursor:pointer;'});
+    svg.appendChild(outer);
+    outer.addEventListener('mouseenter',()=>showEventCard(card,ev,outer,wrap,true));
+    outer.addEventListener('mouseleave',()=>hideEventCard(card));
+  });
+
+  // Crosshair
+  const xline=svgEl('line',{x1:-10,y1:padY,x2:-10,y2:H-padY,stroke:'rgba(255,255,255,.1)',strokeWidth:'1',strokeDasharray:'2,4'});
+  svg.appendChild(xline);
+  const hitArea=svgEl('rect',{x:padX,y:0,width:W-padX*2,height:H,fill:'transparent'});
+  svg.appendChild(hitArea);
+  hitArea.addEventListener('mousemove',e=>{ const rect=svg.getBoundingClientRect(); const svgX=(e.clientX-rect.left)*(W/rect.width); xline.setAttribute('x1',svgX); xline.setAttribute('x2',svgX); });
+  hitArea.addEventListener('mouseleave',()=>{ xline.setAttribute('x1',-10); xline.setAttribute('x2',-10); });
+})();
+
+// ─── TC6: GRADIENT TIDE ──────────────────────────────────────────────────────
+(function(){
+  const svg = document.getElementById('tc6-svg');
+  const wrap = document.getElementById('tc6-wrap');
+  const card = document.getElementById('tc6-card');
+  const W=900, H=320, padX=52, padY=32;
+
+  const defs = svgEl('defs',{});
+  const grad = svgEl('linearGradient',{id:'tc6-grad',x1:'0',y1:'0',x2:'0',y2:'1'});
+  const s1 = svgEl('stop',{'offset':'0%','stop-color':'rgba(249,115,22,.3)'});
+  const s2 = svgEl('stop',{'offset':'100%','stop-color':'rgba(249,115,22,0)'});
+  grad.appendChild(s1); grad.appendChild(s2); defs.appendChild(grad); svg.appendChild(defs);
+
+  // Grid
+  for(let v of [40,60,80,100]){
+    const y=valToY(v,padY,H,30,100);
+    svg.appendChild(svgEl('line',{x1:padX,y1:y,x2:W-padX,y2:y,stroke:'rgba(255,255,255,.04)',strokeWidth:'.5'}));
+    const t=svgEl('text',{x:padX-8,y:y+4,'text-anchor':'end',fill:'rgba(255,255,255,.2)',fontSize:'10','font-family':'monospace'});
+    t.textContent=v; svg.appendChild(t);
+  }
+  for(let d of [0,15,30,45,60,75,90]){
+    const x=dayToX(d,padX,W);
+    const t=svgEl('text',{x,y:H-8,'text-anchor':'middle',fill:'rgba(255,255,255,.2)',fontSize:'10','font-family':'monospace'});
+    t.textContent='D'+d; svg.appendChild(t);
+  }
+
+  // Area
+  const areaPath=PHL_PTS.map((p,i)=>(i===0?'M':'L')+dayToX(p[0],padX,W).toFixed(1)+','+valToY(p[1],padY,H,30,100).toFixed(1)).join(' ')
+    +` L${dayToX(90,padX,W)},${H-padY} L${padX},${H-padY} Z`;
+  const aEl=svgEl('path',{d:areaPath,fill:'url(#tc6-grad)',opacity:'0'});
+  svg.appendChild(aEl);
+
+  // Line
+  const path=svgEl('path',{d:linePath(PHL_PTS,padX,padY,W,H),fill:'none',stroke:'#F97316',strokeWidth:'2',strokeLinecap:'round',strokeLinejoin:'round'});
+  svg.appendChild(path);
+  animateDash(path,1500,0);
+  setTimeout(()=>{ aEl.style.transition='opacity .8s ease'; aEl.style.opacity='1'; }, 1800);
+
+  // Regular dots
+  PHL_PTS.forEach(p=>{
+    const cx=dayToX(p[0],padX,W), cy=valToY(p[1],padY,H,30,100);
+    const dot=svgEl('circle',{cx,cy,r:'4.5',fill:'#F97316',style:'filter:drop-shadow(0 0 2px rgba(249,115,22,.4));transition:r .15s;cursor:default;'});
+    svg.appendChild(dot);
+  });
+
+  // Event dots
+  EVENTS.filter(e=>e.city==='PHL').forEach(ev=>{
+    const closestPt=PHL_PTS.reduce((a,b)=>Math.abs(b[0]-ev.day)<Math.abs(a[0]-ev.day)?b:a);
+    const cx=dayToX(ev.day,padX,W), cy=valToY(closestPt[1],padY,H,30,100);
+    const evColor=EVENT_COLORS[ev.type];
+    const dot=svgEl('circle',{cx,cy,r:'7',fill:evColor,style:'cursor:pointer;transition:r .15s;filter:drop-shadow(0 0 4px '+evColor+'88);'});
+    svg.appendChild(dot);
+    dot.addEventListener('mouseenter',()=>{ dot.setAttribute('r','9'); showEventCard(card,ev,dot,wrap); });
+    dot.addEventListener('mouseleave',()=>{ dot.setAttribute('r','7'); hideEventCard(card); });
+  });
+})();
+
+// ─── TC7: STRATA ─────────────────────────────────────────────────────────────
+(function(){
+  const svg = document.getElementById('tc7-svg');
+  const wrap = document.getElementById('tc7-wrap');
+  const tooltip = document.getElementById('tc7-tooltip');
+  const W=900, H=320, padX=52, padY=32;
+
+  // Grid
+  for(let v of [25,50,75,100]){
+    const y=valToY(v,padY,H,20,100);
+    svg.appendChild(svgEl('line',{x1:padX,y1:y,x2:W-padX,y2:y,stroke:'rgba(255,255,255,.04)',strokeWidth:'.5'}));
+    const t=svgEl('text',{x:padX-6,y:y+4,'text-anchor':'end',fill:'rgba(161,161,170,.4)',fontSize:'9','font-family':'monospace'});
+    t.textContent=v; svg.appendChild(t);
+  }
+  for(let d of [0,15,30,45,60,75,90]){
+    const x=dayToX(d,padX,W);
+    const t=svgEl('text',{x,y:H-8,'text-anchor':'middle',fill:'rgba(161,161,170,.3)',fontSize:'9','font-family':'monospace'});
+    t.textContent='D'+d; svg.appendChild(t);
+  }
+
+  const cities=[
+    { pts:PHL_PTS, color:'#F97316', name:'PHL', sw:'2',   dash:'none' },
+    { pts:SF_PTS,  color:'#a855f7', name:'SF',  sw:'1.5', dash:'6,4'  },
+    { pts:NYC_PTS, color:'#60a5fa', name:'NYC', sw:'1',   dash:'3,3'  },
+  ];
+
+  function interp(pts,d){ for(let i=1;i<pts.length;i++) if(d<=pts[i][0]){ const t=(d-pts[i-1][0])/(pts[i][0]-pts[i-1][0]); return (pts[i-1][1]+t*(pts[i][1]-pts[i-1][1])).toFixed(0); } return pts[pts.length-1][1].toFixed(0); }
+
+  cities.forEach((c,ci)=>{
+    const p=svgEl('path',{d:linePath(c.pts,padX,padY,W,H,20,100),fill:'none',stroke:c.color,strokeWidth:c.sw,strokeDasharray:c.dash,strokeLinecap:'round',strokeLinejoin:'round'});
+    svg.appendChild(p);
+    animateDash(p,1400,ci*350);
+
+    // Endpoint
+    const last=c.pts[c.pts.length-1];
+    const ex=dayToX(last[0],padX,W), ey=valToY(last[1],padY,H,20,100);
+    svg.appendChild(svgEl('circle',{cx:ex,cy:ey,r:'5',fill:'#09090b',stroke:c.color,strokeWidth:'2'}));
+    const lbl=svgEl('text',{x:ex+8,y:ey+4,fill:c.color,fontSize:'10',fontWeight:'600','font-family':'monospace'});
+    lbl.textContent=last[1]; svg.appendChild(lbl);
+  });
+
+  // Crosshair + joint tooltip
+  const xline=svgEl('line',{x1:-10,y1:padY,x2:-10,y2:H-padY,stroke:'rgba(255,255,255,.1)',strokeWidth:'1',strokeDasharray:'2,4'});
+  svg.appendChild(xline);
+  const hitArea=svgEl('rect',{x:padX,y:0,width:W-padX*2,height:H,fill:'transparent'});
+  svg.appendChild(hitArea);
+
+  hitArea.addEventListener('mousemove',e=>{
+    const rect=svg.getBoundingClientRect();
+    const svgX=(e.clientX-rect.left)*(W/rect.width);
+    const day=Math.max(0,Math.min(90,(svgX-padX)/(W-padX*2)*90));
+    xline.setAttribute('x1',svgX); xline.setAttribute('x2',svgX);
+    const phl=interp(PHL_PTS,day), sf=interp(SF_PTS,day), nyc=interp(NYC_PTS,day);
+    tooltip.style.display='block';
+    tooltip.style.left=(e.clientX-wrap.getBoundingClientRect().left+14)+'px';
+    tooltip.style.top=(e.clientY-wrap.getBoundingClientRect().top-56)+'px';
+    tooltip.innerHTML=`<div style="color:rgba(255,255,255,.4);font-size:9px;margin-bottom:5px;">Day ${Math.round(day)}</div>
+      <div style="color:#F97316;">PHL <strong>${phl}</strong></div>
+      <div style="color:#a855f7;">SF&nbsp;&nbsp;<strong>${sf}</strong></div>
+      <div style="color:#60a5fa;">NYC <strong>${nyc}</strong></div>`;
+  });
+  hitArea.addEventListener('mouseleave',()=>{ xline.setAttribute('x1',-10); xline.setAttribute('x2',-10); tooltip.style.display='none'; });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForkFox Pulse · Node Graph Gallery R4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0a;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --border: rgba(255,255,255,.08);
+  --orange: #F97316;
+  --red: #FA2A52;
+  --green: #34d399;
+  --amber: #fbbf24;
+  --blue: #60a5fa;
+  --text: #e5e5e5;
+  --text-muted: rgba(255,255,255,.4);
+  --text-dim: rgba(255,255,255,.2);
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; line-height: 1.5; }
+
+/* NAV */
+.nav {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(10,10,10,.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 56px;
+}
+.nav-brand { font-family: 'Geologica', sans-serif; font-weight: 900; font-size: 18px; letter-spacing: -.5px; }
+.nav-brand span { color: var(--orange); }
+.nav-divider { color: var(--text-dim); margin: 0 8px; }
+.nav-label { color: var(--text-muted); font-size: 13px; font-weight: 500; }
+.nav-links { display: flex; gap: 4px; }
+.nav-links a {
+  text-decoration: none; color: var(--text-muted); font-size: 13px; font-weight: 500;
+  padding: 6px 12px; border-radius: 6px; border: 1px solid transparent;
+  transition: all .2s;
+}
+.nav-links a:hover { color: var(--text); border-color: var(--border); background: var(--surface2); }
+
+/* PAGE HEADER */
+.page-header {
+  text-align: center; padding: 80px 24px 48px;
+  border-bottom: 1px solid var(--border);
+}
+.page-header h1 {
+  font-family: 'Geologica', sans-serif; font-weight: 900;
+  font-size: clamp(36px, 6vw, 72px); letter-spacing: -2px; line-height: 1.05;
+}
+.page-header h1 span { color: var(--orange); }
+.page-header p { color: var(--text-muted); font-size: 16px; margin-top: 16px; max-width: 580px; margin-inline: auto; }
+
+/* DESIGN SECTION */
+.design-section { padding: 80px 0; border-bottom: 1px solid var(--border); }
+.section-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+.concept-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 99px; padding: 4px 14px;
+  font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 20px;
+}
+.section-title {
+  font-family: 'Geologica', sans-serif; font-weight: 900;
+  font-size: clamp(28px, 4vw, 48px); letter-spacing: -1px; margin-bottom: 10px;
+}
+.section-desc { color: var(--text-muted); font-size: 15px; max-width: 600px; margin-bottom: 36px; }
+
+/* PREVIEW FRAME */
+.preview-frame {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden; position: relative;
+  margin-bottom: 32px;
+}
+
+/* PROS CONS */
+.pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+.pros-cons-card {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px;
+}
+.pros-cons-card h4 { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+.pros-cons-card.pros h4 { color: var(--green); }
+.pros-cons-card.cons h4 { color: var(--red); }
+.pros-cons-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.pros-cons-card li { font-size: 13px; color: var(--text-muted); padding-left: 16px; position: relative; }
+.pros-cons-card li::before { position: absolute; left: 0; font-weight: 700; }
+.pros-cons-card.pros li::before { content: '+'; color: var(--green); }
+.pros-cons-card.cons li::before { content: '−'; color: var(--red); }
+
+/* GRAPH HINT */
+.graph-hint {
+  position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+  font-size: 11px; color: var(--text-dim); white-space: nowrap;
+  pointer-events: none; letter-spacing: .5px;
+}
+
+/* BELOW-GRAPH LAYOUT */
+.below-graph { display: grid; gap: 20px; padding: 24px; border-top: 1px solid var(--border); }
+.below-graph.three-col { grid-template-columns: 1fr 1fr 1fr; }
+.below-graph-card { background: var(--surface2); border-radius: 12px; padding: 20px; }
+.below-graph-card-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* FLOAT ANIMATIONS */
+@keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+@keyframes float2 { 0%,100%{transform:translateY(-2px)} 50%{transform:translateY(3px)} }
+@keyframes float3 { 0%,100%{transform:translateY(1px)} 50%{transform:translateY(-4px)} }
+@keyframes float4 { 0%,100%{transform:translateY(-3px)} 50%{transform:translateY(2px)} }
+@keyframes float5 { 0%,100%{transform:translateY(2px)} 50%{transform:translateY(-2px)} }
+
+/* PARTICLE DASH FLOWS */
+@keyframes dash-flow { to { stroke-dashoffset: 0; } }
+@keyframes dash-flow-rev { to { stroke-dashoffset: 60; } }
+
+/* =====================================================================
+   NC5 — AFFINITY DNA
+===================================================================== */
+#nc5 .preview-frame { background: linear-gradient(160deg, #0d0b20 0%, #0a0a0a 60%); }
+
+/* connection hover card */
+.conn-card {
+  position: fixed; width: 320px; z-index: 500;
+  background: rgba(10,10,14,.94); backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.1); border-radius: 14px;
+  padding: 20px; pointer-events: none; opacity: 0;
+  transition: opacity .2s; box-shadow: 0 12px 48px rgba(0,0,0,.7);
+}
+.conn-card.visible { opacity: 1; }
+.conn-card-pair { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.conn-card-strength-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.conn-card-strength-label { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.conn-card-strength-bar { flex: 1; height: 4px; background: rgba(255,255,255,.08); border-radius: 99px; overflow: hidden; }
+.conn-card-strength-fill { height: 100%; background: var(--orange); border-radius: 99px; transition: width .4s ease; }
+.conn-card-strength-num { font-family: 'Geologica', sans-serif; font-weight: 900; font-size: 15px; color: var(--orange); }
+.conn-card-reasons { display: flex; flex-direction: column; gap: 10px; }
+.conn-reason-row { display: flex; gap: 10px; align-items: flex-start; }
+.conn-reason-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.conn-reason-body { flex: 1; }
+.conn-reason-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.conn-reason-name { font-size: 12px; font-weight: 600; }
+.conn-reason-score { font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.conn-reason-bar { height: 3px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; margin-bottom: 4px; }
+.conn-reason-fill { height: 100%; border-radius: 99px; }
+.conn-reason-detail { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+.conn-card-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,.06); }
+.conn-chip {
+  font-size: 10px; font-weight: 500; padding: 2px 8px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 99px; color: var(--text-muted);
+}
+
+/* NC5 connection line hitbox (wider invisible stroke for hover) */
+.nc5-edge-hit { stroke: transparent; stroke-width: 3; fill: none; cursor: pointer; }
+.nc5-edge-hit:hover ~ .nc5-edge-vis { stroke-opacity: 0.9 !important; }
+
+/* NC5 node dimming */
+.nc5-graph-wrap.dimmed .nc5-node-g { opacity: 0.2; transition: opacity .25s; }
+.nc5-graph-wrap.dimmed .nc5-node-g.lit { opacity: 1; }
+.nc5-graph-wrap.dimmed .nc5-edge-group { opacity: 0.08; transition: opacity .25s; }
+.nc5-graph-wrap.dimmed .nc5-edge-group.lit { opacity: 1; }
+
+/* NC5 connection rank rows */
+.nc5-conn-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 8px; border: 1px solid transparent;
+  background: rgba(255,255,255,.03); margin-bottom: 6px; font-size: 12px;
+}
+.nc5-conn-row:hover { background: rgba(255,255,255,.06); border-color: var(--border); }
+.nc5-conn-rank { font-size: 10px; color: var(--text-dim); width: 16px; text-align: center; font-variant-numeric: tabular-nums; }
+.nc5-conn-names { flex: 1; font-weight: 500; line-height: 1.3; }
+.nc5-conn-icons { display: flex; gap: 2px; font-size: 11px; }
+.nc5-conn-score { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--orange); font-size: 13px; }
+
+/* NC5 type legend rows */
+.nc5-type-row { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+.nc5-type-row:last-child { border-bottom: none; }
+.nc5-type-icon { font-size: 18px; }
+.nc5-type-body { flex: 1; }
+.nc5-type-name { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+.nc5-type-desc { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+
+/* NC5 network leader rows */
+.nc5-leader-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 8px;
+  background: rgba(255,255,255,.03); margin-bottom: 6px;
+}
+.nc5-leader-rank { font-size: 10px; color: var(--text-dim); width: 16px; }
+.nc5-leader-name { flex: 1; font-size: 12px; font-weight: 600; }
+.nc5-leader-bar-wrap { width: 60px; height: 4px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
+.nc5-leader-bar { height: 100%; border-radius: 99px; }
+.nc5-leader-score { font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-muted); min-width: 28px; text-align: right; }
+
+/* =====================================================================
+   NC6 — SIGNAL WEB
+===================================================================== */
+#nc6 .preview-frame { background: linear-gradient(160deg, #0d0b20 0%, #0a0a0a 60%); }
+
+/* mid-line badge */
+.nc6-badge {
+  position: absolute; transform: translate(-50%, -50%);
+  background: rgba(20,20,28,.88); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 99px; padding: 3px 9px;
+  font-size: 11px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 4px;
+  transition: all .2s; white-space: nowrap; z-index: 10;
+  pointer-events: auto;
+}
+.nc6-badge:hover { background: rgba(30,30,40,.95); border-color: rgba(255,255,255,.22); transform: translate(-50%,-50%) scale(1.05); }
+.nc6-badge-icon { font-size: 12px; }
+.nc6-badge-score { font-variant-numeric: tabular-nums; }
+
+/* nc6 type strip */
+.nc6-type-strip {
+  display: flex; gap: 6px; padding: 10px 16px;
+  border-bottom: 1px solid var(--border); background: rgba(255,255,255,.02);
+  flex-wrap: wrap;
+}
+.nc6-type-pill {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600; padding: 3px 10px;
+  border-radius: 99px; border: 1px solid transparent;
+  letter-spacing: .3px;
+}
+.nc6-type-pill.chef { background: rgba(249,115,22,.1); border-color: rgba(249,115,22,.2); color: #F97316; }
+.nc6-type-pill.supplier { background: rgba(52,211,153,.1); border-color: rgba(52,211,153,.2); color: #34d399; }
+.nc6-type-pill.menu { background: rgba(96,165,250,.1); border-color: rgba(96,165,250,.2); color: #60a5fa; }
+.nc6-type-pill.customer { background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.2); color: #fbbf24; }
+
+/* nc6 right panel */
+.nc6-panel {
+  position: absolute; top: 0; right: 0; width: 42%; height: 100%;
+  background: rgba(10,10,16,.96); backdrop-filter: blur(20px);
+  border-left: 1px solid rgba(255,255,255,.1);
+  transform: translateX(100%);
+  transition: transform .35s cubic-bezier(.16,1,.3,1);
+  z-index: 50; overflow-y: auto; padding: 24px 20px;
+}
+.nc6-panel.open { transform: translateX(0); }
+.nc6-panel-header { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,.07); }
+.nc6-panel-name { font-family: 'Geologica', sans-serif; font-weight: 900; font-size: 20px; line-height: 1.1; }
+.nc6-panel-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; letter-spacing: .5px; }
+.nc6-panel-close {
+  position: absolute; top: 16px; right: 16px; width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 50%; cursor: pointer; font-size: 14px; color: var(--text-muted);
+  transition: all .15s;
+}
+.nc6-panel-close:hover { color: var(--text); border-color: rgba(255,255,255,.2); }
+.nc6-conn-item { padding: 12px; background: rgba(255,255,255,.03); border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,.05); }
+.nc6-conn-item-pair { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.nc6-conn-item-strength { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.nc6-conn-item-bar { flex: 1; height: 3px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
+.nc6-conn-item-fill { height: 100%; background: var(--orange); border-radius: 99px; }
+.nc6-conn-item-num { font-size: 12px; font-weight: 700; color: var(--orange); font-variant-numeric: tabular-nums; }
+.nc6-conn-reason-mini { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
+.nc6-conn-reason-mini-score { font-weight: 600; color: var(--text); }
+
+/* nc6 stat */
+.nc6-stat { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 13px; }
+.nc6-stat:last-child { border-bottom: none; }
+.nc6-stat-label { color: var(--text-muted); }
+.nc6-stat-val { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* nc6 donut-like bar */
+.nc6-type-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 12px; }
+.nc6-type-bar-icon { font-size: 14px; }
+.nc6-type-bar-name { width: 90px; }
+.nc6-type-bar-track { flex: 1; height: 5px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
+.nc6-type-bar-fill { height: 100%; border-radius: 99px; }
+.nc6-type-bar-count { font-weight: 700; width: 16px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* nc6 insight card */
+.nc6-insight-card {
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07);
+  border-radius: 10px; padding: 14px; margin-bottom: 10px;
+}
+.nc6-insight-tag { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--orange); margin-bottom: 6px; }
+.nc6-insight-text { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.nc6-insight-text strong { color: var(--text); }
+
+/* =====================================================================
+   NC7 — DEEP LINKS
+===================================================================== */
+#nc7 .preview-frame { background: linear-gradient(160deg, #0e0c1a 0%, #0b0b0b 60%); }
+
+/* nc7 fan hover — handled via JS class toggling */
+.nc7-strand { transition: opacity .2s, stroke-width .2s; }
+.nc7-edge-group:hover .nc7-strand { opacity: 0.9; stroke-width: 0.7 !important; }
+.nc7-edge-group:hover .nc7-strand-label { opacity: 1 !important; }
+
+.nc7-strand-label { opacity: 0; transition: opacity .2s; font-family: 'Inter', sans-serif; pointer-events: none; }
+
+/* nc7 strand key rows */
+.nc7-key-row { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+.nc7-key-row:last-child { border-bottom: none; }
+.nc7-key-line { width: 24px; height: 3px; border-radius: 99px; flex-shrink: 0; margin-top: 7px; }
+.nc7-key-body { flex: 1; }
+.nc7-key-name { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+.nc7-key-why { font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+
+/* nc7 bundle rows */
+.nc7-bundle-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px; border-radius: 8px; background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.05); margin-bottom: 8px;
+}
+.nc7-bundle-strands { display: flex; gap: 2px; align-items: center; }
+.nc7-bundle-strand { width: 16px; height: 3px; border-radius: 99px; }
+.nc7-bundle-names { flex: 1; font-size: 12px; font-weight: 600; line-height: 1.3; }
+.nc7-bundle-score { font-size: 13px; font-weight: 700; color: var(--orange); font-variant-numeric: tabular-nums; }
+
+/* nc7 live feed */
+.nc7-feed-item {
+  display: flex; gap: 10px; padding: 10px; border-radius: 8px;
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.05);
+  margin-bottom: 8px;
+}
+.nc7-feed-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.nc7-feed-body { flex: 1; }
+.nc7-feed-headline { font-size: 12px; font-weight: 600; margin-bottom: 3px; line-height: 1.3; }
+.nc7-feed-sub { font-size: 11px; color: var(--text-muted); }
+.nc7-feed-time { font-size: 10px; color: var(--text-dim); margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+/* LIVE BADGE */
+.live-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 500; color: var(--text-muted);
+  background: rgba(52,211,153,.08); border: 1px solid rgba(52,211,153,.2);
+  border-radius: 99px; padding: 4px 12px;
+}
+.live-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+  animation: pulse-green 2s ease-in-out infinite;
+}
+@keyframes pulse-green {
+  0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(52,211,153,.5); }
+  50% { opacity: .8; box-shadow: 0 0 0 4px rgba(52,211,153,0); }
+}
+
+@media (max-width: 768px) {
+  .below-graph.three-col { grid-template-columns: 1fr; }
+  .pros-cons { grid-template-columns: 1fr; }
+  .nc6-panel { width: 85%; }
+  .conn-card { width: 280px; }
+  .nav-links a:not(:last-child) { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div style="display:flex;align-items:center;gap:0">
+    <span class="nav-brand">Fork<span>Fox</span> Pulse</span>
+    <span class="nav-divider"> · </span>
+    <span class="nav-label">Node Graphs R4</span>
+  </div>
+  <div class="nav-links">
+    <a href="node-gallery.html">← Node Gallery</a>
+    <a href="chart-gallery.html">Charts</a>
+    <a href="index.html">Hub</a>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>Fork<span>Fox</span> Pulse</h1>
+  <p>Round 4: Connection Intelligence. Three designs that answer the one question plain node graphs can't — <em>why</em> are these restaurants linked, and what does that mean for foodies?</p>
+</div>
+
+<!-- =====================================================================
+     NC5 — AFFINITY DNA
+===================================================================== -->
+<section class="design-section" id="nc5">
+  <div class="section-inner">
+    <div class="concept-label">NC5</div>
+    <h2 class="section-title">Affinity DNA</h2>
+    <p class="section-desc">Connections flow like a living system — particles pulse through lines whose width reflects bond strength. Hover any connection to read the full story of why two restaurants belong together.</p>
+
+    <div class="preview-frame" id="nc5-frame" style="position:relative;">
+      <!-- SVG GRAPH -->
+      <svg id="nc5-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"
+        style="width:100%;aspect-ratio:1/1;display:block;cursor:default;">
+        <defs>
+          <filter id="glow-orange5" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-green5" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-amber5" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-red5" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <!-- Gradient definitions generated by JS -->
+        </defs>
+
+        <!-- Neighborhood labels -->
+        <text x="14" y="11" font-family="Inter,sans-serif" font-size="3" font-weight="700" fill="rgba(255,255,255,.05)" letter-spacing=".5">FISHTOWN</text>
+        <text x="46" y="48" font-family="Inter,sans-serif" font-size="2.8" font-weight="700" fill="rgba(255,255,255,.05)" letter-spacing=".5">RITTENHOUSE</text>
+        <text x="65" y="33" font-family="Inter,sans-serif" font-size="2.6" font-weight="700" fill="rgba(255,255,255,.05)" letter-spacing=".5">OLD CITY</text>
+        <text x="13" y="80" font-family="Inter,sans-serif" font-size="2.6" font-weight="700" fill="rgba(255,255,255,.05)" letter-spacing=".5">SOUTH PHILLY</text>
+        <text x="61" y="80" font-family="Inter,sans-serif" font-size="2.6" font-weight="700" fill="rgba(255,255,255,.05)" letter-spacing=".5">KENSINGTON</text>
+
+        <!-- Edge groups injected by JS -->
+        <g id="nc5-edges"></g>
+
+        <!-- Nodes injected by JS -->
+        <g id="nc5-nodes"></g>
+      </svg>
+
+      <!-- Connection hover card (fixed positioning via JS) -->
+      <div class="conn-card" id="nc5-conn-card">
+        <div class="conn-card-pair" id="nc5-card-pair"></div>
+        <div class="conn-card-strength-wrap">
+          <span class="conn-card-strength-label">Affinity Bond</span>
+          <div class="conn-card-strength-bar"><div class="conn-card-strength-fill" id="nc5-card-bar"></div></div>
+          <span class="conn-card-strength-num" id="nc5-card-score"></span>
+        </div>
+        <div class="conn-card-reasons" id="nc5-card-reasons"></div>
+        <div class="conn-card-chips" id="nc5-card-chips"></div>
+      </div>
+
+      <div class="graph-hint">Hover a connection line to see why these restaurants are linked</div>
+    </div>
+
+    <!-- BELOW GRAPH -->
+    <div class="below-graph three-col">
+      <div class="below-graph-card">
+        <div class="below-graph-card-title">Strongest Links</div>
+        <div id="nc5-top-conns"></div>
+      </div>
+      <div class="below-graph-card">
+        <div class="below-graph-card-title">Connection Types</div>
+        <div id="nc5-type-legend"></div>
+      </div>
+      <div class="below-graph-card">
+        <div class="below-graph-card-title">Network Leaders</div>
+        <div id="nc5-leaders"></div>
+      </div>
+    </div>
+
+    <div class="pros-cons">
+      <div class="pros-cons-card pros">
+        <h4>Strengths</h4>
+        <ul>
+          <li>Particles make the network feel alive — foodies sense activity before they read a word</li>
+          <li>Full 4-factor breakdown on every connection hover — no data left behind</li>
+          <li>Line width encodes bond strength passively — strongest links are unmissable</li>
+          <li>Dimming on node hover cuts visual clutter precisely where needed</li>
+          <li>Chips at card bottom give foodies vocabulary to describe the connection</li>
+        </ul>
+      </div>
+      <div class="pros-cons-card cons">
+        <h4>Tradeoffs</h4>
+        <ul>
+          <li>Hover card on mobile requires tap precision on thin lines — challenging UX</li>
+          <li>Many connections visible at once may overwhelm casual users</li>
+          <li>Fixed-position card can clip at viewport edge on small screens</li>
+          <li>Particles add GPU cost on low-end devices with many edges</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+     NC6 — SIGNAL WEB
+===================================================================== -->
+<section class="design-section" id="nc6">
+  <div class="section-inner">
+    <div class="concept-label">NC6</div>
+    <h2 class="section-title">Signal Web</h2>
+    <p class="section-desc">Every connection wears its badge — a small pill floating mid-line shows the primary bond type and strength at a glance. Click a restaurant node to pull up the full connection dossier in a side panel.</p>
+
+    <div class="preview-frame" id="nc6-frame" style="position:relative;overflow:hidden;">
+      <!-- Type strip -->
+      <div class="nc6-type-strip">
+        <div class="live-badge" style="margin-right:auto;"><div class="live-dot"></div>Philadelphia · 8 active connections</div>
+        <div class="nc6-type-pill chef">👨‍🍳 Chef Network</div>
+        <div class="nc6-type-pill supplier">🌿 Shared Suppliers</div>
+        <div class="nc6-type-pill menu">🍽️ Menu Philosophy</div>
+        <div class="nc6-type-pill customer">👥 Guest Overlap</div>
+      </div>
+
+      <!-- SVG graph -->
+      <svg id="nc6-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"
+        style="width:100%;aspect-ratio:1/1;display:block;cursor:default;">
+        <defs>
+          <filter id="glow-orange6" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-green6" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-amber6" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-red6" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <style>
+            @keyframes nc6-dash { to { stroke-dashoffset: -20; } }
+          </style>
+        </defs>
+
+        <!-- neighborhood labels -->
+        <text x="14" y="11" font-family="Inter,sans-serif" font-size="3" font-weight="700" fill="rgba(255,255,255,.04)" letter-spacing=".5">FISHTOWN</text>
+        <text x="46" y="48" font-family="Inter,sans-serif" font-size="2.8" font-weight="700" fill="rgba(255,255,255,.04)" letter-spacing=".5">RITTENHOUSE</text>
+        <text x="65" y="33" font-family="Inter,sans-serif" font-size="2.6" font-weight="700" fill="rgba(255,255,255,.04)" letter-spacing=".5">OLD CITY</text>
+        <text x="13" y="80" font-family="Inter,sans-serif" font-size="2.6" font-weight="700" fill="rgba(255,255,255,.04)" letter-spacing=".5">SOUTH PHILLY</text>
+        <text x="61" y="80" font-family="Inter,sans-serif" font-size="2.6" font-weight="700" fill="rgba(255,255,255,.04)" letter-spacing=".5">KENSINGTON</text>
+
+        <g id="nc6-edges"></g>
+        <g id="nc6-nodes"></g>
+      </svg>
+
+      <!-- Mid-line badges container (absolute over SVG) -->
+      <div id="nc6-badges" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></div>
+
+      <!-- Expanded connection card for NC6 badge hover -->
+      <div class="conn-card" id="nc6-conn-card" style="z-index:100;">
+        <div class="conn-card-pair" id="nc6-card-pair"></div>
+        <div class="conn-card-strength-wrap">
+          <span class="conn-card-strength-label">Affinity Bond</span>
+          <div class="conn-card-strength-bar"><div class="conn-card-strength-fill" id="nc6-card-bar"></div></div>
+          <span class="conn-card-strength-num" id="nc6-card-score"></span>
+        </div>
+        <div class="conn-card-reasons" id="nc6-card-reasons"></div>
+        <div class="conn-card-chips" id="nc6-card-chips"></div>
+      </div>
+
+      <!-- Right panel -->
+      <div class="nc6-panel" id="nc6-panel">
+        <div class="nc6-panel-close" id="nc6-close">×</div>
+        <div id="nc6-panel-content"></div>
+      </div>
+
+      <div class="graph-hint">Click a restaurant node to open its connection dossier</div>
+    </div>
+
+    <!-- BELOW GRAPH -->
+    <div class="below-graph three-col">
+      <div class="below-graph-card">
+        <div class="below-graph-card-title">Your Network at a Glance</div>
+        <div id="nc6-stats"></div>
+      </div>
+      <div class="below-graph-card">
+        <div class="below-graph-card-title">By Connection Type</div>
+        <div id="nc6-type-breakdown"></div>
+      </div>
+      <div class="below-graph-card">
+        <div class="below-graph-card-title">Intelligence Briefs</div>
+        <div id="nc6-insight-cards"></div>
+      </div>
+    </div>
+
+    <div class="pros-cons">
+      <div class="pros-cons-card pros">
+        <h4>Strengths</h4>
+        <ul>
+          <li>Always-on badges mean zero hover-fishing — every connection is legible at rest</li>
+          <li>Color-coded by dominant bond type creates instant wayfinding across the graph</li>
+          <li>Right panel is a full dossier — perfect for the curious foodie who wants everything</li>
+          <li>Dashed flow animation gives direction without overwhelming the eye</li>
+          <li>Works beautifully as a click-first mobile pattern (node click → panel)</li>
+        </ul>
+      </div>
+      <div class="pros-cons-card cons">
+        <h4>Tradeoffs</h4>
+        <ul>
+          <li>Badge density can crowd the graph on a phone if connections overlap</li>
+          <li>Right panel eats 40% of frame — smaller graph area to explore</li>
+          <li>Dominant type coloring may oversimplify multi-driver connections</li>
+          <li>Panel close gesture is unfamiliar for users expecting a back button</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+     NC7 — DEEP LINKS
+===================================================================== -->
+<section class="design-section" id="nc7">
+  <div class="section-inner">
+    <div class="concept-label">NC7</div>
+    <h2 class="section-title">Deep Links</h2>
+    <p class="section-desc">Every bond is a bundle — four parallel strands color-coded by type. The thickness tells you how many forces hold these restaurants together. Hover to fan the strands open and read each driver clearly.</p>
+
+    <div class="preview-frame" id="nc7-frame" style="position:relative;">
+      <svg id="nc7-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"
+        style="width:100%;aspect-ratio:1/1;display:block;cursor:default;">
+        <defs>
+          <filter id="glow-orange7" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-green7" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-amber7" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-red7" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1.3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <style>
+            @keyframes nc7-dash { to { stroke-dashoffset: -16; } }
+          </style>
+        </defs>
+
+        <text x="14" y="11" font-family="Inter,sans-serif" font-size="3" font-weight="700" fill="rgba(255,255,255,.04)" letter-spacing=".5">FISHTOWN</text>
+        <text x="46" y="48" font-family="Inter,sans-serif" font-size="2.8" font-weight="700" fill="rgba(255,255,255,.04)" letter-spacing=".5">RITTENHOUSE</text>
+        <text x="65" y="33" font-family="Inter,sans-serif" font-size="2.6" font-weight="700" fill="rgba(255,255,255,.04)" letter-spacing=".5">OLD CITY</text>
+        <text x="13" y="80" font-family="Inter,sans-serif" font-size="2.6" font-weight="700" fill="rgba(255,255,255,.04)" letter-spacing=".5">SOUTH PHILLY</text>
+        <text x="61" y="80" font-family="Inter,sans-serif" font-size="2.6" font-weight="700" fill="rgba(255,255,255,.04)" letter-spacing=".5">KENSINGTON</text>
+
+        <g id="nc7-edges"></g>
+        <g id="nc7-nodes"></g>
+      </svg>
+
+      <div class="graph-hint">Hover a bundle to fan open its ingredient strands</div>
+    </div>
+
+    <!-- BELOW GRAPH -->
+    <div class="below-graph three-col">
+      <div class="below-graph-card">
+        <div class="below-graph-card-title">Strand Key</div>
+        <div id="nc7-strand-key"></div>
+      </div>
+      <div class="below-graph-card">
+        <div class="below-graph-card-title">Thickest Bundles</div>
+        <div id="nc7-bundles"></div>
+      </div>
+      <div class="below-graph-card">
+        <div class="below-graph-card-title">Right Now</div>
+        <div id="nc7-live-feed"></div>
+      </div>
+    </div>
+
+    <div class="pros-cons">
+      <div class="pros-cons-card pros">
+        <h4>Strengths</h4>
+        <ul>
+          <li>Most information-dense design — reveals all four drivers without any click</li>
+          <li>Bundle thickness gives instant sense of connection complexity</li>
+          <li>Fan-open hover is visually satisfying and memorable</li>
+          <li>Square nodes feel architectural and data-confident, unlike generic circles</li>
+          <li>Strand color system is learnable in one pass — applies to the whole graph</li>
+        </ul>
+      </div>
+      <div class="pros-cons-card cons">
+        <h4>Tradeoffs</h4>
+        <ul>
+          <li>Highest learning curve — requires user to absorb the strand legend first</li>
+          <li>Fan-open animation needs smooth perpendicular math or it looks jittery</li>
+          <li>At small sizes (mobile) strands compress to illegible hairlines</li>
+          <li>Label density on hover can overlap neighboring bundles</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+     JAVASCRIPT
+===================================================================== -->
+<script>
+// ── SHARED DATA ──────────────────────────────────────────────────────────────
+
+const RESTAURANTS = [
+  { idx:0, name:"Vernick Fish",          short:"Vernick",    cx:22, cy:28, r:3.5, status:"trending", color:"#F97316", buzz:94, hood:"Fishtown",    price:"$$$$", chef:"Greg Vernick" },
+  { idx:1, name:"Laser Wolf",            short:"Laser Wolf", cx:30, cy:20, r:3.0, status:"rising",   color:"#34d399", buzz:88, hood:"Fishtown",    price:"$$$",  chef:"Andrew Henshaw" },
+  { idx:2, name:"Kalaya",                short:"Kalaya",     cx:20, cy:72, r:2.5, status:"rising",   color:"#34d399", buzz:82, hood:"S. Philly",   price:"$$$",  chef:"Nok Suntaranon" },
+  { idx:3, name:"Suraya",                short:"Suraya",     cx:18, cy:42, r:2.5, status:"stable",   color:"#fbbf24", buzz:76, hood:"Fishtown",    price:"$$$",  chef:"Nick Kennedy" },
+  { idx:4, name:"Friday Saturday Sunday",short:"Fri Sat Sun",cx:52, cy:52, r:2.5, status:"rising",   color:"#34d399", buzz:79, hood:"Rittenhouse", price:"$$$$", chef:"Chad Williams" },
+  { idx:5, name:"Zahav",                 short:"Zahav",      cx:66, cy:38, r:1.8, status:"cooling",  color:"#FA2A52", buzz:61, hood:"Old City",    price:"$$$$", chef:"Michael Solomonov" },
+  { idx:6, name:"Parc",                  short:"Parc",       cx:58, cy:62, r:1.8, status:"cooling",  color:"#FA2A52", buzz:58, hood:"Rittenhouse", price:"$$$",  chef:"Stephen Starr" },
+  { idx:7, name:"Pizzeria Beddia",       short:"Beddia",     cx:12, cy:35, r:1.8, status:"stable",   color:"#fbbf24", buzz:71, hood:"Fishtown",    price:"$$",   chef:"Joe Beddia" },
+  { idx:8, name:"Cheik",                 short:"Cheik",      cx:68, cy:72, r:2.5, status:"rising",   color:"#34d399", buzz:83, hood:"Kensington",  price:"$$",   chef:"Cheik Mbaye" },
+];
+
+const CONNECTIONS = [
+  { a:0, b:1, strength:87, reasons:[
+    {type:'chef',    icon:'👨‍🍳', label:'Chef Network',    score:85, detail:'Both James Beard Philly alumni — cross-trained kitchens'},
+    {type:'supplier',icon:'🌿', label:'Shared Suppliers', score:72, detail:'South Jersey farms & Rittenhouse Market Co-op'},
+    {type:'menu',    icon:'🍽️', label:'Menu Philosophy',  score:88, detail:'Whole-fish, open-flame, restrained preparations'},
+    {type:'customer',icon:'👥', label:'Guest Overlap',    score:74, detail:'74% of regulars dined at both in the past month'},
+  ], shared:['Natural wine program','Fish-forward menus','Fishtown neighborhood'] },
+
+  { a:1, b:5, strength:92, reasons:[
+    {type:'chef',    icon:'👨‍🍳', label:'Restaurant Group',score:95, detail:'Both CookNSolo restaurants — same owner & supply chain'},
+    {type:'menu',    icon:'🍽️', label:'Menu Philosophy',  score:94, detail:'Israeli cuisine as foundation, hummus as centerpiece'},
+    {type:'supplier',icon:'🌿', label:'Shared Suppliers', score:90, detail:'Same produce and import chain across the portfolio'},
+    {type:'customer',icon:'👥', label:'Guest Overlap',    score:88, detail:'Shared loyalty program — 88% crossover diners'},
+  ], shared:['Israeli wine list','Tahini-forward','In-house pita program'] },
+
+  { a:0, b:3, strength:79, reasons:[
+    {type:'supplier',icon:'🌿', label:'Shared Suppliers', score:82, detail:'Iovine Bros and local Fishtown co-ops exclusively'},
+    {type:'customer',icon:'👥', label:'Guest Overlap',    score:76, detail:'76% of Friday dinner guests visit both monthly'},
+    {type:'menu',    icon:'🍽️', label:'Menu Philosophy',  score:69, detail:'Middle Eastern influence, mezze-forward sharing culture'},
+    {type:'chef',    icon:'👨‍🍳', label:'Chef Network',    score:71, detail:'Both chefs active in the Fishtown dining collective'},
+  ], shared:['Fishtown address','Mezze/sharing format','Garden herb programs'] },
+
+  { a:1, b:7, strength:74, reasons:[
+    {type:'customer',icon:'👥', label:'Guest Overlap',    score:78, detail:'Fishtown crowd bounces between both bi-weekly'},
+    {type:'supplier',icon:'🌿', label:'Shared Suppliers', score:71, detail:'Same natural wine importer & Fishtown produce collective'},
+    {type:'menu',    icon:'🍽️', label:'Menu Philosophy',  score:62, detail:'Cult-following, limited seating, zero pretension'},
+    {type:'chef',    icon:'👨‍🍳', label:'Chef Network',    score:65, detail:'Co-taught masterclasses at Philly Food Week'},
+  ], shared:['Cult neighborhood status','Natural wine','Fishtown block'] },
+
+  { a:4, b:5, strength:78, reasons:[
+    {type:'chef',    icon:'👨‍🍳', label:'Chef Network',    score:80, detail:"Philly's top two James Beard winners in fine dining"},
+    {type:'customer',icon:'👥', label:'Guest Overlap',    score:82, detail:'Fine-dining regulars booking both in same windows'},
+    {type:'menu',    icon:'🍽️', label:'Menu Philosophy',  score:74, detail:'Chef-driven tasting menus at $120+ price point'},
+    {type:'supplier',icon:'🌿', label:'Shared Suppliers', score:58, detail:"Both source from Philly's top-tier specialty butchers"},
+  ], shared:['James Beard chefs','Tasting menu format','National top-50 ranked'] },
+
+  { a:4, b:6, strength:69, reasons:[
+    {type:'customer',icon:'👥', label:'Guest Overlap',    score:74, detail:'Rittenhouse regulars splitting between both monthly'},
+    {type:'menu',    icon:'🍽️', label:'Menu Philosophy',  score:68, detail:'French-rooted, refined presentation, long-form dining'},
+    {type:'supplier',icon:'🌿', label:'Shared Suppliers', score:61, detail:'Same imported French butter and cheese program'},
+    {type:'chef',    icon:'👨‍🍳', label:'Chef Network',    score:55, detail:'Adjacent fine-dining community, overlapping media'},
+  ], shared:['Rittenhouse Square address','French technique','Wine-driven dining'] },
+
+  { a:2, b:8, strength:76, reasons:[
+    {type:'chef',    icon:'👨‍🍳', label:'Chef Network',    score:79, detail:'Immigrant chef stories — Thai & Senegalese-American'},
+    {type:'menu',    icon:'🍽️', label:'Menu Philosophy',  score:80, detail:'Diaspora cooking, spice-forward, zero compromise'},
+    {type:'customer',icon:'👥', label:'Guest Overlap',    score:73, detail:'Adventurous eater crossover on every "must visit" list'},
+    {type:'supplier',icon:'🌿', label:'Shared Suppliers', score:60, detail:'Same South Philly specialty spice importers'},
+  ], shared:['Diaspora-forward cuisine','BYOB policy','Under-the-radar gems'] },
+
+  { a:2, b:4, strength:71, reasons:[
+    {type:'chef',    icon:'👨‍🍳', label:'Chef Network',    score:76, detail:'Co-taught at James Beard Benefit Dinner 2025'},
+    {type:'customer',icon:'👥', label:'Guest Overlap',    score:72, detail:'72% of adventurous diners try both in a weekend'},
+    {type:'menu',    icon:'🍽️', label:'Menu Philosophy',  score:68, detail:'Technique-first cooking with bold cultural anchors'},
+    {type:'supplier',icon:'🌿', label:'Shared Suppliers', score:57, detail:'Both use Sang Kee imports and specialty Asian grocers'},
+  ], shared:['Eater Philadelphia Top 10','Chef-personality driven','Seasonal prix-fixe'] },
+];
+
+// ── DERIVED DATA ─────────────────────────────────────────────────────────────
+const TYPE_COLORS = { chef:'#F97316', supplier:'#34d399', menu:'#60a5fa', customer:'#fbbf24' };
+const TYPE_LABELS = { chef:'Chef Network', supplier:'Shared Suppliers', menu:'Menu Philosophy', customer:'Guest Overlap' };
+const GLOW_FILTER = { trending:'url(#glow-orange', rising:'url(#glow-green', stable:'url(#glow-amber', cooling:'url(#glow-red' };
+
+// Dominant type per connection (highest-score reason)
+function dominantType(conn) {
+  return conn.reasons.reduce((a, b) => a.score >= b.score ? a : b).type;
+}
+
+// Per-node total connection strength
+function nodeStrengths() {
+  const totals = {};
+  RESTAURANTS.forEach(r => totals[r.idx] = 0);
+  CONNECTIONS.forEach(c => {
+    totals[c.a] += c.strength;
+    totals[c.b] += c.strength;
+  });
+  return totals;
+}
+
+// SVG namespace helper
+const SVG_NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs={}) {
+  const el = document.createElementNS(SVG_NS, tag);
+  Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
+  return el;
+}
+
+// ── SHARED CARD RENDERER ─────────────────────────────────────────────────────
+function renderConnCard(conn, pairEl, barEl, scoreEl, reasonsEl, chipsEl) {
+  const ra = RESTAURANTS[conn.a], rb = RESTAURANTS[conn.b];
+  pairEl.textContent = `${ra.name} ↔ ${rb.name}`;
+  barEl.style.width = conn.strength + '%';
+  scoreEl.textContent = conn.strength;
+  reasonsEl.innerHTML = conn.reasons.map(r => {
+    const col = TYPE_COLORS[r.type];
+    return `<div class="conn-reason-row">
+      <div class="conn-reason-icon">${r.icon}</div>
+      <div class="conn-reason-body">
+        <div class="conn-reason-label">
+          <span class="conn-reason-name" style="color:${col}">${r.label}</span>
+          <span class="conn-reason-score" style="color:${col}">${r.score}</span>
+        </div>
+        <div class="conn-reason-bar"><div class="conn-reason-fill" style="width:${r.score}%;background:${col}"></div></div>
+        <div class="conn-reason-detail">${r.detail}</div>
+      </div>
+    </div>`;
+  }).join('');
+  chipsEl.innerHTML = conn.shared.map(s => `<span class="conn-chip">${s}</span>`).join('');
+}
+
+// ── NC5 — AFFINITY DNA ───────────────────────────────────────────────────────
+(function() {
+  const svg = document.getElementById('nc5-svg');
+  const edgesG = document.getElementById('nc5-edges');
+  const nodesG = document.getElementById('nc5-nodes');
+  const card = document.getElementById('nc5-conn-card');
+  const pairEl = document.getElementById('nc5-card-pair');
+  const barEl = document.getElementById('nc5-card-bar');
+  const scoreEl = document.getElementById('nc5-card-score');
+  const reasonsEl = document.getElementById('nc5-card-reasons');
+  const chipsEl = document.getElementById('nc5-card-chips');
+
+  const defs = svg.querySelector('defs');
+
+  // Build gradient defs
+  CONNECTIONS.forEach((conn, i) => {
+    const ra = RESTAURANTS[conn.a], rb = RESTAURANTS[conn.b];
+    const grad = svgEl('linearGradient', {
+      id: `nc5-grad-${i}`, gradientUnits: 'userSpaceOnUse',
+      x1: ra.cx, y1: ra.cy, x2: rb.cx, y2: rb.cy
+    });
+    grad.appendChild(svgEl('stop', { offset: '0%',   'stop-color': ra.color }));
+    grad.appendChild(svgEl('stop', { offset: '100%', 'stop-color': rb.color }));
+    defs.appendChild(grad);
+  });
+
+  // Build edge groups
+  CONNECTIONS.forEach((conn, i) => {
+    const ra = RESTAURANTS[conn.a], rb = RESTAURANTS[conn.b];
+    const sw = Math.max(0.3, Math.min(1.2, conn.strength/100 * 1.2));
+    const op = 0.15 + conn.strength/100 * 0.4;
+
+    const g = svgEl('g', { class: 'nc5-edge-group', 'data-conn': i });
+    g.style.cursor = 'pointer';
+
+    // Visible gradient line
+    const vis = svgEl('line', {
+      class: 'nc5-edge-vis',
+      x1: ra.cx, y1: ra.cy, x2: rb.cx, y2: rb.cy,
+      stroke: `url(#nc5-grad-${i})`,
+      'stroke-width': sw,
+      'stroke-opacity': op,
+      'stroke-linecap': 'round'
+    });
+    g.appendChild(vis);
+
+    // Invisible wider hitbox
+    const hit = svgEl('line', {
+      class: 'nc5-edge-hit',
+      x1: ra.cx, y1: ra.cy, x2: rb.cx, y2: rb.cy,
+      stroke: 'transparent', 'stroke-width': 3, fill: 'none'
+    });
+    g.appendChild(hit);
+
+    // Particles (animateMotion)
+    const delays = [0, 1.2, 2.4];
+    delays.forEach((delay, pi) => {
+      const p = svgEl('circle', { r: 0.45, fill: pi % 2 === 0 ? ra.color : rb.color });
+      p.style.opacity = '0.75';
+      const am = document.createElementNS(SVG_NS, 'animateMotion');
+      am.setAttribute('dur', (3 + conn.strength / 60).toFixed(1) + 's');
+      am.setAttribute('repeatCount', 'indefinite');
+      am.setAttribute('begin', delay + 's');
+      const mpath = document.createElementNS(SVG_NS, 'mpath');
+      // We'll use path directly
+      am.setAttribute('path', `M ${ra.cx},${ra.cy} L ${rb.cx},${rb.cy}`);
+      p.appendChild(am);
+      g.appendChild(p);
+    });
+
+    edgesG.appendChild(g);
+
+    // Hover events
+    g.addEventListener('mouseenter', (e) => showNC5Card(e, conn, i, g));
+    g.addEventListener('mousemove', (e) => positionCard(e, card));
+    g.addEventListener('mouseleave', () => { card.classList.remove('visible'); });
+  });
+
+  function showNC5Card(e, conn, idx, g) {
+    renderConnCard(conn, pairEl, barEl, scoreEl, reasonsEl, chipsEl);
+    card.classList.add('visible');
+    positionCard(e, card);
+  }
+
+  function positionCard(e, card) {
+    const vw = window.innerWidth, vh = window.innerHeight;
+    let x = e.clientX + 16, y = e.clientY + 16;
+    if (x + 330 > vw) x = e.clientX - 330;
+    if (y + 400 > vh) y = e.clientY - 400;
+    card.style.left = x + 'px';
+    card.style.top  = y + 'px';
+  }
+
+  // Build node groups
+  const floats = ['float1 4.2s','float2 3.8s','float3 5.1s','float4 4.7s','float5 3.5s','float1 5.5s','float2 4.9s','float3 4.0s','float4 3.2s'];
+  const glowIds = { trending:'glow-orange5', rising:'glow-green5', stable:'glow-amber5', cooling:'glow-red5' };
+
+  RESTAURANTS.forEach((r, idx) => {
+    const g = svgEl('g', { class: 'nc5-node-g', 'data-idx': idx });
+    g.style.animation = floats[idx] + ' ease-in-out infinite';
+    g.style.cursor = 'pointer';
+
+    // Status ring (outer)
+    g.appendChild(svgEl('circle', {
+      cx: r.cx, cy: r.cy, r: r.r + 0.7,
+      fill: 'none', stroke: r.color, 'stroke-width': 0.3, 'stroke-opacity': 0.35
+    }));
+    // Main node
+    g.appendChild(svgEl('circle', {
+      cx: r.cx, cy: r.cy, r: r.r,
+      fill: r.color, filter: `url(#${glowIds[r.status]})`
+    }));
+    // Label
+    const lbl = svgEl('text', {
+      x: r.cx, y: r.cy - r.r - 1.2,
+      'text-anchor': 'middle',
+      'font-family': 'Inter,sans-serif',
+      'font-size': '2',
+      fill: 'rgba(255,255,255,.7)'
+    });
+    lbl.setAttribute('pointer-events', 'none');
+    lbl.textContent = r.short;
+    g.appendChild(lbl);
+
+    nodesG.appendChild(g);
+
+    // Node hover dimming
+    g.addEventListener('mouseenter', () => dimForNode(idx));
+    g.addEventListener('mouseleave', () => undim());
+  });
+
+  function dimForNode(idx) {
+    const wrap = svg.closest('#nc5-frame') || svg.parentElement;
+    edgesG.querySelectorAll('.nc5-edge-group').forEach((eg, i) => {
+      const c = CONNECTIONS[i];
+      if (c.a === idx || c.b === idx) eg.classList.add('lit');
+      else eg.classList.remove('lit');
+    });
+    nodesG.querySelectorAll('.nc5-node-g').forEach((ng, i) => {
+      const r = RESTAURANTS[i];
+      const touched = CONNECTIONS.some(c => (c.a===idx && c.b===i)||(c.b===idx && c.a===i));
+      if (i === idx || touched) ng.style.opacity = '1';
+      else ng.style.opacity = '0.15';
+    });
+    edgesG.querySelectorAll('.nc5-edge-group').forEach((eg, i) => {
+      const c = CONNECTIONS[i];
+      if (c.a !== idx && c.b !== idx) eg.style.opacity = '0.06';
+      else eg.style.opacity = '1';
+    });
+  }
+  function undim() {
+    nodesG.querySelectorAll('.nc5-node-g').forEach(ng => ng.style.opacity = '');
+    edgesG.querySelectorAll('.nc5-edge-group').forEach(eg => eg.style.opacity = '');
+  }
+
+  // ── NC5 BELOW GRAPH ────────────────────────────────────────────────────────
+  // Col 1: Top 5 connections
+  const sorted = [...CONNECTIONS].sort((a,b) => b.strength - a.strength);
+  const topConns = document.getElementById('nc5-top-conns');
+  sorted.slice(0,5).forEach((c, i) => {
+    const ra = RESTAURANTS[c.a], rb = RESTAURANTS[c.b];
+    const icons = [...new Set(c.reasons.map(r=>r.icon))];
+    topConns.innerHTML += `<div class="nc5-conn-row">
+      <span class="nc5-conn-rank">${i+1}</span>
+      <span class="nc5-conn-names">${ra.short}<br><small style="color:var(--text-muted)">↔ ${rb.short}</small></span>
+      <span class="nc5-conn-icons">${icons.join('')}</span>
+      <span class="nc5-conn-score">${c.strength}</span>
+    </div>`;
+  });
+
+  // Col 2: Connection type legend
+  const types = [
+    { type:'chef',    icon:'👨‍🍳', name:'Chef Network',    col:'#F97316', desc:"Where a chef trained and who they've cooked alongside shapes every decision on the menu — from sourcing to technique to pricing." },
+    { type:'supplier',icon:'🌿', name:'Shared Suppliers', col:'#34d399', desc:"Two restaurants buying from the same farm or importer share flavor DNA. When the produce is identical, the dish philosophy often follows." },
+    { type:'menu',    icon:'🍽️', name:'Menu Philosophy',  col:'#60a5fa', desc:"Cuisine style, format, and technique overlap. A commitment to open-flame cooking or Japanese minimalism creates a natural kinship even across zip codes." },
+    { type:'customer',icon:'👥', name:'Guest Overlap',    col:'#fbbf24', desc:"The percentage of regulars who dine at both monthly. High overlap means a trend at one will surface at the other within two weeks." },
+  ];
+  const typeLeg = document.getElementById('nc5-type-legend');
+  types.forEach(t => {
+    typeLeg.innerHTML += `<div class="nc5-type-row">
+      <div class="nc5-type-icon">${t.icon}</div>
+      <div class="nc5-type-body">
+        <div class="nc5-type-name" style="color:${t.col}">${t.name}</div>
+        <div class="nc5-type-desc">${t.desc}</div>
+      </div>
+    </div>`;
+  });
+
+  // Col 3: Network leaders
+  const strengths = nodeStrengths();
+  const maxStrength = Math.max(...Object.values(strengths));
+  const rankedNodes = RESTAURANTS.filter(r => strengths[r.idx] > 0)
+    .sort((a,b) => strengths[b.idx] - strengths[a.idx]);
+  const leadersEl = document.getElementById('nc5-leaders');
+  rankedNodes.forEach((r, i) => {
+    const pct = Math.round(strengths[r.idx] / maxStrength * 100);
+    leadersEl.innerHTML += `<div class="nc5-leader-row">
+      <span class="nc5-leader-rank">${i+1}</span>
+      <span class="nc5-leader-name">${r.name}</span>
+      <div class="nc5-leader-bar-wrap"><div class="nc5-leader-bar" style="width:${pct}%;background:${r.color}"></div></div>
+      <span class="nc5-leader-score" style="color:${r.color}">${strengths[r.idx]}</span>
+    </div>`;
+  });
+})();
+
+// ── NC6 — SIGNAL WEB ─────────────────────────────────────────────────────────
+(function() {
+  const frame = document.getElementById('nc6-frame');
+  const svg = document.getElementById('nc6-svg');
+  const edgesG = document.getElementById('nc6-edges');
+  const nodesG = document.getElementById('nc6-nodes');
+  const badgesDiv = document.getElementById('nc6-badges');
+  const card = document.getElementById('nc6-conn-card');
+  const panel = document.getElementById('nc6-panel');
+  const panelContent = document.getElementById('nc6-panel-content');
+  const closeBtn = document.getElementById('nc6-close');
+
+  const glowIds = { trending:'glow-orange6', rising:'glow-green6', stable:'glow-amber6', cooling:'glow-red6' };
+  const domTypeColorMap = { chef:'#F97316', supplier:'#34d399', menu:'#60a5fa', customer:'#fbbf24' };
+
+  let activeConn = null;
+  let cardTimeout = null;
+
+  // Build edges with dashed animation (color = dominant type)
+  CONNECTIONS.forEach((conn, i) => {
+    const ra = RESTAURANTS[conn.a], rb = RESTAURANTS[conn.b];
+    const dtype = dominantType(conn);
+    const dcol = domTypeColorMap[dtype];
+    const sw = Math.max(0.35, Math.min(1.0, conn.strength/100));
+    const dur = (1.5 + (100 - conn.strength)/100).toFixed(1) + 's';
+
+    const g = svgEl('g', { class: 'nc6-edge-group', 'data-conn': i });
+
+    const line = svgEl('line', {
+      x1: ra.cx, y1: ra.cy, x2: rb.cx, y2: rb.cy,
+      stroke: dcol, 'stroke-width': sw,
+      'stroke-opacity': 0.4, 'stroke-linecap': 'round',
+      'stroke-dasharray': '3,3'
+    });
+    line.style.animation = `nc6-dash ${dur} linear infinite`;
+    g.appendChild(line);
+
+    edgesG.appendChild(g);
+  });
+
+  // Badge positioning helper — convert SVG coords to CSS % over the frame
+  function svgToPercent(x, y) {
+    // viewBox 0 0 100 100, aspect-ratio 1/1 → direct percentage
+    return { left: x + '%', top: y + '%' };
+  }
+
+  // Build mid-line badges
+  CONNECTIONS.forEach((conn, i) => {
+    const ra = RESTAURANTS[conn.a], rb = RESTAURANTS[conn.b];
+    const mx = (ra.cx + rb.cx) / 2;
+    const my = (ra.cy + rb.cy) / 2;
+    const dtype = dominantType(conn);
+    const icon = conn.reasons.find(r => r.type === dtype).icon;
+    const pos = svgToPercent(mx, my);
+
+    const badge = document.createElement('div');
+    badge.className = 'nc6-badge';
+    badge.style.left = pos.left;
+    badge.style.top = pos.top;
+    badge.style.pointerEvents = 'auto';
+    badge.innerHTML = `<span class="nc6-badge-icon">${icon}</span><span class="nc6-badge-score">${conn.strength}</span>`;
+    badge.dataset.conn = i;
+    badgesDiv.appendChild(badge);
+
+    badge.addEventListener('mouseenter', (e) => {
+      clearTimeout(cardTimeout);
+      renderConnCard(conn,
+        document.getElementById('nc6-card-pair'),
+        document.getElementById('nc6-card-bar'),
+        document.getElementById('nc6-card-score'),
+        document.getElementById('nc6-card-reasons'),
+        document.getElementById('nc6-card-chips')
+      );
+      card.classList.add('visible');
+      posCard(e);
+    });
+    badge.addEventListener('mousemove', posCard);
+    badge.addEventListener('mouseleave', () => {
+      cardTimeout = setTimeout(() => card.classList.remove('visible'), 200);
+    });
+    card.addEventListener('mouseenter', () => clearTimeout(cardTimeout));
+    card.addEventListener('mouseleave', () => card.classList.remove('visible'));
+  });
+
+  function posCard(e) {
+    const vw = window.innerWidth, vh = window.innerHeight;
+    let x = e.clientX + 16, y = e.clientY + 16;
+    if (x + 330 > vw) x = e.clientX - 340;
+    if (y + 420 > vh) y = e.clientY - 420;
+    card.style.left = x + 'px';
+    card.style.top  = y + 'px';
+  }
+
+  // Build nodes
+  const floats = ['float1 4.2s','float2 3.8s','float3 5.1s','float4 4.7s','float5 3.5s','float1 5.5s','float2 4.9s','float3 4.0s','float4 3.2s'];
+  RESTAURANTS.forEach((r, idx) => {
+    const g = svgEl('g', { class: 'nc6-node-g', 'data-idx': idx });
+    g.style.animation = floats[idx] + ' ease-in-out infinite';
+    g.style.cursor = 'pointer';
+
+    g.appendChild(svgEl('circle', {
+      cx: r.cx, cy: r.cy, r: r.r + 0.6,
+      fill: 'none', stroke: r.color, 'stroke-width': 0.3, 'stroke-opacity': 0.3
+    }));
+    g.appendChild(svgEl('circle', {
+      cx: r.cx, cy: r.cy, r: r.r,
+      fill: r.color, filter: `url(#${glowIds[r.status]})`
+    }));
+    const lbl = svgEl('text', {
+      x: r.cx, y: r.cy - r.r - 1.2,
+      'text-anchor': 'middle', 'font-family': 'Inter,sans-serif',
+      'font-size': '2', fill: 'rgba(255,255,255,.7)'
+    });
+    lbl.setAttribute('pointer-events', 'none');
+    lbl.textContent = r.short;
+    g.appendChild(lbl);
+    nodesG.appendChild(g);
+
+    g.addEventListener('click', () => openPanel(idx));
+  });
+
+  function openPanel(idx) {
+    const r = RESTAURANTS[idx];
+    const myConns = CONNECTIONS.filter(c => c.a === idx || c.b === idx).sort((a,b) => b.strength - a.strength);
+    panelContent.innerHTML = `
+      <div class="nc6-panel-header">
+        <div class="nc6-panel-name" style="color:${r.color}">${r.name}</div>
+        <div class="nc6-panel-meta">${r.hood} · ${r.price} · Chef ${r.chef}</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">${myConns.length} Active Connection${myConns.length!==1?'s':''}</div>
+      ${myConns.map(c => {
+        const other = RESTAURANTS[c.a === idx ? c.b : c.a];
+        const topR = c.reasons.reduce((a,b) => a.score>=b.score?a:b);
+        return `<div class="nc6-conn-item">
+          <div class="nc6-conn-item-pair" style="color:${other.color}">${other.name}</div>
+          <div class="nc6-conn-item-strength">
+            <div class="nc6-conn-item-bar"><div class="nc6-conn-item-fill" style="width:${c.strength}%"></div></div>
+            <span class="nc6-conn-item-num">${c.strength}</span>
+          </div>
+          ${c.reasons.map(re => `<div class="nc6-conn-reason-mini">
+            <span>${re.icon}</span>
+            <span>${re.label}</span>
+            <span class="nc6-conn-reason-mini-score" style="margin-left:auto">${re.score}</span>
+          </div>`).join('')}
+        </div>`;
+      }).join('')}
+    `;
+    panel.classList.add('open');
+  }
+
+  closeBtn.addEventListener('click', () => panel.classList.remove('open'));
+
+  // ── NC6 BELOW GRAPH ────────────────────────────────────────────────────────
+  // Col 1: Stats
+  const totalStrength = CONNECTIONS.reduce((s,c) => s+c.strength, 0);
+  const strongest = [...CONNECTIONS].sort((a,b) => b.strength - a.strength)[0];
+  const ra = RESTAURANTS[strongest.a], rb = RESTAURANTS[strongest.b];
+  const avgStrength = Math.round(totalStrength / CONNECTIONS.length);
+
+  const statsEl = document.getElementById('nc6-stats');
+  [
+    ['Restaurants tracked', RESTAURANTS.length],
+    ['Active connections', CONNECTIONS.length],
+    ['Average bond strength', avgStrength],
+    ['Strongest link', `${ra.short} ↔ ${rb.short}`],
+    ['Strongest score', strongest.strength],
+    ['Rising connections', CONNECTIONS.filter(c => c.strength >= 75).length],
+    ['Cross-neighborhood links', CONNECTIONS.filter(c => RESTAURANTS[c.a].hood !== RESTAURANTS[c.b].hood).length],
+    ['Fishtown connections', CONNECTIONS.filter(c => [c.a,c.b].some(i => RESTAURANTS[i].hood==='Fishtown')).length],
+  ].forEach(([label, val]) => {
+    statsEl.innerHTML += `<div class="nc6-stat">
+      <span class="nc6-stat-label">${label}</span>
+      <span class="nc6-stat-val">${val}</span>
+    </div>`;
+  });
+
+  // Col 2: Type breakdown — count dominant type per connection
+  const typeCounts = { chef:0, supplier:0, menu:0, customer:0 };
+  CONNECTIONS.forEach(c => typeCounts[dominantType(c)]++);
+  const maxCount = Math.max(...Object.values(typeCounts));
+  const typeBreakEl = document.getElementById('nc6-type-breakdown');
+  [
+    { type:'chef',    icon:'👨‍🍳', label:'Chef Network',    col:'#F97316' },
+    { type:'menu',    icon:'🍽️', label:'Menu Philosophy',  col:'#60a5fa' },
+    { type:'customer',icon:'👥', label:'Guest Overlap',    col:'#fbbf24' },
+    { type:'supplier',icon:'🌿', label:'Shared Suppliers', col:'#34d399' },
+  ].forEach(t => {
+    const n = typeCounts[t.type];
+    typeBreakEl.innerHTML += `<div class="nc6-type-bar-row">
+      <span class="nc6-type-bar-icon">${t.icon}</span>
+      <span class="nc6-type-bar-name">${t.label}</span>
+      <div class="nc6-type-bar-track"><div class="nc6-type-bar-fill" style="width:${Math.round(n/maxCount*100)}%;background:${t.col}"></div></div>
+      <span class="nc6-type-bar-count" style="color:${t.col}">${n}</span>
+    </div>`;
+  });
+  typeBreakEl.innerHTML += `<div style="margin-top:12px;font-size:11px;color:var(--text-muted);line-height:1.5">Each connection is classified by its strongest individual driver — the factor that explains the most about why these two restaurants belong together.</div>`;
+
+  // Col 3: Intelligence briefs
+  const insightsEl = document.getElementById('nc6-insight-cards');
+  [
+    { tag:'Guest Intelligence', text:'<strong>Vernick Fish and Laser Wolf</strong> share 74% of their monthly regulars. When Vernick trends up, Laser Wolf typically follows within 10–14 days — track both together.' },
+    { tag:'Owner Ecosystem', text:'<strong>Laser Wolf and Zahav</strong> are both CookNSolo restaurants. A staffing move, a supplier win, or a press mention at one almost always ripples to the other within the week.' },
+    { tag:'Diaspora Wave', text:'<strong>Kalaya and Cheik</strong> are the city\'s two strongest immigrant-chef BYOB plays. Adventurous diners treat them as a double-header — they\'re on every "must-try Philly" list together.' },
+  ].forEach(ins => {
+    insightsEl.innerHTML += `<div class="nc6-insight-card">
+      <div class="nc6-insight-tag">${ins.tag}</div>
+      <div class="nc6-insight-text">${ins.text}</div>
+    </div>`;
+  });
+})();
+
+// ── NC7 — DEEP LINKS ─────────────────────────────────────────────────────────
+(function() {
+  const svg = document.getElementById('nc7-svg');
+  const edgesG = document.getElementById('nc7-edges');
+  const nodesG = document.getElementById('nc7-nodes');
+
+  const TYPE_ORDER = ['chef','supplier','menu','customer'];
+  const STRAND_COLS = { chef:'rgba(249,115,22,.55)', supplier:'rgba(52,211,153,.55)', menu:'rgba(96,165,250,.55)', customer:'rgba(251,191,36,.55)' };
+  const STRAND_COLS_LIT = { chef:'rgba(249,115,22,.95)', supplier:'rgba(52,211,153,.95)', menu:'rgba(96,165,250,.95)', customer:'rgba(251,191,36,.95)' };
+  const STRAND_NAMES = { chef:'Chef Network', supplier:'Shared Suppliers', menu:'Menu Philosophy', customer:'Guest Overlap' };
+  const glowIds = { trending:'glow-orange7', rising:'glow-green7', stable:'glow-amber7', cooling:'glow-red7' };
+
+  // Perpendicular offset helper
+  function perp(x1,y1,x2,y2,d) {
+    const dx = x2-x1, dy = y2-y1;
+    const len = Math.hypot(dx,dy);
+    const px = -dy/len, py = dx/len;
+    return { x1: x1+px*d, y1: y1+py*d, x2: x2+px*d, y2: y2+py*d };
+  }
+
+  CONNECTIONS.forEach((conn, ci) => {
+    const ra = RESTAURANTS[conn.a], rb = RESTAURANTS[conn.b];
+    const offsets = [-0.55, -0.2, 0.2, 0.55];
+    const dur = (2 + (100 - conn.strength)/80).toFixed(1) + 's';
+
+    const g = svgEl('g', { class: 'nc7-edge-group', 'data-conn': ci });
+    g.style.cursor = 'pointer';
+
+    TYPE_ORDER.forEach((type, ti) => {
+      const d = offsets[ti];
+      const pts = perp(ra.cx, ra.cy, rb.cx, rb.cy, d);
+      const score = conn.reasons.find(r => r.type === type)?.score || 0;
+      const sw = Math.max(0.25, score/100 * 0.65);
+
+      const strand = svgEl('line', {
+        class: 'nc7-strand',
+        x1: pts.x1, y1: pts.y1, x2: pts.x2, y2: pts.y2,
+        stroke: STRAND_COLS[type],
+        'stroke-width': sw,
+        'stroke-linecap': 'round',
+        'stroke-dasharray': '2.5,2.5'
+      });
+      strand.style.animation = `nc7-dash ${dur} linear infinite`;
+      strand.dataset.type = type;
+      g.appendChild(strand);
+
+      // Type label (visible on hover via group hover via CSS + JS)
+      const mx = (pts.x1 + pts.x2) / 2;
+      const my = (pts.y1 + pts.y2) / 2;
+      const lbl = svgEl('text', {
+        class: 'nc7-strand-label',
+        x: mx, y: my - 0.8,
+        'text-anchor': 'middle',
+        'font-family': 'Inter,sans-serif',
+        'font-size': '1.8',
+        fill: STRAND_COLS_LIT[type],
+        'stroke': '#0a0a0a',
+        'stroke-width': '0.5',
+        'paint-order': 'stroke'
+      });
+      lbl.textContent = STRAND_NAMES[type] + ' ' + score;
+      g.appendChild(lbl);
+    });
+
+    edgesG.appendChild(g);
+
+    // Hover: fan strands open
+    g.addEventListener('mouseenter', () => {
+      const strands = g.querySelectorAll('.nc7-strand');
+      const labels = g.querySelectorAll('.nc7-strand-label');
+      const fanOffsets = [-1.4, -0.5, 0.5, 1.4];
+      strands.forEach((s, ti) => {
+        const type = TYPE_ORDER[ti];
+        const d = fanOffsets[ti];
+        const pts = perp(ra.cx, ra.cy, rb.cx, rb.cy, d);
+        s.setAttribute('x1', pts.x1); s.setAttribute('y1', pts.y1);
+        s.setAttribute('x2', pts.x2); s.setAttribute('y2', pts.y2);
+        s.setAttribute('stroke', STRAND_COLS_LIT[type]);
+        s.setAttribute('stroke-width', '0.6');
+        labels[ti].setAttribute('x', (pts.x1+pts.x2)/2);
+        labels[ti].setAttribute('y', (pts.y1+pts.y2)/2 - 0.9);
+        labels[ti].style.opacity = '1';
+      });
+    });
+    g.addEventListener('mouseleave', () => {
+      const strands = g.querySelectorAll('.nc7-strand');
+      const labels = g.querySelectorAll('.nc7-strand-label');
+      const origOffsets = [-0.55, -0.2, 0.2, 0.55];
+      strands.forEach((s, ti) => {
+        const type = TYPE_ORDER[ti];
+        const d = origOffsets[ti];
+        const pts = perp(ra.cx, ra.cy, rb.cx, rb.cy, d);
+        s.setAttribute('x1', pts.x1); s.setAttribute('y1', pts.y1);
+        s.setAttribute('x2', pts.x2); s.setAttribute('y2', pts.y2);
+        s.setAttribute('stroke', STRAND_COLS[type]);
+        const score = conn.reasons.find(r => r.type === type)?.score || 0;
+        s.setAttribute('stroke-width', Math.max(0.25, score/100 * 0.65));
+        labels[ti].style.opacity = '0';
+      });
+    });
+  });
+
+  // Build square-ish nodes (rounded rect)
+  const floats = ['float1 4.2s','float2 3.8s','float3 5.1s','float4 4.7s','float5 3.5s','float1 5.5s','float2 4.9s','float3 4.0s','float4 3.2s'];
+  RESTAURANTS.forEach((r, idx) => {
+    const g = svgEl('g', { class: 'nc7-node-g', 'data-idx': idx });
+    g.style.animation = floats[idx] + ' ease-in-out infinite';
+    g.style.cursor = 'pointer';
+
+    const s = r.r * 1.7; // rect side (approx same area as circle)
+    g.appendChild(svgEl('rect', {
+      x: r.cx - s/2, y: r.cy - s/2, width: s, height: s,
+      rx: 0.5, ry: 0.5,
+      fill: r.color, filter: `url(#${glowIds[r.status]})`
+    }));
+    // Outer ring rect
+    g.appendChild(svgEl('rect', {
+      x: r.cx - s/2 - 0.5, y: r.cy - s/2 - 0.5, width: s+1, height: s+1,
+      rx: 0.8, ry: 0.8,
+      fill: 'none', stroke: r.color, 'stroke-width': 0.3, 'stroke-opacity': 0.35
+    }));
+    const lbl = svgEl('text', {
+      x: r.cx, y: r.cy - s/2 - 1.2,
+      'text-anchor': 'middle', 'font-family': 'Inter,sans-serif',
+      'font-size': '1.9', fill: 'rgba(255,255,255,.7)'
+    });
+    lbl.setAttribute('pointer-events', 'none');
+    lbl.textContent = r.short;
+    g.appendChild(lbl);
+    nodesG.appendChild(g);
+  });
+
+  // ── NC7 BELOW GRAPH ────────────────────────────────────────────────────────
+  // Col 1: Strand key
+  const keyEl = document.getElementById('nc7-strand-key');
+  [
+    { type:'chef',    col:'#F97316', name:'Chef Network',    why:"The alumni tree behind a toque is the single strongest predictor of a restaurant's culinary fingerprint. Shared training = shared DNA." },
+    { type:'supplier',col:'#34d399', name:'Shared Suppliers', why:"Two kitchens drawing from the same farm are building flavor on the same raw material. You'll taste the kinship before you read the menu." },
+    { type:'menu',    col:'#60a5fa', name:'Menu Philosophy',  why:"Technique, format, and cuisine philosophy. When two chefs solve the same problem — how to cook a whole fish — from the same angle, diners feel it." },
+    { type:'customer',col:'#fbbf24', name:'Guest Overlap',    why:"The most real-time signal. High crossover means a sell-out event, a viral dish, or a PR moment at one will hit both reservation books within days." },
+  ].forEach(t => {
+    keyEl.innerHTML += `<div class="nc7-key-row">
+      <div class="nc7-key-line" style="background:${t.col}"></div>
+      <div class="nc7-key-body">
+        <div class="nc7-key-name" style="color:${t.col}">${t.name}</div>
+        <div class="nc7-key-why">${t.why}</div>
+      </div>
+    </div>`;
+  });
+
+  // Col 2: Thickest bundles (ranked by avg strand score + strength)
+  const bundlesEl = document.getElementById('nc7-bundles');
+  const scored = CONNECTIONS.map(c => ({
+    conn: c,
+    bundleScore: c.reasons.reduce((s,r)=>s+r.score,0) / c.reasons.length,
+    strandCount: c.reasons.length
+  })).sort((a,b) => b.bundleScore - a.bundleScore);
+
+  scored.forEach(({conn, bundleScore, strandCount}) => {
+    const ra = RESTAURANTS[conn.a], rb = RESTAURANTS[conn.b];
+    const strandBars = TYPE_ORDER.map(type => {
+      const r = conn.reasons.find(r => r.type === type);
+      return r ? `<div class="nc7-bundle-strand" style="background:${STRAND_COLS_LIT[type]};opacity:${0.4+r.score/100*.6}"></div>` : '';
+    }).join('');
+    bundlesEl.innerHTML += `<div class="nc7-bundle-row">
+      <div class="nc7-bundle-strands">${strandBars}</div>
+      <div class="nc7-bundle-names">${ra.short}<br><small style="color:var(--text-muted)">↔ ${rb.short}</small></div>
+      <div class="nc7-bundle-score">${Math.round(bundleScore)}</div>
+    </div>`;
+  });
+
+  // Col 3: Live feed
+  const feedEl = document.getElementById('nc7-live-feed');
+  [
+    { col:'#F97316', headline:'Vernick ↔ Laser Wolf bond strengthened +3pts', detail:'New shared sommelier hire this week — first CookNSolo/Vernick staff crossover in two years.', time:'2h ago' },
+    { col:'#34d399', headline:'Kalaya ↔ Fri Sat Sun: new supplier overlap', detail:'Both chefs now sourcing from Sang Kee Imports for spring produce — strand activated.', time:'Yesterday' },
+    { col:'#fbbf24', headline:'Suraya guest overlap with Vernick climbed to 76%', detail:'Post-Food-Week reservations show record crossover — highest in 14 months.', time:'3 days ago' },
+    { col:'#60a5fa', headline:'Zahav ↔ Fri Sat Sun: tasting menu alignment', detail:'Both published spring prix-fixe formats within 48 hours. Menu philosophy score up to 74.', time:'5 days ago' },
+  ].forEach(f => {
+    feedEl.innerHTML += `<div class="nc7-feed-item">
+      <div class="nc7-feed-dot" style="background:${f.col}"></div>
+      <div class="nc7-feed-body">
+        <div class="nc7-feed-headline">${f.headline}</div>
+        <div class="nc7-feed-sub">${f.detail}</div>
+        <div class="nc7-feed-time">${f.time}</div>
+      </div>
+    </div>`;
+  });
+})();
+</script>
+</body>
+</html>
