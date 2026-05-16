@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ForkFox Pulse — Feed V2 Design Gallery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Brand tokens ─────────────────────────────────────────────── */
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface2: #1a1a1a;
+      --surface3: #222222;
+      --border: rgba(255,255,255,.07);
+      --border-solid: #2a2a2a;
+      --text: #f0f0f0;
+      --muted: #888888;
+      --muted2: #555555;
+      --orange: #F97316;
+      --red: #FA2A52;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --blue: #60a5fa;
+      --purple: #a855f7;
+    }
+
+    /* ── Reset ────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      line-height: 1.4;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, h4, h5 { font-family: 'Geologica', sans-serif; }
+
+    /* ── Sticky Nav ───────────────────────────────────────────────── */
+    .gnav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(10,10,10,.97);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: .8rem 2rem;
+      flex-wrap: wrap;
+    }
+    .gnav-brand {
+      font-family: 'Geologica', sans-serif;
+      font-size: .95rem;
+      font-weight: 900;
+      color: #fff;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .gnav-brand span { color: var(--orange); }
+    .gnav-badge {
+      font-size: .58rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .18rem .48rem;
+      border-radius: 4px;
+      background: rgba(249,115,22,.15);
+      color: var(--orange);
+      border: 1px solid rgba(249,115,22,.25);
+      margin-left: .4rem;
+      vertical-align: middle;
+    }
+    .gnav-jumps {
+      display: flex;
+      gap: .3rem;
+      flex: 1;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .jump-btn {
+      padding: .35rem 1rem;
+      border-radius: 100px;
+      border: 1px solid rgba(255,255,255,.1);
+      background: transparent;
+      color: rgba(255,255,255,.45);
+      font-size: .75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: 'Geologica', sans-serif;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .jump-btn:hover {
+      border-color: rgba(249,115,22,.4);
+      color: rgba(255,255,255,.8);
+    }
+    .jump-btn.active {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: #fff;
+    }
+    .gnav-back {
+      padding: .35rem 1rem;
+      border-radius: 100px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: transparent;
+      color: rgba(255,255,255,.4);
+      font-size: .72rem;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all .2s;
+      font-family: 'Geologica', sans-serif;
+    }
+    .gnav-back:hover { color: var(--orange); border-color: rgba(249,115,22,.4); }
+
+    /* ── Page header ──────────────────────────────────────────────── */
+    .page-header {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 52px 2rem 36px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+    .kicker {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: .6rem;
+    }
+    .page-header h1 {
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 900;
+      letter-spacing: -.03em;
+      margin-bottom: .6rem;
+    }
+    .page-header h1 span { color: var(--orange); }
+    .page-header p {
+      font-size: .9rem;
+      color: var(--muted);
+      max-width: 640px;
+      line-height: 1.7;
+    }
+
+    /* ── Design section ───────────────────────────────────────────── */
+    .design-section {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 60px 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .design-section:last-of-type { border-bottom: none; }
+
+    .sec-meta {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: .5rem;
+    }
+    .sec-label {
+      font-size: .62rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
+    .sec-id {
+      font-size: .62rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted2);
+    }
+    .design-section h2 {
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      font-weight: 900;
+      letter-spacing: -.02em;
+      margin-bottom: .5rem;
+    }
+    .sec-desc {
+      font-size: .85rem;
+      color: var(--muted);
+      max-width: 680px;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    /* ── Preview box ──────────────────────────────────────────────── */
+    .preview-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .preview-label {
+      padding: .5rem 1rem;
+      background: rgba(255,255,255,.025);
+      border-bottom: 1px solid var(--border);
+      font-size: .65rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted2);
+    }
+    .preview-inner {
+      padding: 1rem;
+    }
+
+    /* ── Pros / Cons ──────────────────────────────────────────────── */
+    .pcon-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem;
+    }
+    @media (max-width: 600px) { .pcon-grid { grid-template-columns: 1fr; } }
+    .pcon {
+      padding: .85rem 1rem;
+      border-radius: 8px;
+    }
+    .pcon.pros { background: rgba(52,211,153,.05); border: 1px solid rgba(52,211,153,.15); }
+    .pcon.cons { background: rgba(250,42,82,.05); border: 1px solid rgba(250,42,82,.15); }
+    .pcon h5 {
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: .5rem;
+    }
+    .pcon.pros h5 { color: var(--green); }
+    .pcon.cons h5 { color: var(--red); }
+    .pcon ul { list-style: none; display: flex; flex-direction: column; gap: .35rem; }
+    .pcon li {
+      font-size: .75rem;
+      color: rgba(255,255,255,.55);
+      line-height: 1.5;
+      padding-left: .9rem;
+      position: relative;
+    }
+    .pcon li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: .55em;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+    }
+    .pcon.pros li::before { background: var(--green); }
+    .pcon.cons li::before { background: var(--red); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NF1 — THE TICKER BOARD
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* Ticker strip */
+    .nf1-ticker-wrap {
+      background: #0d0d0d;
+      border-top: 2px solid var(--orange);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      overflow: hidden;
+      height: 34px;
+      display: flex;
+      align-items: center;
+    }
+    .nf1-ticker-inner {
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      animation: ticker-scroll 40s linear infinite;
+      will-change: transform;
+    }
+    .nf1-ticker-inner:hover { animation-play-state: paused; }
+    @keyframes ticker-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .nf1-tick-item {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: 0 1.4rem;
+      font-size: .7rem;
+      font-weight: 500;
+      color: rgba(255,255,255,.7);
+      border-right: 1px solid rgba(255,255,255,.08);
+    }
+    .nf1-tick-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .nf1-tick-signal {
+      font-size: .58rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .nf1-tick-sep {
+      color: var(--muted2);
+    }
+    .nf1-tick-src {
+      font-size: .62rem;
+      color: var(--muted);
+      background: rgba(255,255,255,.06);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    .nf1-tick-time {
+      font-size: .62rem;
+      color: var(--muted2);
+    }
+
+    /* Stat bar */
+    .nf1-stat-bar {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(255,255,255,.02);
+    }
+    .nf1-stat {
+      flex: 1;
+      padding: .55rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      border-right: 1px solid rgba(255,255,255,.06);
+      font-size: .72rem;
+    }
+    .nf1-stat:last-child { border-right: none; }
+    .nf1-stat-num {
+      font-family: 'Geologica', sans-serif;
+      font-weight: 800;
+      font-size: .88rem;
+      color: var(--orange);
+    }
+    .nf1-stat-label { color: var(--muted); }
+
+    /* 3-column dense card grid */
+    .nf1-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,.05);
+    }
+    @media (max-width: 900px) { .nf1-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .nf1-grid { grid-template-columns: 1fr; } }
+
+    .nf1-card {
+      background: var(--surface);
+      padding: 10px 12px;
+      max-height: 130px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: background .15s, border-left-color .15s;
+      border-left: 2px solid transparent;
+      position: relative;
+    }
+    .nf1-card:hover {
+      background: var(--surface2);
+      transform: none;
+    }
+    .nf1-card-top {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      margin-bottom: .35rem;
+    }
+    .nf1-time {
+      font-size: .62rem;
+      color: var(--muted2);
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+    .sig-chip {
+      display: inline-flex;
+      align-items: center;
+      height: 16px;
+      padding: 0 5px;
+      border-radius: 3px;
+      font-size: .58rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+      max-width: 40px;
+    }
+    .nf1-source {
+      font-size: .62rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .nf1-nbhd {
+      font-size: .58rem;
+      color: var(--muted2);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 3px;
+      padding: 0 4px;
+      height: 14px;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .nf1-hl {
+      font-size: .75rem;
+      font-weight: 500;
+      line-height: 1.3;
+      color: rgba(255,255,255,.85);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: .35rem;
+    }
+    .nf1-bottom {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .sent-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .nf1-sent-label {
+      font-size: .62rem;
+      color: var(--muted2);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NF2 — THE STREAM
+    ═══════════════════════════════════════════════════════════════ */
+
+    .nf2-wrap {
+      font-size: .78rem;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    /* Status bar */
+    .nf2-status {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .5rem .9rem;
+      background: #0d0d0d;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      font-size: .65rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: live-pulse 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes live-pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(52,211,153,.4); }
+      50% { opacity: .8; box-shadow: 0 0 0 4px rgba(52,211,153,0); }
+    }
+    .nf2-status-live {
+      font-weight: 700;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+    }
+    .nf2-status-sep { color: rgba(255,255,255,.15); }
+
+    /* Feed rows */
+    .nf2-feed {
+      position: relative;
+      overflow: hidden;
+    }
+    .nf2-row {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: 0 .9rem;
+      height: 40px;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      transition: background .12s, border-left-color .12s;
+      border-left: 2px solid transparent;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+    }
+    .nf2-row:nth-child(even) { background: rgba(255,255,255,.018); }
+    .nf2-row:hover {
+      background: rgba(249,115,22,.06) !important;
+      border-left-color: var(--orange);
+    }
+    .nf2-row.is-new {
+      animation: slideInNew .35s ease forwards;
+      border-left-color: var(--green);
+      background: rgba(52,211,153,.06) !important;
+    }
+    @keyframes slideInNew {
+      from { opacity: 0; transform: translateY(-100%); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .nf2-row.fading { opacity: .6; transition: opacity 1.5s ease; }
+
+    .nf2-time {
+      font-size: .6rem;
+      color: var(--muted2);
+      font-weight: 500;
+      flex-shrink: 0;
+      width: 42px;
+      text-align: right;
+    }
+    .nf2-chip {
+      font-size: .58rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      padding: 1px 5px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      width: 32px;
+      text-align: center;
+      line-height: 14px;
+      height: 14px;
+    }
+    .nf2-src {
+      font-size: .62rem;
+      color: var(--muted2);
+      flex-shrink: 0;
+      width: 72px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .nf2-nbhd {
+      font-size: .58rem;
+      color: var(--muted);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 3px;
+      padding: 0 5px;
+      height: 14px;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .nf2-hl {
+      flex: 1;
+      font-size: .75rem;
+      font-weight: 400;
+      color: rgba(255,255,255,.8);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+    .nf2-sent-bar-wrap {
+      width: 40px;
+      height: 4px;
+      background: rgba(255,255,255,.08);
+      border-radius: 2px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .nf2-sent-bar {
+      height: 100%;
+      border-radius: 2px;
+    }
+
+    /* Time divider */
+    .nf2-divider {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .3rem .9rem;
+      background: rgba(255,255,255,.025);
+      border-bottom: 1px solid rgba(255,255,255,.04);
+    }
+    .nf2-divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,.08);
+    }
+    .nf2-divider-label {
+      font-size: .58rem;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      white-space: nowrap;
+    }
+
+    /* Load more */
+    .nf2-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: .6rem 1rem;
+      background: rgba(255,255,255,.018);
+      border-top: 1px solid rgba(255,255,255,.06);
+      font-size: .7rem;
+      color: var(--muted);
+    }
+    .nf2-footer a {
+      color: var(--orange);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .nf2-footer a:hover { text-decoration: underline; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NF3 — THE TRADING FLOOR
+    ═══════════════════════════════════════════════════════════════ */
+
+    .nf3-stat-strip {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .5rem .75rem;
+      background: rgba(255,255,255,.02);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      font-size: .65rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+    .nf3-strip-label {
+      font-weight: 700;
+      color: rgba(255,255,255,.5);
+      font-family: 'Geologica', sans-serif;
+    }
+    .nf3-strip-sep { color: rgba(255,255,255,.15); }
+    .nf3-strip-stat {
+      display: flex;
+      align-items: center;
+      gap: .25rem;
+    }
+    .nf3-strip-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+
+    .nf3-board {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      background: rgba(255,255,255,.04);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,.1) transparent;
+    }
+    .nf3-board::-webkit-scrollbar { height: 4px; }
+    .nf3-board::-webkit-scrollbar-track { background: transparent; }
+    .nf3-board::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+
+    .nf3-col {
+      flex: 1;
+      min-width: 185px;
+      max-width: 280px;
+      border-right: 1px solid rgba(255,255,255,.05);
+      display: flex;
+      flex-direction: column;
+    }
+    .nf3-col:last-child { border-right: none; }
+    .nf3-col.col-close { background: rgba(250,42,82,.025); }
+
+    .nf3-col-head {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      padding: .55rem .7rem;
+      border-bottom: 2px solid;
+      background: rgba(255,255,255,.02);
+      position: sticky;
+      top: 0;
+    }
+    .nf3-col-head .col-emoji { font-size: .85rem; }
+    .nf3-col-name {
+      font-family: 'Geologica', sans-serif;
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .nf3-col-count {
+      margin-left: auto;
+      font-size: .58rem;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nf3-col-cards {
+      padding: .5rem;
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+    }
+
+    .nf3-card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 6px;
+      padding: 8px 10px;
+      max-height: 130px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color .15s, transform .15s;
+    }
+    .nf3-card:hover {
+      transform: translateY(-1px);
+    }
+    .nf3-card-src {
+      font-size: .6rem;
+      color: var(--muted2);
+      margin-bottom: .2rem;
+    }
+    .nf3-nbhd-pill {
+      display: inline-flex;
+      align-items: center;
+      height: 13px;
+      padding: 0 5px;
+      border-radius: 3px;
+      font-size: .56rem;
+      font-weight: 600;
+      border: 1px solid;
+      margin-bottom: .3rem;
+    }
+    .nf3-hl {
+      font-size: .72rem;
+      font-weight: 500;
+      line-height: 1.3;
+      color: rgba(255,255,255,.82);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: .3rem;
+    }
+    .nf3-card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nf3-card-time {
+      font-size: .6rem;
+      color: var(--muted2);
+    }
+    .nf3-sent-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NF4 — STAT STRIP + MASONRY GRID
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* Stat strip */
+    .nf4-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    @media (max-width: 700px) { .nf4-stats { grid-template-columns: repeat(2, 1fr); } }
+
+    .nf4-stat-card {
+      padding: .9rem 1.1rem;
+      border-right: 1px solid rgba(255,255,255,.06);
+      border-left: 3px solid;
+      display: flex;
+      flex-direction: column;
+      gap: .2rem;
+    }
+    .nf4-stat-card:last-child { border-right: none; }
+    .nf4-stat-card:nth-child(1) { border-left-color: var(--orange); }
+    .nf4-stat-card:nth-child(2) { border-left-color: var(--green); }
+    .nf4-stat-card:nth-child(3) { border-left-color: var(--amber); }
+    .nf4-stat-card:nth-child(4) { border-left-color: var(--blue); }
+    .nf4-stat-icon { font-size: .85rem; margin-bottom: .1rem; }
+    .nf4-stat-num {
+      font-family: 'Geologica', sans-serif;
+      font-weight: 900;
+      font-size: 1.35rem;
+      line-height: 1;
+      color: var(--text);
+    }
+    .nf4-stat-sub {
+      font-size: .65rem;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    /* Masonry grid — two explicit columns */
+    .nf4-masonry {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: rgba(255,255,255,.05);
+    }
+    @media (max-width: 600px) { .nf4-masonry { grid-template-columns: 1fr; } }
+
+    .nf4-col { display: flex; flex-direction: column; gap: 1px; }
+
+    .nf4-card {
+      background: var(--surface);
+      padding: 10px 14px;
+      max-height: 130px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: background .15s, transform .15s, box-shadow .15s;
+      position: relative;
+      border-left: 2px solid transparent;
+    }
+    .nf4-card:hover {
+      background: var(--surface2);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,.4);
+    }
+    .nf4-card-top {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      margin-bottom: .35rem;
+    }
+    .nf4-source {
+      font-size: .62rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .nf4-nbhd {
+      font-size: .58rem;
+      color: var(--muted2);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 3px;
+      padding: 0 4px;
+      height: 14px;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .nf4-time {
+      font-size: .6rem;
+      color: var(--muted2);
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+    .nf4-hl {
+      font-size: .77rem;
+      font-weight: 500;
+      line-height: 1.3;
+      color: rgba(255,255,255,.85);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: .35rem;
+    }
+    .nf4-excerpt {
+      font-size: .68rem;
+      color: var(--muted);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .nf4-card-foot {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      margin-top: .35rem;
+    }
+    .nf4-sent-bar-wrap {
+      width: 48px;
+      height: 3px;
+      background: rgba(255,255,255,.08);
+      border-radius: 2px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .nf4-sent-bar { height: 100%; border-radius: 2px; }
+    .nf4-sent-label { font-size: .6rem; color: var(--muted2); }
+  </style>
+</head>
+<body>
+
+<!-- ── Sticky Nav ─────────────────────────────────────────────────── -->
+<nav class="gnav">
+  <a class="gnav-brand" href="index.html">Fork<span>Fox</span> <span class="gnav-badge">Pulse</span></a>
+  <div class="gnav-jumps">
+    <a class="jump-btn" href="#nf1">NF1 Ticker Board</a>
+    <a class="jump-btn" href="#nf2">NF2 The Stream</a>
+    <a class="jump-btn" href="#nf3">NF3 Trading Floor</a>
+    <a class="jump-btn" href="#nf4">NF4 Stat Strip + Grid</a>
+  </div>
+  <a class="gnav-back" href="index.html">← Gallery</a>
+</nav>
+
+<!-- ── Page header ────────────────────────────────────────────────── -->
+<div class="page-header">
+  <div class="kicker">Feed V2 Design Gallery</div>
+  <h1>News Feed <span>Concepts</span></h1>
+  <p>Four redesigned feed layouts — dense, information-rich, alive. Every card capped at 130px. No wasted bars, no empty space. Use these to pick the direction before engineering begins.</p>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     NF1 — THE TICKER BOARD
+══════════════════════════════════════════════════════════════════ -->
+<section class="design-section" id="nf1">
+  <div class="sec-meta">
+    <span class="sec-label">Design Concept</span>
+    <span class="sec-id">NF1</span>
+  </div>
+  <h2>The Ticker Board</h2>
+  <p class="sec-desc">A scrolling ticker strip brings the sensation of live data without a live backend. Below it, a stat bar gives instant pulse metrics, and a dense 3-column card grid shows all articles at maximum density.</p>
+
+  <div class="preview-box">
+    <div class="preview-label">Full Preview — NF1</div>
+    <div class="preview-inner" style="padding:0;">
+
+      <!-- Ticker -->
+      <div class="nf1-ticker-wrap">
+        <div class="nf1-ticker-inner" id="nf1-ticker"></div>
+      </div>
+
+      <!-- Stat bar -->
+      <div class="nf1-stat-bar">
+        <div class="nf1-stat">
+          <span class="nf1-stat-num">14</span>
+          <span class="nf1-stat-label">articles today</span>
+        </div>
+        <div class="nf1-stat">
+          <span class="nf1-stat-num">5</span>
+          <span class="nf1-stat-label">openings</span>
+        </div>
+        <div class="nf1-stat">
+          <span class="nf1-stat-num">Fishtown</span>
+          <span class="nf1-stat-label">trending</span>
+        </div>
+        <div class="nf1-stat">
+          <span class="nf1-stat-num">76</span>
+          <span class="nf1-stat-label">avg sentiment</span>
+        </div>
+      </div>
+
+      <!-- Dense 3-col grid -->
+      <div class="nf1-grid" id="nf1-grid"></div>
+    </div>
+  </div>
+
+  <div class="pcon-grid">
+    <div class="pcon pros">
+      <h5>Pros</h5>
+      <ul>
+        <li>Ticker conveys live sensation without real-time infrastructure</li>
+        <li>3-column grid maximizes article density per viewport</li>
+        <li>Stat bar gives instant pulse metrics above the fold</li>
+        <li>Hover-pause on ticker gives readers time to read</li>
+      </ul>
+    </div>
+    <div class="pcon cons">
+      <h5>Cons</h5>
+      <ul>
+        <li>Ticker and grid can feel visually disconnected</li>
+        <li>Mobile collapses to 1 column — ticker dominates small screens</li>
+        <li>Signal variety in ticker requires careful ordering logic</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     NF2 — THE STREAM
+══════════════════════════════════════════════════════════════════ -->
+<section class="design-section" id="nf2">
+  <div class="sec-meta">
+    <span class="sec-label">Design Concept</span>
+    <span class="sec-id">NF2</span>
+  </div>
+  <h2>The Stream</h2>
+  <p class="sec-desc">Single-column terminal-style feed. Every row is exactly 40px — time, signal chip, source, neighborhood, headline, and sentiment bar all on one line. A simulated "NEW" row slides in every 8 seconds.</p>
+
+  <div class="preview-box">
+    <div class="preview-label">Full Preview — NF2</div>
+    <div class="preview-inner" style="padding:0;">
+      <div class="nf2-wrap">
+
+        <!-- Status bar -->
+        <div class="nf2-status">
+          <span class="nf2-status-live"><span class="live-dot"></span> LIVE</span>
+          <span class="nf2-status-sep">·</span>
+          Philadelphia
+          <span class="nf2-status-sep">·</span>
+          May 16, 2026
+          <span class="nf2-status-sep">·</span>
+          14 articles today
+          <span class="nf2-status-sep">·</span>
+          Last updated 2 minutes ago
+        </div>
+
+        <!-- Feed rows -->
+        <div class="nf2-feed" id="nf2-feed"></div>
+
+        <!-- Footer -->
+        <div class="nf2-footer">
+          12 of 14 articles shown · <a href="#">Load 2 more</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pcon-grid">
+    <div class="pcon pros">
+      <h5>Pros</h5>
+      <ul>
+        <li>Maximum density — 12 articles visible without scrolling on large screens</li>
+        <li>Terminal / Bloomberg aesthetic feels professional and fast</li>
+        <li>Time dividers create clear temporal context</li>
+        <li>"NEW" animation simulates real-time without live data</li>
+      </ul>
+    </div>
+    <div class="pcon cons">
+      <h5>Cons</h5>
+      <ul>
+        <li>1-line headline truncation loses meaningful context</li>
+        <li>No visual hierarchy — all rows feel equally weighted</li>
+        <li>Source column too narrow for longer outlet names</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     NF3 — THE TRADING FLOOR
+══════════════════════════════════════════════════════════════════ -->
+<section class="design-section" id="nf3">
+  <div class="sec-meta">
+    <span class="sec-label">Design Concept</span>
+    <span class="sec-id">NF3</span>
+  </div>
+  <h2>The Trading Floor</h2>
+  <p class="sec-desc">Five independent kanban columns — Openings, Closures, Awards, Opinions, Trends. Operators immediately jump to what matters. Self-filtering without a single click.</p>
+
+  <div class="preview-box">
+    <div class="preview-label">Full Preview — NF3</div>
+    <div class="preview-inner" style="padding:0;">
+
+      <!-- Stat strip -->
+      <div class="nf3-stat-strip">
+        <span class="nf3-strip-label">Today</span>
+        <span class="nf3-strip-sep">·</span>
+        <span class="nf3-strip-stat"><span class="nf3-strip-dot" style="background:rgba(255,255,255,.3)"></span> 12 articles</span>
+        <span class="nf3-strip-sep">·</span>
+        <span class="nf3-strip-stat"><span class="nf3-strip-dot" style="background:var(--green)"></span> 5 open</span>
+        <span class="nf3-strip-sep">·</span>
+        <span class="nf3-strip-stat"><span class="nf3-strip-dot" style="background:var(--red)"></span> 1 close</span>
+        <span class="nf3-strip-sep">·</span>
+        <span class="nf3-strip-stat"><span class="nf3-strip-dot" style="background:var(--amber)"></span> 2 awards</span>
+        <span class="nf3-strip-sep">·</span>
+        <span class="nf3-strip-stat"><span class="nf3-strip-dot" style="background:var(--blue)"></span> 2 opinions</span>
+        <span class="nf3-strip-sep">·</span>
+        <span class="nf3-strip-stat"><span class="nf3-strip-dot" style="background:var(--purple)"></span> 2 trends</span>
+      </div>
+
+      <!-- Kanban board -->
+      <div class="nf3-board" id="nf3-board"></div>
+    </div>
+  </div>
+
+  <div class="pcon-grid">
+    <div class="pcon pros">
+      <h5>Pros</h5>
+      <ul>
+        <li>Zero-click self-filtering — operators go straight to Openings</li>
+        <li>Signal distribution instantly visible from column heights</li>
+        <li>Cards per column are tight — no empty white space</li>
+        <li>Closes column tinted red creates immediate visual alarm</li>
+      </ul>
+    </div>
+    <div class="pcon cons">
+      <h5>Cons</h5>
+      <ul>
+        <li>5 columns very wide — requires horizontal scroll on most screens</li>
+        <li>Low-volume columns (Closures) look sparse and unbalanced</li>
+        <li>Can't easily sort across signal types</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     NF4 — STAT STRIP + MASONRY GRID
+══════════════════════════════════════════════════════════════════ -->
+<section class="design-section" id="nf4">
+  <div class="sec-meta">
+    <span class="sec-label">Design Concept</span>
+    <span class="sec-id">NF4</span>
+  </div>
+  <h2>Stat Strip + Masonry Grid</h2>
+  <p class="sec-desc">Four bold stat cards anchor the top for instant orientation. Below, a two-column asymmetric grid puts high-priority Openings and Awards in the left column, everything else right — editorial hierarchy without a filter bar.</p>
+
+  <div class="preview-box">
+    <div class="preview-label">Full Preview — NF4</div>
+    <div class="preview-inner" style="padding:0;">
+
+      <!-- Stat strip -->
+      <div class="nf4-stats">
+        <div class="nf4-stat-card">
+          <span class="nf4-stat-icon">🔥</span>
+          <span class="nf4-stat-num">14</span>
+          <span class="nf4-stat-sub">articles today in Philadelphia</span>
+        </div>
+        <div class="nf4-stat-card">
+          <span class="nf4-stat-icon">📍</span>
+          <span class="nf4-stat-num">Fishtown</span>
+          <span class="nf4-stat-sub">most mentioned neighborhood</span>
+        </div>
+        <div class="nf4-stat-card">
+          <span class="nf4-stat-icon">↑</span>
+          <span class="nf4-stat-num">76 / 100</span>
+          <span class="nf4-stat-sub">avg sentiment score today</span>
+        </div>
+        <div class="nf4-stat-card">
+          <span class="nf4-stat-icon">⚡</span>
+          <span class="nf4-stat-num">Vernick Fish</span>
+          <span class="nf4-stat-sub">most buzzed restaurant · buzz 94 ↑84%</span>
+        </div>
+      </div>
+
+      <!-- Masonry grid -->
+      <div class="nf4-masonry">
+        <div class="nf4-col" id="nf4-left"></div>
+        <div class="nf4-col" id="nf4-right"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pcon-grid">
+    <div class="pcon pros">
+      <h5>Pros</h5>
+      <ul>
+        <li>Stat strip gives instant city-level orientation</li>
+        <li>Left-column priority gives editorial hierarchy without UI chrome</li>
+        <li>Cards have room for 1-line excerpt — more context than NF2</li>
+        <li>Sentiment bar on every card makes quality scannable</li>
+      </ul>
+    </div>
+    <div class="pcon cons">
+      <h5>Cons</h5>
+      <ul>
+        <li>Left-vs-right logic must be maintained as data grows</li>
+        <li>Stat strip requires a real data layer to stay accurate</li>
+        <li>Two columns collapse awkwardly at narrow widths</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<script>
+/* ── Article data ─────────────────────────────────────────────────── */
+const ARTICLES = [
+  { time:'2m ago',  source:'Eater Philly', neighborhood:'Fishtown',    signal:'OPENING',   abbrev:'OPN', signalColor:'#34d399', headline:'Vernick Fish expands reservation capacity — new patio seating opens May 20', sentiment:88 },
+  { time:'14m ago', source:'Foobooz',      neighborhood:'Center City', signal:'AWARD',     abbrev:'AWD', signalColor:'#fbbf24', headline:'Friday Saturday Sunday named James Beard semifinalist for Outstanding Restaurant', sentiment:92 },
+  { time:'31m ago', source:'Inquirer',     neighborhood:'Kensington',  signal:'OPENING',   abbrev:'OPN', signalColor:'#34d399', headline:'Laser Wolf Kensington soft opens this Friday — reservations already sold out through June', sentiment:95 },
+  { time:'1h ago',  source:'Reddit',       neighborhood:'Old City',    signal:'OPINION',   abbrev:'OPI', signalColor:'#60a5fa', headline:'Zahav at 15: How Solomonov Redrew the Map of Philadelphia Fine Dining', sentiment:72 },
+  { time:'1h ago',  source:'Eater Philly', neighborhood:'South Philly',signal:'TREND',     abbrev:'TRN', signalColor:'#a855f7', headline:'South Philly Vietnamese is having its moment — 3 spots you need to know right now', sentiment:80 },
+  { time:'2h ago',  source:'Foobooz',      neighborhood:'Rittenhouse', signal:'CLOSURE',   abbrev:'CLO', signalColor:'#FA2A52', headline:'Rittenhouse standby loses executive chef after 4 years — menu overhaul incoming', sentiment:34 },
+  { time:'2h ago',  source:'Eater Philly', neighborhood:'Fishtown',    signal:'OPENING',   abbrev:'OPN', signalColor:'#34d399', headline:'Suraya opens terrace season early after record reservation demand this spring', sentiment:90 },
+  { time:'3h ago',  source:'Inquirer',     neighborhood:'NoLibs',      signal:'OPINION',   abbrev:'OPI', signalColor:'#60a5fa', headline:"Mulherin's cuts weekend hours — staffing crisis hitting independent restaurants hard", sentiment:28 },
+  { time:'3h ago',  source:'Foobooz',      neighborhood:'Fitler Square',signal:'OPENING',  abbrev:'OPN', signalColor:'#34d399', headline:"Two natural wine bars announced for Fitler Square — Philly's bougie-casual wave continues", sentiment:82 },
+  { time:'4h ago',  source:'Reddit',       neighborhood:'South Philly', signal:'TREND',    abbrev:'TRN', signalColor:'#a855f7', headline:"The BYOB renaissance: South Philly's no-alcohol-license spots are outperforming every corridor", sentiment:85 },
+  { time:'5h ago',  source:'Eater Philly', neighborhood:'Center City', signal:'AWARD',     abbrev:'AWD', signalColor:'#fbbf24', headline:'Kalaya chef Chutatip Suntaranon shortlisted for semifinalist recognition — third year running', sentiment:91 },
+  { time:'6h ago',  source:'Inquirer',     neighborhood:'Fishtown',    signal:'EXPANSION', abbrev:'EXP', signalColor:'#34d399', headline:'Pizzeria Beddia expanding — second location confirmed for Washington Ave corridor', sentiment:86 }
+];
+
+/* ── Helpers ──────────────────────────────────────────────────────── */
+function sentColor(s) {
+  if (s >= 70) return '#34d399';
+  if (s >= 40) return '#fbbf24';
+  return '#FA2A52';
+}
+
+function hexToRgba(hex, a) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+/* ── NF1: Ticker Board ────────────────────────────────────────────── */
+(function buildNF1() {
+  // Ticker — duplicate content for seamless loop
+  const ticker = document.getElementById('nf1-ticker');
+  const tickerItems = ARTICLES.map(a => {
+    const sigMap = { OPENING:'🟢', AWARD:'🏆', CLOSURE:'🔴', OPINION:'💬', TREND:'📈', EXPANSION:'🔷' };
+    const ico = sigMap[a.signal] || '●';
+    return `<span class="nf1-tick-item">
+      <span class="nf1-tick-dot" style="background:${a.signalColor}"></span>
+      <span class="nf1-tick-signal" style="color:${a.signalColor}">${a.signal}</span>
+      <span class="nf1-tick-sep">·</span>
+      ${a.neighborhood}
+      <span class="nf1-tick-sep">·</span>
+      ${a.headline.substring(0,60)}${a.headline.length > 60 ? '…' : ''}
+      <span class="nf1-tick-src">${a.source}</span>
+      <span class="nf1-tick-time">${a.time}</span>
+    </span>`;
+  }).join('');
+  // Double for seamless infinite scroll
+  ticker.innerHTML = tickerItems + tickerItems;
+
+  // Grid
+  const grid = document.getElementById('nf1-grid');
+  ARTICLES.forEach(a => {
+    const sc = sentColor(a.sentiment);
+    const card = document.createElement('div');
+    card.className = 'nf1-card';
+    card.style.setProperty('--sig-color', a.signalColor);
+    card.onmouseenter = () => { card.style.borderLeftColor = a.signalColor; };
+    card.onmouseleave = () => { card.style.borderLeftColor = 'transparent'; };
+    card.innerHTML = `
+      <div class="nf1-card-top">
+        <span class="nf1-time">${a.time}</span>
+        <span class="sig-chip" style="background:${hexToRgba(a.signalColor,.18)};color:${a.signalColor}">${a.abbrev}</span>
+        <span class="nf1-source">${a.source}</span>
+        <span class="nf1-nbhd">${a.neighborhood}</span>
+      </div>
+      <div class="nf1-hl">${a.headline}</div>
+      <div class="nf1-bottom">
+        <span class="sent-dot" style="background:${sc}"></span>
+        <span class="nf1-sent-label">${a.sentiment}/100</span>
+      </div>`;
+    grid.appendChild(card);
+  });
+})();
+
+/* ── NF2: The Stream ──────────────────────────────────────────────── */
+(function buildNF2() {
+  const feed = document.getElementById('nf2-feed');
+
+  function makeRow(a, isNew = false) {
+    const sc = sentColor(a.sentiment);
+    const row = document.createElement('div');
+    row.className = 'nf2-row' + (isNew ? ' is-new' : '');
+    row.innerHTML = `
+      <span class="nf2-time">${a.time}</span>
+      <span class="nf2-chip" style="background:${hexToRgba(a.signalColor,.18)};color:${a.signalColor}">${a.abbrev}</span>
+      <span class="nf2-src">${a.source}</span>
+      <span class="nf2-nbhd">${a.neighborhood}</span>
+      <span class="nf2-hl">${a.headline}</span>
+      <div class="nf2-sent-bar-wrap"><div class="nf2-sent-bar" style="width:${a.sentiment}%;background:${sc}"></div></div>`;
+    return row;
+  }
+
+  function makeDivider(label) {
+    const d = document.createElement('div');
+    d.className = 'nf2-divider';
+    d.innerHTML = `<div class="nf2-divider-line"></div><span class="nf2-divider-label">${label}</span><div class="nf2-divider-line"></div>`;
+    return d;
+  }
+
+  const dividers = ['Just now', '1 hour ago', '3 hours ago'];
+  ARTICLES.forEach((a, i) => {
+    if (i > 0 && i % 4 === 0) {
+      feed.appendChild(makeDivider(dividers[Math.floor(i/4) - 1] || `${Math.floor(i/4)} hours ago`));
+    }
+    feed.appendChild(makeRow(a));
+  });
+
+  // Simulated NEW article injection every 8s
+  const newArticlePool = [
+    { time:'just now', source:'Eater Philly', neighborhood:'Fishtown', signal:'OPENING', abbrev:'OPN', signalColor:'#34d399', headline:'Marc Vetri announces surprise pop-up at Pizzeria Vetri — one night only this weekend', sentiment:90 },
+    { time:'just now', source:'Foobooz', neighborhood:'Center City', signal:'TREND', abbrev:'TRN', signalColor:'#a855f7', headline:'Center City omakase wave: four new Japanese counters announced in 60 days', sentiment:87 }
+  ];
+  let newIdx = 0;
+  setInterval(() => {
+    const a = newArticlePool[newIdx % newArticlePool.length];
+    newIdx++;
+    const row = makeRow(a, true);
+    feed.insertBefore(row, feed.firstChild);
+    // After 4s, fade to normal
+    setTimeout(() => {
+      row.classList.remove('is-new');
+      row.classList.add('fading');
+      setTimeout(() => row.classList.remove('fading'), 1500);
+    }, 4000);
+    // Remove overflow rows to keep list bounded
+    const rows = feed.querySelectorAll('.nf2-row');
+    if (rows.length > 15) rows[rows.length - 1].remove();
+  }, 8000);
+})();
+
+/* ── NF3: Trading Floor ───────────────────────────────────────────── */
+(function buildNF3() {
+  const board = document.getElementById('nf3-board');
+  const COLUMNS = [
+    { key: ['OPENING','EXPANSION'], name: 'OPENINGS',  emoji: '🟢', color: '#34d399', cls: 'col-open' },
+    { key: ['CLOSURE'],             name: 'CLOSURES',  emoji: '🔴', color: '#FA2A52', cls: 'col-close' },
+    { key: ['AWARD'],               name: 'AWARDS',    emoji: '🏆', color: '#fbbf24', cls: 'col-award' },
+    { key: ['OPINION'],             name: 'OPINIONS',  emoji: '💬', color: '#60a5fa', cls: 'col-opinion' },
+    { key: ['TREND'],               name: 'TRENDS',    emoji: '📈', color: '#a855f7', cls: 'col-trend' }
+  ];
+
+  COLUMNS.forEach(col => {
+    const articles = ARTICLES.filter(a => col.key.includes(a.signal));
+    const colEl = document.createElement('div');
+    colEl.className = `nf3-col ${col.cls}`;
+
+    // Header
+    const head = document.createElement('div');
+    head.className = 'nf3-col-head';
+    head.style.borderBottomColor = col.color;
+    head.innerHTML = `
+      <span class="col-emoji">${col.emoji}</span>
+      <span class="nf3-col-name" style="color:${col.color}">${col.name}</span>
+      <span class="nf3-col-count" style="background:${hexToRgba(col.color,.18)};color:${col.color}">${articles.length}</span>`;
+    colEl.appendChild(head);
+
+    // Cards container
+    const cardsWrap = document.createElement('div');
+    cardsWrap.className = 'nf3-col-cards';
+
+    if (articles.length === 0) {
+      cardsWrap.innerHTML = `<div style="font-size:.65rem;color:rgba(255,255,255,.2);padding:.4rem;text-align:center">No activity today</div>`;
+    } else {
+      articles.forEach(a => {
+        const sc = sentColor(a.sentiment);
+        const card = document.createElement('div');
+        card.className = 'nf3-card';
+        card.style.borderColor = 'rgba(255,255,255,.07)';
+        card.onmouseenter = () => { card.style.borderColor = hexToRgba(col.color, .4); };
+        card.onmouseleave = () => { card.style.borderColor = 'rgba(255,255,255,.07)'; };
+        card.innerHTML = `
+          <div class="nf3-card-src">${a.source}</div>
+          <span class="nf3-nbhd-pill" style="border-color:${hexToRgba(col.color,.3)};color:${col.color}">${a.neighborhood}</span>
+          <div class="nf3-hl">${a.headline}</div>
+          <div class="nf3-card-foot">
+            <span class="nf3-card-time">${a.time}</span>
+            <span class="nf3-sent-dot" style="background:${sc}" title="${a.sentiment}/100"></span>
+          </div>`;
+        cardsWrap.appendChild(card);
+      });
+    }
+
+    colEl.appendChild(cardsWrap);
+    board.appendChild(colEl);
+  });
+})();
+
+/* ── NF4: Stat Strip + Masonry Grid ──────────────────────────────── */
+(function buildNF4() {
+  const leftCol = document.getElementById('nf4-left');
+  const rightCol = document.getElementById('nf4-right');
+
+  // Split: left = OPENING + AWARD articles; right = everything else
+  const leftArticles = ARTICLES.filter(a => ['OPENING','AWARD','EXPANSION'].includes(a.signal));
+  const rightArticles = ARTICLES.filter(a => !['OPENING','AWARD','EXPANSION'].includes(a.signal));
+
+  function makeCard(a) {
+    const sc = sentColor(a.sentiment);
+    const card = document.createElement('div');
+    card.className = 'nf4-card';
+    card.style.borderLeftColor = 'transparent';
+    card.onmouseenter = () => { card.style.borderLeftColor = a.signalColor; };
+    card.onmouseleave = () => { card.style.borderLeftColor = 'transparent'; };
+    // Generate a short excerpt from the headline
+    const words = a.headline.split(' ');
+    const excerpt = words.slice(0, 10).join(' ') + (words.length > 10 ? '…' : '');
+    card.innerHTML = `
+      <div class="nf4-card-top">
+        <span class="sig-chip" style="background:${hexToRgba(a.signalColor,.18)};color:${a.signalColor}">${a.abbrev}</span>
+        <span class="nf4-source">${a.source}</span>
+        <span class="nf4-nbhd">${a.neighborhood}</span>
+        <span class="nf4-time">${a.time}</span>
+      </div>
+      <div class="nf4-hl">${a.headline}</div>
+      <div class="nf4-excerpt">${excerpt}</div>
+      <div class="nf4-card-foot">
+        <div class="nf4-sent-bar-wrap"><div class="nf4-sent-bar" style="width:${a.sentiment}%;background:${sc}"></div></div>
+        <span class="nf4-sent-label">${a.sentiment}/100</span>
+      </div>`;
+    return card;
+  }
+
+  leftArticles.forEach(a => leftCol.appendChild(makeCard(a)));
+  rightArticles.forEach(a => rightCol.appendChild(makeCard(a)));
+})();
+
+/* ── Nav active highlight on scroll ──────────────────────────────── */
+(function initScrollSpy() {
+  const sections = document.querySelectorAll('.design-section[id]');
+  const btns = document.querySelectorAll('.jump-btn');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        btns.forEach(b => b.classList.remove('active'));
+        const active = document.querySelector(`.jump-btn[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px' });
+  sections.forEach(s => obs.observe(s));
+})();
+</script>
+</body>
+</html>

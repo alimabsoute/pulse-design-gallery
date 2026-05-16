@@ -688,14 +688,14 @@
     }
     .f3-expand-area {
       overflow: hidden;
-      max-height: 0;
+      max-height: 2000px;
       transition: max-height 0.35s ease, opacity 0.3s ease;
-      opacity: 0;
+      opacity: 1;
       background: #0d0d0d;
       border-bottom: 1px solid var(--border);
     }
     .f3-expand-area.open {
-      max-height: 300px;
+      max-height: 2000px;
       opacity: 1;
     }
     .f3-expand-inner {
@@ -715,7 +715,7 @@
     /* ══════════════════════════════════════════════════════════════ */
     /* F4 — THE DIGEST                                               */
     /* ══════════════════════════════════════════════════════════════ */
-    #f4 .preview-frame { min-height: 900px; overflow: hidden; position: relative; }
+    #f4 .preview-frame { min-height: 900px; position: relative; }
     .f4-above-fold {
       padding: 28px 28px 24px;
     }
@@ -832,47 +832,21 @@
       transition: all 0.2s ease;
     }
     .f4-btn:hover { background: var(--orange); color: #000; }
-    /* Slide-up feed panel */
+    /* Feed section (inline in gallery mode) */
     .f4-feed-panel {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
       background: #0d0d0d;
       border-top: 1px solid var(--border);
-      transform: translateY(100%);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      max-height: 480px;
-      overflow-y: auto;
-      z-index: 20;
-    }
-    .f4-feed-panel.open {
-      transform: translateY(0);
     }
     .f4-feed-panel-header {
       padding: 14px 20px;
       border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       background: #0d0d0d;
-      position: sticky;
-      top: 0;
     }
     .f4-feed-panel-title {
       font-family: var(--heading);
       font-weight: 800;
       font-size: 14px;
       color: var(--text);
-    }
-    .f4-close-btn {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 20px;
-      cursor: pointer;
-      line-height: 1;
-      padding: 0 4px;
     }
     .f4-feed-inner {
       padding: 14px 16px;
@@ -909,11 +883,24 @@
     .f5-tab:hover { color: var(--text); }
     .f5-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
     .f5-tab-content {
-      display: none;
-      flex: 1;
-      overflow-y: auto;
+      display: block;
+      flex: none;
+      overflow: visible;
     }
     .f5-tab-content.active { display: block; }
+    /* Gallery-mode tab section divider */
+    .gallery-tab-section {
+      padding: 10px 16px 6px;
+      border-top: 2px solid var(--border2);
+      background: var(--surface3);
+    }
+    .gallery-tab-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--orange);
+    }
     .f5-brief-inner {
       padding: 20px;
       display: flex;
@@ -1279,9 +1266,34 @@
         </div>
       </div>
 
-      <!-- Expand area -->
-      <div class="f3-expand-area" id="f3-expand-area">
-        <div class="f3-expand-inner" id="f3-expand-inner"></div>
+      <!-- Expand area — pre-expanded to first highlight in gallery mode -->
+      <div class="f3-expand-area open" id="f3-expand-area">
+        <div class="f3-expand-inner" id="f3-expand-inner">
+          <div class="highlight-card" style="animation: fadeCardIn 0.4s ease both;">
+            <span class="highlight-num">01</span>
+            <div class="highlight-headline">Fishtown Posts Its Best 7-Day Stretch in 6 Months</div>
+            <div class="highlight-row"><strong>For foodies:</strong> Prime time to visit — energy, buzz, and new tables converging.</div>
+            <div class="highlight-row"><strong>For owners:</strong> Visibility window is open; push specials now.</div>
+            <div class="highlight-insight">⚡ ForkFox: 3 major openings + 2 expansions clustered in single zip code.</div>
+            <div class="highlight-count">Based on 14 articles</div>
+          </div>
+          <div class="highlight-card" style="animation: fadeCardIn 0.4s ease 0.05s both;">
+            <span class="highlight-num">02</span>
+            <div class="highlight-headline">Israeli Cuisine Dominates Philly's Trending List</div>
+            <div class="highlight-row"><strong>For foodies:</strong> Zahav remains a benchmark; Laser Wolf's Kensington spot is the one to book.</div>
+            <div class="highlight-row"><strong>For owners:</strong> Med/Middle Eastern menus seeing 40% higher engagement signals.</div>
+            <div class="highlight-insight">⚡ ForkFox: Israeli-adjacent terms up 67% in Reddit r/phillyfood last 30 days.</div>
+            <div class="highlight-count">Based on 8 articles</div>
+          </div>
+          <div class="highlight-card" style="animation: fadeCardIn 0.4s ease 0.1s both;">
+            <span class="highlight-num">03</span>
+            <div class="highlight-headline">Two Chef Departures Signal Instability in Rittenhouse Corridor</div>
+            <div class="highlight-row"><strong>For foodies:</strong> Call ahead — menus in flux, quality variance likely short term.</div>
+            <div class="highlight-row"><strong>For owners:</strong> Talent movement creating hiring opportunity if you're recruiting.</div>
+            <div class="highlight-insight">⚡ ForkFox: Rittenhouse signal dropped from 72 to 54 in 7 days.</div>
+            <div class="highlight-count">Based on 5 articles</div>
+          </div>
+        </div>
       </div>
 
       <!-- Divider -->
@@ -1407,16 +1419,12 @@
           </div>
         </div>
 
-        <div class="f4-read-more-btn">
-          <button class="f4-btn" id="f4-open-feed">Read All Articles →</button>
-        </div>
       </div>
 
-      <!-- Slide-up feed panel -->
+      <!-- Article feed (inline — always visible in gallery mode) -->
       <div class="f4-feed-panel" id="f4-feed-panel">
         <div class="f4-feed-panel-header">
           <span class="f4-feed-panel-title">All Articles · May 15, 2026</span>
-          <button class="f4-close-btn" id="f4-close-feed">✕</button>
         </div>
         <div class="filter-bar" style="padding: 10px 16px; border-top: none;">
           <button class="filter-chip active" style="font-size:11px;">All</button>
@@ -1496,6 +1504,7 @@
 
       <!-- Tab: Today's Brief -->
       <div class="f5-tab-content active" data-tab-content="brief" data-design="f5">
+        <div class="gallery-tab-section"><span class="gallery-tab-section-label">TAB: Today's Brief</span></div>
         <div class="f5-brief-inner">
           <div class="f5-brief-header">
             <div class="f5-brief-title">Philadelphia · May 15</div>
@@ -1507,6 +1516,7 @@
 
       <!-- Tab: All Articles -->
       <div class="f5-tab-content" data-tab-content="all" data-design="f5">
+        <div class="gallery-tab-section"><span class="gallery-tab-section-label">TAB: All Articles</span></div>
         <div class="filter-bar">
           <span class="filter-label">Filter</span>
           <button class="filter-chip active">All</button>
@@ -1519,11 +1529,13 @@
 
       <!-- Tab: Openings -->
       <div class="f5-tab-content" data-tab-content="openings" data-design="f5">
+        <div class="gallery-tab-section"><span class="gallery-tab-section-label">TAB: Openings</span></div>
         <div class="f5-filtered-inner" id="f5-openings"></div>
       </div>
 
       <!-- Tab: Closures -->
       <div class="f5-tab-content" data-tab-content="closures" data-design="f5">
+        <div class="gallery-tab-section"><span class="gallery-tab-section-label">TAB: Closures</span></div>
         <div class="f5-filtered-inner">
           <div class="f5-empty">No closures tracked this week in Philadelphia. <br/>Fishtown is holding strong.</div>
         </div>
@@ -1531,6 +1543,7 @@
 
       <!-- Tab: Trending -->
       <div class="f5-tab-content" data-tab-content="trending" data-design="f5">
+        <div class="gallery-tab-section"><span class="gallery-tab-section-label">TAB: Trending</span></div>
         <div class="f5-filtered-inner" id="f5-trending"></div>
       </div>
     </div>
@@ -1813,35 +1826,30 @@
     });
   });
 
-  // ── F4: Slide-up feed ──────────────────────────────────────────
-  const f4OpenBtn = document.getElementById('f4-open-feed');
-  const f4CloseBtn = document.getElementById('f4-close-feed');
-  const f4Panel = document.getElementById('f4-feed-panel');
-
-  if (f4OpenBtn) {
-    f4OpenBtn.addEventListener('click', () => {
-      f4Panel.classList.add('open');
-    });
-  }
-  if (f4CloseBtn) {
-    f4CloseBtn.addEventListener('click', () => {
-      f4Panel.classList.remove('open');
-    });
-  }
-
-  // ── F5: Tab switching ──────────────────────────────────────────
+  // ── F5: Tab switching (decorative in gallery — all tabs already visible) ─
   const f5Tabs = document.querySelectorAll('.f5-tab[data-design="f5"]');
-  const f5Contents = document.querySelectorAll('[data-tab-content][data-design="f5"]');
 
   f5Tabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      const targetTab = tab.dataset.tab;
       f5Tabs.forEach(t => t.classList.remove('active'));
-      f5Contents.forEach(c => c.classList.remove('active'));
       tab.classList.add('active');
-      document.querySelector(`[data-tab-content="${targetTab}"][data-design="f5"]`).classList.add('active');
     });
   });
+
+  // ── Gallery auto-init ──────────────────────────────────────────
+  populateHighlights('f2-highlights', false);
+  populateFeed('f2-feed', ARTICLES);
+  populateFeed('f3-feed', ARTICLES);
+  populateFeed('f4-feed', ARTICLES);
+  populateHighlights('f5-highlights', false);
+  populateFeed('f5-feed', ARTICLES);
+  const openings = ARTICLES.filter(a => a.signal === 'OPENING');
+  populateFeed('f5-openings', openings);
+  const trending = ARTICLES.filter(a => a.signal === 'OPINION' || a.signal === 'EXPANSION').slice(0, 5);
+  populateFeed('f5-trending', trending);
+  // Pre-expand F3 first pill
+  const f3First = document.querySelector('.f3-pill[data-highlight="1"]');
+  if (f3First) f3First.click();
 
   // ── City toggle (all designs) ──────────────────────────────────
   document.querySelectorAll('.city-toggle').forEach(toggle => {
