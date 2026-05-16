@@ -1,0 +1,1884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ForkFox Pulse — Daily Feed Gallery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Brand tokens ─────────────────────────────────────────────── */
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface2: #1a1a1a;
+      --surface3: #222222;
+      --border: #2a2a2a;
+      --border2: #333333;
+      --text: #f0f0f0;
+      --muted: #888888;
+      --muted2: #555555;
+      --orange: #F97316;
+      --red: #FA2A52;
+      --green: #34d399;
+      --amber: #fbbf24;
+      --blue: #60a5fa;
+      --heading: 'Geologica', sans-serif;
+      --body: 'Inter', sans-serif;
+    }
+
+    /* ── Reset ────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Gallery wrapper ──────────────────────────────────────────── */
+    .gallery-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── Gallery header ───────────────────────────────────────────── */
+    .gallery-header {
+      padding: 56px 0 32px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 40px;
+    }
+    .gallery-header .kicker {
+      font-family: var(--body);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 12px;
+    }
+    .gallery-header h1 {
+      font-family: var(--heading);
+      font-weight: 900;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.1;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .gallery-header h1 span { color: var(--orange); }
+    .gallery-header p {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 680px;
+      line-height: 1.7;
+    }
+    .gallery-header .meta-row {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    .gallery-header .meta-chip {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── Sticky nav pills ─────────────────────────────────────────── */
+    .gallery-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+      margin: 0 -24px 48px;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+    .gallery-nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .gallery-nav-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-right: 8px;
+    }
+    .nav-pill {
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .nav-pill:hover { border-color: var(--orange); color: var(--orange); }
+    .nav-pill.active { background: var(--orange); border-color: var(--orange); color: #000; font-weight: 700; }
+
+    /* ── Gallery section ──────────────────────────────────────────── */
+    .gallery-section {
+      margin-bottom: 80px;
+    }
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .section-badge {
+      font-family: var(--heading);
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #000;
+      background: var(--orange);
+      padding: 4px 12px;
+      border-radius: 4px;
+    }
+    .section-name {
+      font-family: var(--heading);
+      font-weight: 800;
+      font-size: 22px;
+      color: var(--text);
+    }
+    .section-desc {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ── Preview frame ────────────────────────────────────────────── */
+    .preview-frame {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--surface);
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .preview-frame-label {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(10,10,10,0.85);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* ── Commentary card ──────────────────────────────────────────── */
+    .commentary {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .commentary-col h4 {
+      font-family: var(--body);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .commentary-col.pros h4 { color: var(--green); }
+    .commentary-col.cons h4 { color: var(--red); }
+    .commentary-col ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .commentary-col.pros li::before { content: "✓  "; color: var(--green); font-weight: 700; }
+    .commentary-col.cons li::before { content: "✗  "; color: var(--red); font-weight: 700; }
+    .commentary-col li {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ══════════════════════════════════════════════════════════════ */
+    /* SHARED COMPONENT STYLES (used inside all 5 frames)            */
+    /* ══════════════════════════════════════════════════════════════ */
+
+    /* ── Mini nav (shared) ───────────────────────────────────────── */
+    .mini-nav {
+      background: #0d0d0d;
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 48px;
+      flex-shrink: 0;
+    }
+    .mini-nav-brand {
+      font-family: var(--heading);
+      font-weight: 900;
+      font-size: 16px;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .mini-nav-brand span { color: var(--orange); }
+    .mini-nav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .city-toggle {
+      display: flex;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .city-btn {
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      transition: all 0.15s ease;
+      font-family: var(--body);
+    }
+    .city-btn.active { background: var(--orange); color: #000; }
+    .mini-nav-pulse-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--orange);
+      padding: 3px 10px;
+      border: 1px solid rgba(249,115,22,0.3);
+      border-radius: 20px;
+    }
+
+    /* ── Signal chips ────────────────────────────────────────────── */
+    .chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1.6;
+    }
+    .chip-opening { background: rgba(52,211,153,0.15); color: var(--green); }
+    .chip-closure { background: rgba(250,42,82,0.15); color: var(--red); }
+    .chip-expansion { background: rgba(249,115,22,0.15); color: var(--orange); }
+    .chip-award { background: rgba(96,165,250,0.15); color: var(--blue); }
+    .chip-opinion { background: rgba(136,136,136,0.15); color: var(--muted); }
+    .chip-city {
+      background: rgba(255,255,255,0.06);
+      color: #ccc;
+      border: 1px solid var(--border2);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .chip-neighborhood {
+      background: rgba(249,115,22,0.08);
+      color: #a0a0a0;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* ── Source badge ────────────────────────────────────────────── */
+    .source-badge {
+      display: inline-block;
+      background: var(--orange);
+      color: #000;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+
+    /* ── Article card (shared base) ──────────────────────────────── */
+    .article-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+      animation: fadeCardIn 0.4s ease both;
+    }
+    .article-card:hover {
+      border-color: rgba(249,115,22,0.4);
+      transform: translateY(-1px);
+    }
+    @keyframes fadeCardIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .article-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .article-card-headline {
+      font-family: var(--heading);
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.35;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .article-card-link {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--orange);
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .article-card-link:hover { opacity: 0.7; }
+
+    /* ── Highlight card (shared base) ────────────────────────────── */
+    .highlight-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      position: relative;
+      transition: border-color 0.2s ease;
+    }
+    .highlight-card:hover { border-color: rgba(249,115,22,0.4); }
+    .highlight-num {
+      font-family: var(--heading);
+      font-weight: 900;
+      font-size: 32px;
+      color: rgba(249,115,22,0.15);
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      line-height: 1;
+    }
+    .highlight-headline {
+      font-family: var(--heading);
+      font-weight: 800;
+      font-size: 15px;
+      line-height: 1.3;
+      color: var(--text);
+      margin-bottom: 10px;
+      padding-right: 32px;
+    }
+    .highlight-row {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+    .highlight-row strong { color: #ccc; font-weight: 600; }
+    .highlight-insight {
+      font-size: 11px;
+      color: var(--orange);
+      font-weight: 600;
+      background: rgba(249,115,22,0.08);
+      border-left: 2px solid var(--orange);
+      padding: 5px 10px;
+      margin: 8px 0;
+      border-radius: 0 4px 4px 0;
+    }
+    .highlight-count {
+      font-size: 11px;
+      color: var(--muted2);
+      margin-top: 8px;
+    }
+
+    /* ── Signal bar / overall ────────────────────────────────────── */
+    .signal-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      background: rgba(249,115,22,0.06);
+      border-bottom: 1px solid rgba(249,115,22,0.15);
+    }
+    .signal-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .signal-value {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--orange);
+    }
+    .signal-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--orange);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+    .signal-date {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--muted2);
+    }
+
+    /* ── Filter bar ──────────────────────────────────────────────── */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted2);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-right: 4px;
+    }
+    .filter-chip {
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--body);
+      transition: all 0.15s ease;
+    }
+    .filter-chip:hover { border-color: var(--orange); color: var(--orange); }
+    .filter-chip.active { background: var(--orange); border-color: var(--orange); color: #000; font-weight: 700; }
+
+    /* ── Divider ─────────────────────────────────────────────────── */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .section-divider-label {
+      font-family: var(--heading);
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .section-divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .section-divider-count {
+      font-size: 11px;
+      color: var(--muted2);
+      white-space: nowrap;
+    }
+
+    /* ══════════════════════════════════════════════════════════════ */
+    /* F1 — SUMMARY HERO                                             */
+    /* ══════════════════════════════════════════════════════════════ */
+    #f1 .preview-frame { min-height: 900px; }
+    .f1-hero {
+      padding: 28px 24px 20px;
+    }
+    .f1-hero-header {
+      margin-bottom: 20px;
+    }
+    .f1-hero-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 6px;
+    }
+    .f1-hero-title {
+      font-family: var(--heading);
+      font-weight: 900;
+      font-size: clamp(22px, 3vw, 32px);
+      line-height: 1.1;
+      color: var(--text);
+    }
+    .f1-highlights-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .f1-highlights-grid .highlight-card:nth-child(1),
+    .f1-highlights-grid .highlight-card:nth-child(2) {
+      grid-column: span 1;
+    }
+    .f1-highlights-row2 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .f1-feed {
+      padding: 0 24px 24px;
+    }
+    .f1-feed-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* ══════════════════════════════════════════════════════════════ */
+    /* F2 — SIDE BY SIDE                                             */
+    /* ══════════════════════════════════════════════════════════════ */
+    #f2 .preview-frame { min-height: 820px; display: flex; flex-direction: column; }
+    .f2-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      min-height: 720px;
+    }
+    .f2-left {
+      width: 40%;
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      background: #0d0d0d;
+      flex-shrink: 0;
+    }
+    .f2-right {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--surface);
+    }
+    .f2-left-header {
+      padding: 20px 18px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .f2-left-kicker {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 4px;
+    }
+    .f2-left-title {
+      font-family: var(--heading);
+      font-weight: 900;
+      font-size: 18px;
+      line-height: 1.15;
+      color: var(--text);
+    }
+    .f2-highlights-stack {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .f2-right-inner {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .f2-right-header {
+      padding: 16px 16px 0;
+    }
+    .f2-right-title {
+      font-family: var(--heading);
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* ══════════════════════════════════════════════════════════════ */
+    /* F3 — BRIEFING FIRST                                           */
+    /* ══════════════════════════════════════════════════════════════ */
+    #f3 .preview-frame { min-height: 860px; }
+    .f3-pills-strip {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: #0d0d0d;
+    }
+    .f3-strip-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 10px;
+    }
+    .f3-pills-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .f3-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border2);
+      background: var(--surface2);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--body);
+    }
+    .f3-pill:hover { border-color: var(--orange); }
+    .f3-pill.expanded { border-color: var(--orange); background: rgba(249,115,22,0.08); }
+    .f3-pill-num {
+      font-family: var(--heading);
+      font-weight: 900;
+      font-size: 12px;
+      color: var(--orange);
+      min-width: 14px;
+    }
+    .f3-pill-text {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .f3-expand-area {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.35s ease, opacity 0.3s ease;
+      opacity: 0;
+      background: #0d0d0d;
+      border-bottom: 1px solid var(--border);
+    }
+    .f3-expand-area.open {
+      max-height: 300px;
+      opacity: 1;
+    }
+    .f3-expand-inner {
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    .f3-feed {
+      padding: 0 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    /* ══════════════════════════════════════════════════════════════ */
+    /* F4 — THE DIGEST                                               */
+    /* ══════════════════════════════════════════════════════════════ */
+    #f4 .preview-frame { min-height: 900px; overflow: hidden; position: relative; }
+    .f4-above-fold {
+      padding: 28px 28px 24px;
+    }
+    .f4-kicker {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 10px;
+    }
+    .f4-hero-card {
+      background: linear-gradient(135deg, rgba(249,115,22,0.12) 0%, rgba(249,115,22,0.03) 100%);
+      border: 1px solid rgba(249,115,22,0.25);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .f4-hero-card::before {
+      content: '01';
+      position: absolute;
+      top: -10px;
+      right: 16px;
+      font-family: var(--heading);
+      font-weight: 900;
+      font-size: 80px;
+      color: rgba(249,115,22,0.06);
+      line-height: 1;
+    }
+    .f4-hero-headline {
+      font-family: var(--heading);
+      font-weight: 900;
+      font-size: clamp(18px, 2.5vw, 26px);
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+    .f4-hero-why {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .f4-why-box {
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .f4-why-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-bottom: 4px;
+    }
+    .f4-why-text {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .f4-sub-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .f4-sub-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      position: relative;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .f4-sub-card:hover { border-color: rgba(249,115,22,0.4); }
+    .f4-sub-num {
+      font-family: var(--heading);
+      font-weight: 900;
+      font-size: 18px;
+      color: rgba(249,115,22,0.25);
+      margin-bottom: 6px;
+    }
+    .f4-sub-headline {
+      font-family: var(--heading);
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.35;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .f4-sub-insight {
+      font-size: 10px;
+      color: var(--orange);
+      line-height: 1.4;
+    }
+    .f4-read-more-btn {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .f4-btn {
+      padding: 10px 28px;
+      background: transparent;
+      border: 1px solid var(--orange);
+      border-radius: 6px;
+      color: var(--orange);
+      font-family: var(--body);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .f4-btn:hover { background: var(--orange); color: #000; }
+    /* Slide-up feed panel */
+    .f4-feed-panel {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #0d0d0d;
+      border-top: 1px solid var(--border);
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      max-height: 480px;
+      overflow-y: auto;
+      z-index: 20;
+    }
+    .f4-feed-panel.open {
+      transform: translateY(0);
+    }
+    .f4-feed-panel-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0d0d0d;
+      position: sticky;
+      top: 0;
+    }
+    .f4-feed-panel-title {
+      font-family: var(--heading);
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .f4-close-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px;
+    }
+    .f4-feed-inner {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* ══════════════════════════════════════════════════════════════ */
+    /* F5 — TABBED                                                   */
+    /* ══════════════════════════════════════════════════════════════ */
+    #f5 .preview-frame { min-height: 820px; display: flex; flex-direction: column; }
+    .f5-tab-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: #0d0d0d;
+      padding: 0 16px;
+      overflow-x: auto;
+      flex-shrink: 0;
+    }
+    .f5-tab {
+      padding: 12px 16px;
+      font-family: var(--body);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .f5-tab:hover { color: var(--text); }
+    .f5-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+    .f5-tab-content {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .f5-tab-content.active { display: block; }
+    .f5-brief-inner {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .f5-brief-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .f5-brief-title {
+      font-family: var(--heading);
+      font-weight: 900;
+      font-size: 20px;
+      color: var(--text);
+    }
+    .f5-brief-date {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .f5-feed-inner {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .f5-filtered-inner {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .f5-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+
+    /* ── Scrollbar style ─────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="gallery-wrapper">
+
+  <!-- ── Gallery Header ─────────────────────────────────────────── -->
+  <div class="gallery-header">
+    <div class="kicker">Internal Design Review · Not For Deployment</div>
+    <h1>ForkFox <span>Pulse</span> — Daily Feed Gallery</h1>
+    <p>
+      5 layout concepts for the Pulse Daily News Feed page. Each variation explores a different information hierarchy
+      between the AI-generated Daily Summary (top 5 highlights) and the raw scraped article feed. Mock data: Philadelphia,
+      May 15, 2026. Evaluate on scannability, return-visit UX, and how prominently the summary competes with or complements the feed.
+    </p>
+    <div class="meta-row">
+      <span class="meta-chip">City: Philadelphia</span>
+      <span class="meta-chip">Signal: Heating Up 🔺</span>
+      <span class="meta-chip">Articles: 9</span>
+      <span class="meta-chip">Highlights: 5</span>
+      <span class="meta-chip">Date: May 15, 2026</span>
+    </div>
+  </div>
+
+  <!-- ── Sticky Nav ─────────────────────────────────────────────── -->
+  <nav class="gallery-nav" id="gallery-nav">
+    <div class="gallery-nav-inner">
+      <span class="gallery-nav-label">Jump to</span>
+      <a href="#f1" class="nav-pill active">F1 — Summary Hero</a>
+      <a href="#f2" class="nav-pill">F2 — Side by Side</a>
+      <a href="#f3" class="nav-pill">F3 — Briefing First</a>
+      <a href="#f4" class="nav-pill">F4 — The Digest</a>
+      <a href="#f5" class="nav-pill">F5 — Tabbed</a>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- F1 — SUMMARY HERO                                             -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <section class="gallery-section" id="f1">
+    <div class="section-label">
+      <span class="section-badge">F1</span>
+      <span class="section-name">Summary Hero</span>
+      <span class="section-desc">Bold editorial grid above the fold. Feed anchors below.</span>
+    </div>
+
+    <div class="preview-frame">
+      <span class="preview-frame-label">F1 — Summary Hero</span>
+
+      <!-- Mini Nav -->
+      <nav class="mini-nav">
+        <span class="mini-nav-brand">Fork<span>Fox</span></span>
+        <div class="mini-nav-right">
+          <span class="mini-nav-pulse-label">Pulse Daily</span>
+          <div class="city-toggle" data-design="f1">
+            <button class="city-btn active" data-city="PHL">PHL</button>
+            <button class="city-btn" data-city="SF">SF</button>
+            <button class="city-btn" data-city="NYC">NYC</button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Signal bar -->
+      <div class="signal-bar">
+        <div class="signal-dot"></div>
+        <span class="signal-label">Overall Signal</span>
+        <span class="signal-value">Heating Up ↑</span>
+        <span class="signal-date">May 15, 2026 · Philadelphia</span>
+      </div>
+
+      <!-- Hero summary -->
+      <div class="f1-hero">
+        <div class="f1-hero-header">
+          <div class="f1-hero-kicker">Today's Brief · AI-Generated · 5 highlights</div>
+          <div class="f1-hero-title">Philadelphia Food Scene: What Moved the Needle This Week</div>
+        </div>
+
+        <div class="f1-highlights-grid">
+          <div class="highlight-card" style="animation: fadeCardIn 0.4s ease 0.05s both;">
+            <span class="highlight-num">01</span>
+            <div class="highlight-headline">Fishtown Posts Its Best 7-Day Stretch in 6 Months</div>
+            <div class="highlight-row"><strong>For foodies:</strong> Prime time to visit — energy, buzz, and new tables converging.</div>
+            <div class="highlight-row"><strong>For owners:</strong> Visibility window is open; push specials now.</div>
+            <div class="highlight-insight">⚡ ForkFox: 3 major openings + 2 expansions clustered in single zip code.</div>
+            <div class="highlight-count">Based on 14 articles</div>
+          </div>
+          <div class="highlight-card" style="animation: fadeCardIn 0.4s ease 0.1s both;">
+            <span class="highlight-num">02</span>
+            <div class="highlight-headline">Israeli Cuisine Dominates Philly's Trending List</div>
+            <div class="highlight-row"><strong>For foodies:</strong> Zahav remains a benchmark; Laser Wolf's Kensington spot is the one to book.</div>
+            <div class="highlight-row"><strong>For owners:</strong> Med/Middle Eastern menus seeing 40% higher engagement signals.</div>
+            <div class="highlight-insight">⚡ ForkFox: Israeli-adjacent terms up 67% in Reddit r/phillyfood last 30 days.</div>
+            <div class="highlight-count">Based on 8 articles</div>
+          </div>
+          <div class="highlight-card" style="animation: fadeCardIn 0.4s ease 0.15s both;">
+            <span class="highlight-num">03</span>
+            <div class="highlight-headline">Two Chef Departures Signal Instability in Rittenhouse Corridor</div>
+            <div class="highlight-row"><strong>For foodies:</strong> Call ahead — menus in flux, quality variance likely short term.</div>
+            <div class="highlight-row"><strong>For owners:</strong> Talent movement creating hiring opportunity if you're recruiting.</div>
+            <div class="highlight-insight">⚡ ForkFox: Rittenhouse signal dropped from 72 to 54 in 7 days.</div>
+            <div class="highlight-count">Based on 5 articles</div>
+          </div>
+        </div>
+        <div class="f1-highlights-row2" style="margin-top: 12px;">
+          <div class="highlight-card" style="animation: fadeCardIn 0.4s ease 0.2s both;">
+            <span class="highlight-num">04</span>
+            <div class="highlight-headline">Menu Prices Up 12% Across Casual Dining vs Last Year</div>
+            <div class="highlight-row"><strong>For foodies:</strong> Budget $15–22/pp more for equivalent meals vs spring 2025.</div>
+            <div class="highlight-row"><strong>For owners:</strong> Consumer sentiment still positive — elasticity remains, for now.</div>
+            <div class="highlight-insight">⚡ ForkFox: Portion-adjusted complaints up 18% on Yelp despite positive tone.</div>
+            <div class="highlight-count">Based on 11 articles</div>
+          </div>
+          <div class="highlight-card" style="animation: fadeCardIn 0.4s ease 0.25s both;">
+            <span class="highlight-num">05</span>
+            <div class="highlight-headline">Reddit Buzz on South Philly Vietnamese 3× vs Last Month</div>
+            <div class="highlight-row"><strong>For foodies:</strong> Emerging neighborhood story — watch this corridor in June.</div>
+            <div class="highlight-row"><strong>For owners:</strong> Organic discovery wave; no ad spend required yet.</div>
+            <div class="highlight-insight">⚡ ForkFox: 3 distinct spots mentioned organically — not astroturfed.</div>
+            <div class="highlight-count">Based on 6 articles</div>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: center; background: var(--surface3); border: 1px dashed var(--border2); border-radius: 10px; padding: 16px; font-size: 12px; color: var(--muted2); text-align: center; line-height: 1.5;">
+            AI-generated insights refresh<br/>daily at 6AM ET
+          </div>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div class="section-divider">
+        <span class="section-divider-label">Today's Articles</span>
+        <div class="section-divider-line"></div>
+        <span class="section-divider-count">9 articles · May 15</span>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <span class="filter-label">Filter</span>
+        <button class="filter-chip active">All</button>
+        <button class="filter-chip">Openings</button>
+        <button class="filter-chip">Closures</button>
+        <button class="filter-chip">Expansions</button>
+        <button class="filter-chip">Awards</button>
+        <button class="filter-chip">Fishtown</button>
+        <button class="filter-chip">Rittenhouse</button>
+      </div>
+
+      <!-- Feed -->
+      <div class="f1-feed">
+        <div class="f1-feed-grid" id="f1-feed"></div>
+      </div>
+    </div>
+
+    <!-- Commentary -->
+    <div class="commentary">
+      <div class="commentary-col pros">
+        <h4>Pros</h4>
+        <ul>
+          <li>Daily summary is unmissable — dominates above the fold</li>
+          <li>3-column grid makes all 5 highlights scannable at once</li>
+          <li>Clear editorial hierarchy: brief → articles</li>
+          <li>Filter bar at feed entry is well-placed</li>
+          <li>Strong first impression for new visitors</li>
+        </ul>
+      </div>
+      <div class="commentary-col cons">
+        <h4>Cons</h4>
+        <ul>
+          <li>Long scroll before reaching feed — bad for return visitors</li>
+          <li>Grid can feel crowded on sub-1200px screens</li>
+          <li>Summary dominates even when you just want articles</li>
+          <li>No quick way to skip the brief</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- F2 — SIDE BY SIDE                                             -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <section class="gallery-section" id="f2">
+    <div class="section-label">
+      <span class="section-badge">F2</span>
+      <span class="section-name">Side by Side</span>
+      <span class="section-desc">Briefing panel left, feed right. Independent scroll. Newspaper mode.</span>
+    </div>
+
+    <div class="preview-frame">
+      <span class="preview-frame-label">F2 — Side by Side</span>
+
+      <!-- Mini Nav -->
+      <nav class="mini-nav">
+        <span class="mini-nav-brand">Fork<span>Fox</span></span>
+        <div class="mini-nav-right">
+          <span class="mini-nav-pulse-label">Pulse Daily</span>
+          <div class="city-toggle" data-design="f2">
+            <button class="city-btn active" data-city="PHL">PHL</button>
+            <button class="city-btn" data-city="SF">SF</button>
+            <button class="city-btn" data-city="NYC">NYC</button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Signal bar -->
+      <div class="signal-bar">
+        <div class="signal-dot"></div>
+        <span class="signal-label">Overall Signal</span>
+        <span class="signal-value">Heating Up ↑</span>
+        <span class="signal-date">May 15, 2026</span>
+      </div>
+
+      <!-- Split body -->
+      <div class="f2-body">
+        <!-- Left panel: daily summary -->
+        <div class="f2-left">
+          <div class="f2-left-header">
+            <div class="f2-left-kicker">Today's Brief · Philadelphia</div>
+            <div class="f2-left-title">5 Things That Moved the Needle</div>
+          </div>
+          <div class="f2-highlights-stack" id="f2-highlights"></div>
+        </div>
+
+        <!-- Right panel: feed -->
+        <div class="f2-right">
+          <div class="f2-right-header">
+            <div class="f2-right-title">All Articles · May 15</div>
+            <div class="filter-bar" style="padding: 0 0 12px; border-bottom: 1px solid var(--border); border-top: none; flex-wrap: wrap;">
+              <button class="filter-chip active" style="font-size:11px;">All</button>
+              <button class="filter-chip" style="font-size:11px;">Openings</button>
+              <button class="filter-chip" style="font-size:11px;">Expansions</button>
+              <button class="filter-chip" style="font-size:11px;">Fishtown</button>
+            </div>
+          </div>
+          <div class="f2-right-inner" id="f2-feed"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Commentary -->
+    <div class="commentary">
+      <div class="commentary-col pros">
+        <h4>Pros</h4>
+        <ul>
+          <li>Both sections always visible — no scrolling tradeoff</li>
+          <li>Feels like Bloomberg or a financial terminal — premium</li>
+          <li>Power users can cross-reference brief and articles simultaneously</li>
+          <li>No hierarchy conflict — they coexist</li>
+        </ul>
+      </div>
+      <div class="commentary-col cons">
+        <h4>Cons</h4>
+        <ul>
+          <li>Desktop-only layout — collapses poorly on mobile</li>
+          <li>Left panel wasted for return visitors who know the brief</li>
+          <li>Right feed column feels narrow at most viewport sizes</li>
+          <li>Needs JS scroll management — complex to build</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- F3 — BRIEFING FIRST                                           -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <section class="gallery-section" id="f3">
+    <div class="section-label">
+      <span class="section-badge">F3</span>
+      <span class="section-name">Briefing First</span>
+      <span class="section-desc">Compact pill strip. Expand any highlight on click. Feed below.</span>
+    </div>
+
+    <div class="preview-frame">
+      <span class="preview-frame-label">F3 — Briefing First</span>
+
+      <!-- Mini Nav -->
+      <nav class="mini-nav">
+        <span class="mini-nav-brand">Fork<span>Fox</span></span>
+        <div class="mini-nav-right">
+          <span class="mini-nav-pulse-label">Pulse Daily</span>
+          <div class="city-toggle" data-design="f3">
+            <button class="city-btn active" data-city="PHL">PHL</button>
+            <button class="city-btn" data-city="SF">SF</button>
+            <button class="city-btn" data-city="NYC">NYC</button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Signal bar -->
+      <div class="signal-bar">
+        <div class="signal-dot"></div>
+        <span class="signal-label">Overall Signal</span>
+        <span class="signal-value">Heating Up ↑</span>
+        <span class="signal-date">May 15, 2026</span>
+      </div>
+
+      <!-- Pills strip -->
+      <div class="f3-pills-strip">
+        <div class="f3-strip-label">Today's Brief · Click any to expand</div>
+        <div class="f3-pills-row">
+          <div class="f3-pill" data-highlight="1" data-design="f3">
+            <span class="f3-pill-num">1</span>
+            <span class="f3-pill-text">Fishtown heating up ↗</span>
+          </div>
+          <div class="f3-pill" data-highlight="2" data-design="f3">
+            <span class="f3-pill-num">2</span>
+            <span class="f3-pill-text">Israeli cuisine rising</span>
+          </div>
+          <div class="f3-pill" data-highlight="3" data-design="f3">
+            <span class="f3-pill-num">3</span>
+            <span class="f3-pill-text">Rittenhouse chef departures</span>
+          </div>
+          <div class="f3-pill" data-highlight="4" data-design="f3">
+            <span class="f3-pill-num">4</span>
+            <span class="f3-pill-text">Prices up 12%</span>
+          </div>
+          <div class="f3-pill" data-highlight="5" data-design="f3">
+            <span class="f3-pill-num">5</span>
+            <span class="f3-pill-text">S. Philly Viet buzz 3×</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expand area -->
+      <div class="f3-expand-area" id="f3-expand-area">
+        <div class="f3-expand-inner" id="f3-expand-inner"></div>
+      </div>
+
+      <!-- Divider -->
+      <div class="section-divider">
+        <span class="section-divider-label">Today's Articles</span>
+        <div class="section-divider-line"></div>
+        <span class="section-divider-count">9 articles</span>
+      </div>
+
+      <!-- Filter -->
+      <div class="filter-bar">
+        <span class="filter-label">Filter</span>
+        <button class="filter-chip active">All</button>
+        <button class="filter-chip">Openings</button>
+        <button class="filter-chip">Expansions</button>
+        <button class="filter-chip">Fishtown</button>
+        <button class="filter-chip">Rittenhouse</button>
+      </div>
+
+      <!-- Feed -->
+      <div class="f3-feed" id="f3-feed"></div>
+    </div>
+
+    <!-- Commentary -->
+    <div class="commentary">
+      <div class="commentary-col pros">
+        <h4>Pros</h4>
+        <ul>
+          <li>Minimum footprint — feed is never buried</li>
+          <li>Return visitors can skip the brief instantly</li>
+          <li>Pill interaction rewards curiosity without forcing it</li>
+          <li>Works beautifully on mobile as a horizontal scrolling strip</li>
+          <li>Most versatile layout across screen sizes</li>
+        </ul>
+      </div>
+      <div class="commentary-col cons">
+        <h4>Cons</h4>
+        <ul>
+          <li>Brief is underemphasized — new visitors may miss it</li>
+          <li>Expanding a pill pushes the feed down abruptly</li>
+          <li>5 pills can feel cramped on small screens</li>
+          <li>Summary feel is diminished by compression</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- F4 — THE DIGEST                                               -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <section class="gallery-section" id="f4">
+    <div class="section-label">
+      <span class="section-badge">F4</span>
+      <span class="section-name">The Digest</span>
+      <span class="section-desc">Magazine editorial above the fold. Feed slides up on demand.</span>
+    </div>
+
+    <div class="preview-frame">
+      <span class="preview-frame-label">F4 — The Digest</span>
+
+      <!-- Mini Nav -->
+      <nav class="mini-nav">
+        <span class="mini-nav-brand">Fork<span>Fox</span></span>
+        <div class="mini-nav-right">
+          <span class="mini-nav-pulse-label">Pulse Daily</span>
+          <div class="city-toggle" data-design="f4">
+            <button class="city-btn active" data-city="PHL">PHL</button>
+            <button class="city-btn" data-city="SF">SF</button>
+            <button class="city-btn" data-city="NYC">NYC</button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Signal bar -->
+      <div class="signal-bar">
+        <div class="signal-dot"></div>
+        <span class="signal-label">Overall Signal</span>
+        <span class="signal-value">Heating Up ↑</span>
+        <span class="signal-date">May 15, 2026 · Philadelphia</span>
+      </div>
+
+      <!-- Above fold content -->
+      <div class="f4-above-fold">
+        <div class="f4-kicker">Today's Digest · Philadelphia · May 15, 2026</div>
+
+        <!-- Hero highlight #1 -->
+        <div class="f4-hero-card">
+          <div class="f4-hero-headline">Fishtown Posts Its Best 7-Day Stretch in 6 Months — and the Scene Knows It</div>
+          <div class="f4-hero-why">
+            <div class="f4-why-box">
+              <div class="f4-why-label">For Foodies</div>
+              <div class="f4-why-text">Prime time to visit — energy, buzz, and new tables converging in one zip code.</div>
+            </div>
+            <div class="f4-why-box">
+              <div class="f4-why-label">For Owners</div>
+              <div class="f4-why-text">Visibility window is open. Push specials, activate social now while momentum peaks.</div>
+            </div>
+          </div>
+          <div class="highlight-insight" style="margin-bottom:0;">⚡ ForkFox: 3 major openings + 2 expansions clustered in single zip code this week. · Based on 14 articles</div>
+        </div>
+
+        <!-- Highlights 2–5 in sub-grid -->
+        <div class="f4-sub-grid">
+          <div class="f4-sub-card">
+            <div class="f4-sub-num">02</div>
+            <div class="f4-sub-headline">Israeli Cuisine Dominates Philly's Trending List</div>
+            <div class="f4-sub-insight">Israeli-adjacent terms up 67% in r/phillyfood. Based on 8 articles.</div>
+          </div>
+          <div class="f4-sub-card">
+            <div class="f4-sub-num">03</div>
+            <div class="f4-sub-headline">Two Chef Departures Hit Rittenhouse Corridor</div>
+            <div class="f4-sub-insight">Neighborhood signal dropped 72→54 in 7 days. Based on 5 articles.</div>
+          </div>
+          <div class="f4-sub-card">
+            <div class="f4-sub-num">04</div>
+            <div class="f4-sub-headline">Menu Prices Up 12% Across Casual Dining</div>
+            <div class="f4-sub-insight">Consumer sentiment still positive — elasticity holding, for now. 11 articles.</div>
+          </div>
+          <div class="f4-sub-card">
+            <div class="f4-sub-num">05</div>
+            <div class="f4-sub-headline">South Philly Vietnamese Buzz 3× Last Month</div>
+            <div class="f4-sub-insight">3 distinct spots mentioned organically — not astroturfed. 6 articles.</div>
+          </div>
+        </div>
+
+        <div class="f4-read-more-btn">
+          <button class="f4-btn" id="f4-open-feed">Read All Articles →</button>
+        </div>
+      </div>
+
+      <!-- Slide-up feed panel -->
+      <div class="f4-feed-panel" id="f4-feed-panel">
+        <div class="f4-feed-panel-header">
+          <span class="f4-feed-panel-title">All Articles · May 15, 2026</span>
+          <button class="f4-close-btn" id="f4-close-feed">✕</button>
+        </div>
+        <div class="filter-bar" style="padding: 10px 16px; border-top: none;">
+          <button class="filter-chip active" style="font-size:11px;">All</button>
+          <button class="filter-chip" style="font-size:11px;">Openings</button>
+          <button class="filter-chip" style="font-size:11px;">Expansions</button>
+          <button class="filter-chip" style="font-size:11px;">Fishtown</button>
+        </div>
+        <div class="f4-feed-inner" id="f4-feed"></div>
+      </div>
+    </div>
+
+    <!-- Commentary -->
+    <div class="commentary">
+      <div class="commentary-col pros">
+        <h4>Pros</h4>
+        <ul>
+          <li>Most premium editorial feel — reads like NYT Food or Eater daily</li>
+          <li>Top highlight gets the full treatment it deserves</li>
+          <li>Feed doesn't compete — it's secondary by design</li>
+          <li>Great for email newsletter crossover or social sharing</li>
+        </ul>
+      </div>
+      <div class="commentary-col cons">
+        <h4>Cons</h4>
+        <ul>
+          <li>Feed is hidden — friction for article-first users</li>
+          <li>Slide-up panel is a pattern mismatch on mobile</li>
+          <li>4-column sub-grid cramped below 900px</li>
+          <li>Return visitors who want raw feed will be annoyed daily</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- F5 — TABBED                                                   -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <section class="gallery-section" id="f5">
+    <div class="section-label">
+      <span class="section-badge">F5</span>
+      <span class="section-name">Tabbed</span>
+      <span class="section-desc">App-like tab bar. Today's Brief default. Sections cleanly separated.</span>
+    </div>
+
+    <div class="preview-frame">
+      <span class="preview-frame-label">F5 — Tabbed</span>
+
+      <!-- Mini Nav -->
+      <nav class="mini-nav">
+        <span class="mini-nav-brand">Fork<span>Fox</span></span>
+        <div class="mini-nav-right">
+          <span class="mini-nav-pulse-label">Pulse Daily</span>
+          <div class="city-toggle" data-design="f5">
+            <button class="city-btn active" data-city="PHL">PHL</button>
+            <button class="city-btn" data-city="SF">SF</button>
+            <button class="city-btn" data-city="NYC">NYC</button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Signal bar -->
+      <div class="signal-bar">
+        <div class="signal-dot"></div>
+        <span class="signal-label">Overall Signal</span>
+        <span class="signal-value">Heating Up ↑</span>
+        <span class="signal-date">May 15, 2026</span>
+      </div>
+
+      <!-- Tab bar -->
+      <div class="f5-tab-bar">
+        <button class="f5-tab active" data-tab="brief" data-design="f5">Today's Brief</button>
+        <button class="f5-tab" data-tab="all" data-design="f5">All Articles</button>
+        <button class="f5-tab" data-tab="openings" data-design="f5">Openings</button>
+        <button class="f5-tab" data-tab="closures" data-design="f5">Closures</button>
+        <button class="f5-tab" data-tab="trending" data-design="f5">Trending</button>
+      </div>
+
+      <!-- Tab: Today's Brief -->
+      <div class="f5-tab-content active" data-tab-content="brief" data-design="f5">
+        <div class="f5-brief-inner">
+          <div class="f5-brief-header">
+            <div class="f5-brief-title">Philadelphia · May 15</div>
+            <div class="f5-brief-date">AI-generated at 6AM ET</div>
+          </div>
+          <div id="f5-highlights"></div>
+        </div>
+      </div>
+
+      <!-- Tab: All Articles -->
+      <div class="f5-tab-content" data-tab-content="all" data-design="f5">
+        <div class="filter-bar">
+          <span class="filter-label">Filter</span>
+          <button class="filter-chip active">All</button>
+          <button class="filter-chip">Fishtown</button>
+          <button class="filter-chip">Rittenhouse</button>
+          <button class="filter-chip">NoLibs</button>
+        </div>
+        <div class="f5-feed-inner" id="f5-feed"></div>
+      </div>
+
+      <!-- Tab: Openings -->
+      <div class="f5-tab-content" data-tab-content="openings" data-design="f5">
+        <div class="f5-filtered-inner" id="f5-openings"></div>
+      </div>
+
+      <!-- Tab: Closures -->
+      <div class="f5-tab-content" data-tab-content="closures" data-design="f5">
+        <div class="f5-filtered-inner">
+          <div class="f5-empty">No closures tracked this week in Philadelphia. <br/>Fishtown is holding strong.</div>
+        </div>
+      </div>
+
+      <!-- Tab: Trending -->
+      <div class="f5-tab-content" data-tab-content="trending" data-design="f5">
+        <div class="f5-filtered-inner" id="f5-trending"></div>
+      </div>
+    </div>
+
+    <!-- Commentary -->
+    <div class="commentary">
+      <div class="commentary-col pros">
+        <h4>Pros</h4>
+        <ul>
+          <li>Return visitors go straight to "All Articles" — zero friction</li>
+          <li>Clean app-like UX — familiar navigation pattern</li>
+          <li>Signal-type tabs (Openings/Closures) are a natural ForkFox feature</li>
+          <li>Best for users who know what they want</li>
+          <li>Scales well — easy to add new tabs (Awards, Trending)</li>
+        </ul>
+      </div>
+      <div class="commentary-col cons">
+        <h4>Cons</h4>
+        <ul>
+          <li>Brief is one click away — new visitors may skip it entirely</li>
+          <li>Tab bar can overflow on mobile with 5 tabs</li>
+          <li>Less editorial feel — looks like a data dashboard</li>
+          <li>Tab switching loses the narrative/discovery flow</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /gallery-wrapper -->
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- SCRIPT                                                        -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<script>
+  // ── Mock data ──────────────────────────────────────────────────
+  const ARTICLES = [
+    {
+      source: 'Eater Philly',
+      city: 'Philadelphia',
+      neighborhood: 'Fishtown',
+      signal: 'EXPANSION',
+      signalClass: 'expansion',
+      headline: 'Vernick Fish Is Expanding to a Second Location in Fishtown This Summer',
+      url: '#',
+      delay: 0.05
+    },
+    {
+      source: 'Foobooz',
+      city: 'Philadelphia',
+      neighborhood: 'Rittenhouse',
+      signal: 'OPINION',
+      signalClass: 'opinion',
+      headline: 'Zahav at 15: How Michael Solomonov Redrew the Map of Philadelphia Fine Dining',
+      url: '#',
+      delay: 0.1
+    },
+    {
+      source: 'Eater Philly',
+      city: 'Philadelphia',
+      neighborhood: 'Kensington',
+      signal: 'OPENING',
+      signalClass: 'opening',
+      headline: 'Laser Wolf's New Kensington Location Opens Friday — Here's What to Expect',
+      url: '#',
+      delay: 0.15
+    },
+    {
+      source: 'Foobooz',
+      city: 'Philadelphia',
+      neighborhood: 'NoLibs',
+      signal: 'OPINION',
+      signalClass: 'opinion',
+      headline: 'Mulherin's Cuts Weekend Hours Amid Staffing Challenges — Regulars Are Worried',
+      url: '#',
+      delay: 0.2
+    },
+    {
+      source: 'Eater Philly',
+      city: 'Philadelphia',
+      neighborhood: 'Fishtown',
+      signal: 'OPENING',
+      signalClass: 'opening',
+      headline: 'Suraya Opens Its Terrace Season Early After Record Reservation Demand',
+      url: '#',
+      delay: 0.25
+    },
+    {
+      source: 'Eater Philly',
+      city: 'Philadelphia',
+      neighborhood: 'Fishtown',
+      signal: 'OPINION',
+      signalClass: 'opinion',
+      headline: 'Beddia at 10: How a 40-Seat Fishtown Pizzeria Changed the Way Philly Eats',
+      url: '#',
+      delay: 0.3
+    },
+    {
+      source: 'Reddit r/phillyfood',
+      city: 'Philadelphia',
+      neighborhood: 'South Philly',
+      signal: 'OPINION',
+      signalClass: 'opinion',
+      headline: '3 Under-the-Radar Vietnamese Spots in South Philly That Need Your Attention Right Now',
+      url: '#',
+      delay: 0.35
+    },
+    {
+      source: 'Foobooz',
+      city: 'Philadelphia',
+      neighborhood: 'Rittenhouse',
+      signal: 'OPINION',
+      signalClass: 'opinion',
+      headline: 'Rittenhouse Restaurant Loses Executive Chef After 4 Years — Ownership Tight-Lipped',
+      url: '#',
+      delay: 0.4
+    },
+    {
+      source: 'Eater Philly',
+      city: 'Philadelphia',
+      neighborhood: 'Fitler Square',
+      signal: 'OPENING',
+      signalClass: 'opening',
+      headline: 'Two New Natural Wine Bars Announced for Fitler Square — Philly's Bougie-Casual Push Continues',
+      url: '#',
+      delay: 0.45
+    }
+  ];
+
+  const HIGHLIGHTS = [
+    {
+      num: '01',
+      headline: 'Fishtown Posts Its Best 7-Day Stretch in 6 Months',
+      foodie: 'Prime time to visit — energy, buzz, and new tables converging.',
+      owner: 'Visibility window is open; push specials now.',
+      insight: '3 major openings + 2 expansions clustered in single zip code.',
+      count: 14
+    },
+    {
+      num: '02',
+      headline: 'Israeli Cuisine Dominates Philly\'s Trending List',
+      foodie: 'Zahav remains a benchmark; Laser Wolf's Kensington spot is the one to book.',
+      owner: 'Med/Middle Eastern menus seeing 40% higher engagement signals.',
+      insight: 'Israeli-adjacent terms up 67% in Reddit r/phillyfood last 30 days.',
+      count: 8
+    },
+    {
+      num: '03',
+      headline: 'Two Chef Departures Signal Instability in Rittenhouse Corridor',
+      foodie: 'Call ahead — menus in flux, quality variance likely short term.',
+      owner: 'Talent movement creating hiring opportunity if you\'re recruiting.',
+      insight: 'Rittenhouse signal dropped from 72 to 54 in 7 days.',
+      count: 5
+    },
+    {
+      num: '04',
+      headline: 'Menu Prices Up 12% Across Casual Dining vs Last Year',
+      foodie: 'Budget $15–22/pp more for equivalent meals vs spring 2025.',
+      owner: 'Consumer sentiment still positive — elasticity remains, for now.',
+      insight: 'Portion-adjusted complaints up 18% on Yelp despite positive tone.',
+      count: 11
+    },
+    {
+      num: '05',
+      headline: 'Reddit Buzz on South Philly Vietnamese 3× vs Last Month',
+      foodie: 'Emerging neighborhood story — watch this corridor in June.',
+      owner: 'Organic discovery wave; no ad spend required yet.',
+      insight: '3 distinct spots mentioned organically — not astroturfed.',
+      count: 6
+    }
+  ];
+
+  // ── Render helpers ─────────────────────────────────────────────
+  function renderArticleCard(article) {
+    return `
+      <div class="article-card" style="animation-delay: ${article.delay}s;">
+        <div class="article-card-meta">
+          <span class="source-badge">${article.source}</span>
+          <span class="chip chip-city">${article.city}</span>
+          <span class="chip chip-neighborhood">${article.neighborhood}</span>
+          <span class="chip chip-${article.signalClass}">${article.signal}</span>
+        </div>
+        <div class="article-card-headline">${article.headline}</div>
+        <a href="${article.url}" class="article-card-link">↗ Read at ${article.source}</a>
+      </div>
+    `;
+  }
+
+  function renderHighlightCard(h, compact) {
+    if (compact) {
+      return `
+        <div class="highlight-card" style="animation: fadeCardIn 0.4s ease both;">
+          <span class="highlight-num">${h.num}</span>
+          <div class="highlight-headline">${h.headline}</div>
+          <div class="highlight-insight">⚡ ${h.insight}</div>
+          <div class="highlight-count">Based on ${h.count} articles</div>
+        </div>
+      `;
+    }
+    return `
+      <div class="highlight-card" style="animation: fadeCardIn 0.4s ease both;">
+        <span class="highlight-num">${h.num}</span>
+        <div class="highlight-headline">${h.headline}</div>
+        <div class="highlight-row"><strong>For foodies:</strong> ${h.foodie}</div>
+        <div class="highlight-row"><strong>For owners:</strong> ${h.owner}</div>
+        <div class="highlight-insight">⚡ ForkFox: ${h.insight}</div>
+        <div class="highlight-count">Based on ${h.count} articles</div>
+      </div>
+    `;
+  }
+
+  // ── Populate feeds ─────────────────────────────────────────────
+  function populateFeed(containerId, articles) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = articles.map(renderArticleCard).join('');
+  }
+
+  function populateHighlights(containerId, compact) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = HIGHLIGHTS.map(h => renderHighlightCard(h, compact)).join('');
+  }
+
+  // F1
+  populateFeed('f1-feed', ARTICLES);
+
+  // F2
+  populateHighlights('f2-highlights', false);
+  populateFeed('f2-feed', ARTICLES);
+
+  // F3
+  populateFeed('f3-feed', ARTICLES);
+
+  // F4
+  populateFeed('f4-feed', ARTICLES);
+
+  // F5
+  populateHighlights('f5-highlights', false);
+  populateFeed('f5-feed', ARTICLES);
+
+  // F5 openings tab
+  const openingArticles = ARTICLES.filter(a => a.signal === 'OPENING');
+  populateFeed('f5-openings', openingArticles);
+
+  // F5 trending tab (opinion + expansion)
+  const trendingArticles = ARTICLES.filter(a => a.signal === 'OPINION' || a.signal === 'EXPANSION');
+  populateFeed('f5-trending', trendingArticles.slice(0, 5));
+
+  // ── F3: Pill expand ────────────────────────────────────────────
+  const f3Pills = document.querySelectorAll('.f3-pill[data-design="f3"]');
+  const f3ExpandArea = document.getElementById('f3-expand-area');
+  const f3ExpandInner = document.getElementById('f3-expand-inner');
+  let activeF3Pill = null;
+
+  f3Pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      const num = parseInt(pill.dataset.highlight) - 1;
+      const h = HIGHLIGHTS[num];
+      const isExpanded = pill.classList.contains('expanded');
+
+      f3Pills.forEach(p => p.classList.remove('expanded'));
+      if (isExpanded) {
+        f3ExpandArea.classList.remove('open');
+        activeF3Pill = null;
+        return;
+      }
+
+      pill.classList.add('expanded');
+      activeF3Pill = pill;
+
+      // Show 3 highlight cards: selected + neighbors
+      const indices = [num];
+      if (num > 0) indices.unshift(num - 1);
+      if (num < HIGHLIGHTS.length - 1) indices.push(num + 1);
+      while (indices.length < 3) indices.push(indices[indices.length - 1]);
+      const toShow = indices.slice(0, 3);
+
+      f3ExpandInner.innerHTML = toShow.map(i => renderHighlightCard(HIGHLIGHTS[i], false)).join('');
+      f3ExpandArea.classList.add('open');
+    });
+  });
+
+  // ── F4: Slide-up feed ──────────────────────────────────────────
+  const f4OpenBtn = document.getElementById('f4-open-feed');
+  const f4CloseBtn = document.getElementById('f4-close-feed');
+  const f4Panel = document.getElementById('f4-feed-panel');
+
+  if (f4OpenBtn) {
+    f4OpenBtn.addEventListener('click', () => {
+      f4Panel.classList.add('open');
+    });
+  }
+  if (f4CloseBtn) {
+    f4CloseBtn.addEventListener('click', () => {
+      f4Panel.classList.remove('open');
+    });
+  }
+
+  // ── F5: Tab switching ──────────────────────────────────────────
+  const f5Tabs = document.querySelectorAll('.f5-tab[data-design="f5"]');
+  const f5Contents = document.querySelectorAll('[data-tab-content][data-design="f5"]');
+
+  f5Tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const targetTab = tab.dataset.tab;
+      f5Tabs.forEach(t => t.classList.remove('active'));
+      f5Contents.forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelector(`[data-tab-content="${targetTab}"][data-design="f5"]`).classList.add('active');
+    });
+  });
+
+  // ── City toggle (all designs) ──────────────────────────────────
+  document.querySelectorAll('.city-toggle').forEach(toggle => {
+    toggle.querySelectorAll('.city-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        toggle.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  });
+
+  // ── Filter chips (decorative) ──────────────────────────────────
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const bar = chip.closest('.filter-bar');
+      if (!bar) return;
+      bar.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  // ── Gallery nav: active pill on scroll ────────────────────────
+  const galleryNavPills = document.querySelectorAll('.gallery-nav .nav-pill');
+  const gallerySections = document.querySelectorAll('.gallery-section');
+
+  const sectionObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        galleryNavPills.forEach(pill => {
+          pill.classList.toggle('active', pill.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  gallerySections.forEach(s => sectionObserver.observe(s));
+</script>
+</body>
+</html>

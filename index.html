@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForkFox Pulse — Design Gallery</title>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#0a0a0a;color:#f0f0f0;font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+h1,h2,h3,h4,h5{font-family:'Geologica',sans-serif}
+
+/* NAV */
+.gnav{position:sticky;top:0;z-index:200;background:rgba(10,10,10,.97);border-bottom:1px solid rgba(255,255,255,.07);backdrop-filter:blur(12px);display:flex;align-items:center;gap:1.5rem;padding:.9rem 2rem;flex-wrap:wrap}
+.gnav-brand{font-family:'Geologica',sans-serif;font-size:1rem;font-weight:900;color:#fff;text-decoration:none;white-space:nowrap}
+.gnav-brand span{color:#F97316}
+.gnav-badge{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.2rem .5rem;border-radius:4px;background:rgba(249,115,22,.15);color:#F97316;border:1px solid rgba(249,115,22,.25);margin-left:.4rem;vertical-align:middle}
+.tab-row{display:flex;gap:.3rem;flex:1;justify-content:center;flex-wrap:wrap}
+.tab-btn{padding:.4rem 1.1rem;border-radius:100px;border:1px solid rgba(255,255,255,.1);background:transparent;color:rgba(255,255,255,.45);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Geologica',sans-serif}
+.tab-btn:hover{border-color:rgba(249,115,22,.4);color:rgba(255,255,255,.8)}
+.tab-btn.active{background:#F97316;border-color:#F97316;color:#fff}
+.gnav-view-full{padding:.4rem 1.1rem;border-radius:100px;border:1px solid rgba(255,255,255,.12);background:transparent;color:rgba(255,255,255,.4);font-size:.72rem;font-weight:600;text-decoration:none;white-space:nowrap;transition:all .2s;font-family:'Geologica',sans-serif}
+.gnav-view-full:hover{color:#F97316;border-color:rgba(249,115,22,.4)}
+
+/* SECTIONS */
+.gsec{display:none;padding:3rem 2rem 5rem;max-width:1400px;margin:0 auto}
+.gsec.active{display:block}
+
+/* SECTION HEADER */
+.sec-head{margin-bottom:2.5rem}
+.sec-kicker{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#F97316;margin-bottom:.5rem}
+.sec-title{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:900;letter-spacing:-.03em;margin-bottom:.5rem}
+.sec-sub{color:rgba(255,255,255,.4);font-size:.9rem;max-width:600px;line-height:1.7}
+
+/* CONCEPT GRID */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:1.5rem}
+
+/* CONCEPT CARD */
+.ccard{background:#111;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;transition:border-color .2s,transform .2s}
+.ccard:hover{border-color:rgba(249,115,22,.3);transform:translateY(-2px)}
+.ccard.recommended{border-color:rgba(249,115,22,.35);box-shadow:0 0 30px rgba(249,115,22,.08)}
+.ccard-thumb{position:relative;background:#0d0d0d;height:190px;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.06)}
+.ccard-rec-badge{position:absolute;top:.7rem;right:.7rem;z-index:10;font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:100px;background:#F97316;color:#fff;font-family:'Geologica',sans-serif}
+.ccard-body{padding:1.2rem 1.3rem 1rem}
+.ccard-label{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:.3rem}
+.ccard-name{font-size:1.05rem;font-weight:800;color:#fff;margin-bottom:.25rem;letter-spacing:-.02em}
+.ccard-desc{font-size:.8rem;color:rgba(255,255,255,.45);line-height:1.6;margin-bottom:1rem}
+.pcon-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem}
+.pcon{padding:.75rem .85rem;border-radius:8px}
+.pcon.pros{background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.14)}
+.pcon.cons{background:rgba(250,42,82,.05);border:1px solid rgba(250,42,82,.14)}
+.pcon h5{font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem;font-family:'Geologica',sans-serif}
+.pcon.pros h5{color:#34d399}.pcon.cons h5{color:#FA2A52}
+.pcon ul{list-style:none;display:flex;flex-direction:column;gap:.3rem}
+.pcon li{font-size:.73rem;color:rgba(255,255,255,.55);line-height:1.5;padding-left:.8rem;position:relative}
+.pcon li::before{content:'';position:absolute;left:0;top:.55em;width:3px;height:3px;border-radius:50%}
+.pcon.pros li::before{background:#34d399}.pcon.cons li::before{background:#FA2A52}
+.view-full-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.75rem;font-weight:600;color:#F97316;text-decoration:none;font-family:'Geologica',sans-serif;padding:.4rem 0;transition:gap .2s}
+.view-full-link:hover{gap:.7rem}
+.view-full-link::after{content:'→'}
+
+/* ── THUMBNAIL LAYOUTS ─────────────────────────────────────── */
+/* shared blocks */
+.tb{width:100%;height:100%;position:relative;padding:8px;display:flex;flex-direction:column;gap:5px}
+.block{border-radius:5px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:.52rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.2);font-family:'Geologica',sans-serif}
+.block.ng-block{background:rgba(249,115,22,.06);border-color:rgba(249,115,22,.15)}
+.block.chart-block{background:rgba(52,211,153,.04);border-color:rgba(52,211,153,.1)}
+.block.lb-block{background:rgba(255,255,255,.04)}
+.block.fc-block{background:rgba(249,115,22,.04);border-color:rgba(249,115,22,.1)}
+.block.kpi-block{background:rgba(96,165,250,.05);border-color:rgba(96,165,250,.12)}
+.block.flash-strip{background:rgba(250,42,82,.05);border-color:rgba(250,42,82,.12)}
+.row{display:flex;gap:5px;flex:1}
+
+/* node graph mini animation */
+@keyframes nfloat{0%,100%{transform:translate(0,0)}50%{transform:translate(2px,-2px)}}
+.mini-node{position:absolute;border-radius:50%;animation:nfloat 3s ease-in-out infinite}
+.mini-node:nth-child(2){animation-delay:-.8s}.mini-node:nth-child(3){animation-delay:-1.5s}.mini-node:nth-child(4){animation-delay:-2.2s}.mini-node:nth-child(5){animation-delay:-.4s}
+.mini-edge{position:absolute;background:rgba(249,115,22,.25);border-radius:1px;transform-origin:left center}
+
+/* chart mini line */
+@keyframes cline{from{stroke-dashoffset:200}to{stroke-dashoffset:0}}
+.mini-chart-line{stroke-dasharray:200;stroke-dashoffset:200;animation:cline 1.8s ease forwards .3s}
+.mini-glow{filter:drop-shadow(0 0 3px #F97316)}
+
+/* DIVIDER */
+.section-divider{border:none;border-top:1px solid rgba(255,255,255,.06);margin:3rem 0}
+
+/* OPTIMIZED SECTION */
+.opt-intro{background:linear-gradient(135deg,rgba(249,115,22,.08),rgba(52,211,153,.04));border:1px solid rgba(249,115,22,.2);border-radius:14px;padding:1.5rem 1.8rem;margin-bottom:2.5rem;display:flex;align-items:flex-start;gap:1rem}
+.opt-intro-icon{font-size:1.5rem;flex-shrink:0;line-height:1}
+.opt-intro-text h3{font-size:1rem;font-weight:800;margin-bottom:.4rem;color:#fff}
+.opt-intro-text p{font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.7}
+
+.opt-stack{display:flex;flex-direction:column;gap:3.5rem}
+.opt-card{background:#111;border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden}
+.opt-card.pick1{border-color:rgba(249,115,22,.4);box-shadow:0 0 50px rgba(249,115,22,.07)}
+.opt-card-header{padding:1.4rem 1.8rem;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.opt-number{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Geologica',sans-serif;font-size:.85rem;font-weight:900;flex-shrink:0}
+.opt-card.pick1 .opt-number{background:rgba(249,115,22,.2);color:#F97316}
+.opt-card.pick2 .opt-number{background:rgba(52,211,153,.15);color:#34d399}
+.opt-card.pick3 .opt-number{background:rgba(96,165,250,.15);color:#60a5fa}
+.opt-header-text{flex:1}
+.opt-title{font-size:1.15rem;font-weight:900;letter-spacing:-.02em;color:#fff;margin-bottom:.2rem}
+.opt-subtitle{font-size:.8rem;color:rgba(255,255,255,.4)}
+.opt-verdict{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .7rem;border-radius:100px;flex-shrink:0;font-family:'Geologica',sans-serif}
+.opt-card.pick1 .opt-verdict{background:rgba(249,115,22,.15);color:#F97316;border:1px solid rgba(249,115,22,.3)}
+.opt-card.pick2 .opt-verdict{background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.25)}
+.opt-card.pick3 .opt-verdict{background:rgba(96,165,250,.1);color:#60a5fa;border:1px solid rgba(96,165,250,.25)}
+.opt-mock{padding:1.5rem 1.8rem;border-bottom:1px solid rgba(255,255,255,.05)}
+.opt-mock-frame{background:#080808;border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;position:relative}
+.opt-rationale{padding:1.2rem 1.8rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.rationale-col h5{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:.6rem;font-family:'Geologica',sans-serif}
+.rationale-col ul{list-style:none;display:flex;flex-direction:column;gap:.35rem}
+.rationale-col li{font-size:.78rem;color:rgba(255,255,255,.55);line-height:1.5;padding-left:.9rem;position:relative}
+.rationale-col li::before{content:'→';position:absolute;left:0;color:rgba(249,115,22,.5);font-size:.65rem}
+
+/* ── OPTIMIZED MOCK INTERNALS ───────────────────────────────── */
+
+/* O1 mock — The Signal (D1 stack + enhanced chart + flash cards) */
+.o1-mock{font-size:0;line-height:0}
+.o1-nav{height:32px;background:#0a0a0a;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 12px;gap:8px}
+.o1-nav-brand{font-family:'Geologica',sans-serif;font-size:.65rem;font-weight:900;color:#fff}
+.o1-nav-brand b{color:#F97316}
+.o1-nav-links{display:flex;gap:6px;margin-left:auto}
+.o1-nav-link{font-size:.52rem;color:rgba(255,255,255,.35);font-family:'Geologica',sans-serif;font-weight:600}
+.o1-nav-link.active{color:#F97316}
+.o1-city-toggle{display:flex;gap:1px;background:rgba(255,255,255,.05);border-radius:6px;padding:2px;margin-left:8px}
+.o1-cb{font-size:.5rem;padding:.15rem .45rem;border-radius:4px;font-weight:700;color:rgba(255,255,255,.35);font-family:'Geologica',sans-serif;cursor:default}
+.o1-cb.a{background:#F97316;color:#fff}
+
+/* Node graph zone */
+.o1-graph{height:180px;background:linear-gradient(180deg,rgba(249,115,22,.03),transparent);position:relative;border-bottom:1px solid rgba(255,255,255,.05)}
+.o1-graph-label{position:absolute;top:10px;left:12px;font-size:.55rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.18);font-family:'Geologica',sans-serif}
+.o1-live-badge{position:absolute;top:10px;right:12px;display:flex;align-items:center;gap:4px;font-size:.52rem;font-weight:700;color:rgba(255,255,255,.5);font-family:'Geologica',sans-serif}
+.o1-dot{width:5px;height:5px;border-radius:50%;background:#34d399;box-shadow:0 0 6px rgba(52,211,153,.8)}
+@keyframes livepulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,.6);opacity:1}50%{box-shadow:0 0 0 6px rgba(52,211,153,0);opacity:.7}}
+.o1-dot{animation:livepulse 2s infinite}
+
+/* Neighborhood labels */
+.nh-label{position:absolute;font-size:.42rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:rgba(255,255,255,.1);font-family:'Geologica',sans-serif}
+
+/* mini nodes */
+.mn{position:absolute;border-radius:50%;animation:nfloat 4s ease-in-out infinite}
+.mn:nth-child(odd){animation-duration:5.2s}.mn:nth-child(even){animation-delay:-1.4s;animation-duration:3.8s}
+.mn:nth-child(3){animation-delay:-2s}.mn:nth-child(4){animation-delay:-.7s}
+.mn:nth-child(5){animation-delay:-3s}.mn:nth-child(6){animation-delay:-1.8s}
+
+/* chart zone */
+.o1-chart-zone{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+.o1-chart-header{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.o1-chart-title{font-size:.58rem;font-weight:700;color:rgba(255,255,255,.6);font-family:'Geologica',sans-serif}
+.o1-legend{display:flex;gap:8px;margin-left:auto}
+.o1-leg-item{display:flex;align-items:center;gap:3px;font-size:.48rem;color:rgba(255,255,255,.3);font-family:'Geologica',sans-serif}
+.o1-leg-line{width:12px;height:2px;border-radius:1px}
+.o1-leg-dash{width:12px;height:0;border-top:1.5px dashed rgba(255,255,255,.25)}
+.o1-delta-badge{font-size:.5rem;font-weight:700;padding:.15rem .45rem;border-radius:4px;background:rgba(52,211,153,.15);color:#34d399;border:1px solid rgba(52,211,153,.25);font-family:'Geologica',sans-serif;margin-left:4px}
+.o1-chart-compare{font-size:.48rem;padding:.12rem .4rem;border-radius:4px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3);font-family:'Geologica',sans-serif}
+
+/* flash cards strip */
+.o1-flash-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+.o1-fc{padding:7px 8px;border-radius:7px}
+.o1-fc.fire{background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2)}
+.o1-fc.cool{background:rgba(250,42,82,.07);border:1px solid rgba(250,42,82,.18)}
+.o1-fc.gem{background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.18)}
+.o1-fc-icon{font-size:.85rem;line-height:1;margin-bottom:3px}
+.o1-fc-label{font-size:.48rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-family:'Geologica',sans-serif;margin-bottom:2px}
+.o1-fc.fire .o1-fc-label{color:#F97316}.o1-fc.cool .o1-fc-label{color:#FA2A52}.o1-fc.gem .o1-fc-label{color:#34d399}
+.o1-fc-name{font-size:.58rem;font-weight:700;color:#fff;margin-bottom:1px;font-family:'Geologica',sans-serif}
+.o1-fc-score{font-size:.5rem;color:rgba(255,255,255,.35)}
+
+/* leaderboard zone */
+.o1-lb-zone{display:flex;gap:0;padding:0 0}
+.o1-lb-main{flex:1;padding:8px 12px;overflow:hidden}
+.o1-lb-tabs{display:flex;gap:4px;margin-bottom:8px}
+.o1-lb-tab{font-size:.52rem;font-weight:700;padding:.2rem .55rem;border-radius:100px;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.3);font-family:'Geologica',sans-serif;cursor:default}
+.o1-lb-tab.a{background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.3);color:#F97316}
+.o1-lb-row{display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:5px;margin-bottom:3px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.04)}
+.o1-rank{font-size:.6rem;font-weight:900;color:rgba(255,255,255,.2);width:14px;text-align:center;font-family:'Geologica',sans-serif;flex-shrink:0}
+.o1-badge{font-size:.45rem;font-weight:700;padding:.1rem .3rem;border-radius:3px;font-family:'Geologica',sans-serif;flex-shrink:0}
+.o1-badge.up{background:rgba(52,211,153,.15);color:#34d399}
+.o1-badge.dn{background:rgba(250,42,82,.15);color:#FA2A52}
+.o1-badge.nw{background:rgba(249,115,22,.15);color:#F97316}
+.o1-rest-name{font-size:.62rem;font-weight:600;color:#fff;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.o1-rest-sub{font-size:.48rem;color:rgba(255,255,255,.25)}
+.o1-score-bar{width:36px;height:3px;background:rgba(255,255,255,.07);border-radius:2px;flex-shrink:0}
+.o1-score-fill{height:3px;border-radius:2px;background:#F97316}
+.o1-vel{font-size:.52rem;font-weight:700;font-family:'Geologica',sans-serif;width:26px;text-align:right;flex-shrink:0}
+.o1-vel.pos{color:#34d399}.o1-vel.neg{color:#FA2A52}
+.o1-unlock{font-size:.48rem;color:rgba(249,115,22,.6);font-weight:600;white-space:nowrap;flex-shrink:0;font-family:'Geologica',sans-serif}
+
+/* O2 mock — Business Edge */
+.o2-mock{font-family:'Geologica',sans-serif;font-size:0}
+.o2-nav{height:30px;background:#0a0a0a;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 10px;gap:6px}
+.o2-nav-brand{font-size:.62rem;font-weight:900;color:#fff}
+.o2-nav-brand b{color:#F97316}
+.o2-alert-strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;padding:7px 10px;background:rgba(0,0,0,.3);border-bottom:1px solid rgba(255,255,255,.06)}
+.o2-alert{padding:5px 7px;border-radius:6px}
+.o2-alert.fire{background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25)}
+.o2-alert.cool{background:rgba(250,42,82,.08);border:1px solid rgba(250,42,82,.2)}
+.o2-alert.gem{background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.18)}
+.o2-alert-icon{font-size:.7rem;line-height:1;margin-bottom:2px}
+.o2-alert-label{font-size:.48rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:1px}
+.o2-alert.fire .o2-alert-label{color:#F97316}.o2-alert.cool .o2-alert-label{color:#FA2A52}.o2-alert.gem .o2-alert-label{color:#34d399}
+.o2-alert-name{font-size:.55rem;font-weight:700;color:#fff}
+.o2-alert-cta{font-size:.44rem;color:rgba(255,255,255,.3);margin-top:2px}
+.o2-graph{height:120px;background:linear-gradient(180deg,rgba(249,115,22,.03),transparent);position:relative;border-bottom:1px solid rgba(255,255,255,.05)}
+.o2-graph-label{position:absolute;top:8px;left:10px;font-size:.5rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:rgba(255,255,255,.18)}
+.o2-split{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid rgba(255,255,255,.05)}
+.o2-chart-col{padding:8px 10px;border-right:1px solid rgba(255,255,255,.05)}
+.o2-chart-label{font-size:.52rem;font-weight:700;color:rgba(255,255,255,.35);margin-bottom:5px}
+.o2-lb-col{padding:8px 10px}
+.o2-lb-label{font-size:.52rem;font-weight:700;color:rgba(255,255,255,.35);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+.o2-lb-count{font-size:.44rem;padding:.1rem .35rem;border-radius:3px;background:rgba(249,115,22,.12);color:#F97316;font-weight:700}
+.o2-lb-row{display:flex;align-items:center;gap:4px;padding:3px 5px;border-radius:4px;margin-bottom:2px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)}
+.o2-rank{font-size:.55rem;font-weight:900;color:rgba(255,255,255,.18);width:12px;text-align:center;flex-shrink:0}
+.o2-badge{font-size:.42rem;font-weight:700;padding:.08rem .28rem;border-radius:3px}
+.o2-badge.up{background:rgba(52,211,153,.15);color:#34d399}
+.o2-badge.dn{background:rgba(250,42,82,.15);color:#FA2A52}
+.o2-badge.nw{background:rgba(249,115,22,.15);color:#F97316}
+.o2-name{font-size:.58rem;font-weight:600;color:#fff;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.o2-score{font-size:.5rem;font-weight:700;color:#F97316;flex-shrink:0}
+.o2-unlock{font-size:.44rem;color:rgba(249,115,22,.5);font-weight:700;flex-shrink:0}
+
+/* OF1 mock — The Brief (Feed) */
+.of1-mock{font-family:'Geologica',sans-serif;font-size:0}
+.of1-nav{height:30px;background:#0a0a0a;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;padding:0 10px;gap:6px}
+.of1-nav-brand{font-size:.62rem;font-weight:900;color:#fff}
+.of1-nav-brand b{color:#F97316}
+.of1-hero{padding:14px 12px 10px;border-bottom:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(249,115,22,.04),transparent)}
+.of1-signal-badge{display:inline-flex;align-items:center;gap:4px;font-size:.52rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .6rem;border-radius:100px;background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.25);color:#F97316;margin-bottom:6px}
+.of1-signal-dot{width:5px;height:5px;border-radius:50%;background:#F97316;animation:livepulse 1.8s infinite}
+.of1-hero-title{font-size:.9rem;font-weight:900;color:#fff;margin-bottom:2px;letter-spacing:-.02em}
+.of1-hero-date{font-size:.52rem;color:rgba(255,255,255,.35)}
+.of1-highlights{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.05)}
+.of1-hl-label{font-size:.52rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:6px}
+.of1-hl-row{display:flex;gap:5px;margin-bottom:4px}
+.of1-hl-num{font-size:.75rem;font-weight:900;color:rgba(249,115,22,.4);width:16px;flex-shrink:0;line-height:1.2}
+.of1-hl-body{flex:1}
+.of1-hl-headline{font-size:.65rem;font-weight:700;color:#fff;line-height:1.4;margin-bottom:2px}
+.of1-hl-insight{font-size:.55rem;color:rgba(255,255,255,.35);line-height:1.4}
+.of1-hl-meta{font-size:.48rem;color:rgba(249,115,22,.5);font-weight:600;margin-top:2px}
+.of1-filters{padding:6px 12px;display:flex;gap:4px;border-bottom:1px solid rgba(255,255,255,.05);flex-wrap:wrap}
+.of1-filter{font-size:.5rem;font-weight:700;padding:.18rem .5rem;border-radius:100px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.3)}
+.of1-filter.a{background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.3);color:#F97316}
+.of1-feed{padding:7px 12px;display:flex;flex-direction:column;gap:4px}
+.of1-feed-label{font-size:.5rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:4px}
+.of1-article{padding:6px 8px;border-radius:5px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);display:flex;gap:6px;align-items:flex-start}
+.of1-signal-chip{font-size:.44rem;font-weight:700;padding:.1rem .4rem;border-radius:3px;flex-shrink:0;margin-top:1px}
+.of1-signal-chip.opening{background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.2)}
+.of1-signal-chip.opinion{background:rgba(96,165,250,.1);color:#60a5fa;border:1px solid rgba(96,165,250,.18)}
+.of1-signal-chip.award{background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.18)}
+.of1-signal-chip.closure{background:rgba(250,42,82,.1);color:#FA2A52;border:1px solid rgba(250,42,82,.18)}
+.of1-article-body{flex:1;min-width:0}
+.of1-article-source{font-size:.46rem;color:rgba(255,255,255,.3);margin-bottom:1px}
+.of1-article-headline{font-size:.6rem;font-weight:600;color:#fff;line-height:1.4;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.of1-article-link{font-size:.48rem;color:rgba(249,115,22,.6);font-weight:600}
+
+/* chart SVG sizing */
+.chart-svg{width:100%;display:block}
+</style>
+</head>
+<body>
+
+<!-- GLOBAL NAV -->
+<nav class="gnav">
+  <a href="/" class="gnav-brand">Fork<span>Fox</span><span class="gnav-badge">Pulse Gallery</span></a>
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchTab('dashboard',this)">Intelligence Dashboard</button>
+    <button class="tab-btn" onclick="switchTab('feed',this)">Daily Feed</button>
+    <button class="tab-btn" onclick="switchTab('optimized',this)">Optimized Picks</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 1: DASHBOARD CONCEPTS
+═══════════════════════════════════════════════════════════════ -->
+<section class="gsec active" id="sec-dashboard">
+  <div class="sec-head">
+    <div class="sec-kicker">Intelligence Dashboard · 5 Concepts</div>
+    <h2 class="sec-title">Which layout wins the room?</h2>
+    <p class="sec-sub">Five structural approaches for the /pulse Intelligence Dashboard. Click "View full design" to see any concept at full scale with working animations.</p>
+  </div>
+
+  <div class="concept-grid">
+
+    <!-- D1 -->
+    <div class="ccard recommended">
+      <div class="ccard-thumb">
+        <div class="ccard-rec-badge">Recommended</div>
+        <div class="tb">
+          <div class="block ng-block" style="height:72px">
+            <!-- mini node graph -->
+            <div class="mini-node" style="width:14px;height:14px;background:#F97316;opacity:.9;top:20px;left:18%"></div>
+            <div class="mini-node" style="width:10px;height:10px;background:#fbbf24;opacity:.7;top:28px;left:38%"></div>
+            <div class="mini-node" style="width:18px;height:18px;background:#F97316;opacity:.85;top:12px;left:55%"></div>
+            <div class="mini-node" style="width:8px;height:8px;background:#34d399;opacity:.65;top:34px;left:72%"></div>
+            <div class="mini-node" style="width:12px;height:12px;background:#fbbf24;opacity:.7;top:22px;left:84%"></div>
+            Node Graph Hero
+          </div>
+          <svg class="chart-svg" height="38">
+            <polyline points="0,28 30,22 60,18 90,24 120,14 150,10 180,16 210,8 240,12 270,6" fill="none" stroke="rgba(249,115,22,.15)" stroke-width="6"/>
+            <polyline class="mini-chart-line mini-glow" points="0,28 30,22 60,18 90,24 120,14 150,10 180,16 210,8 240,12 270,6" fill="none" stroke="#F97316" stroke-width="2"/>
+            <polyline points="0,30 30,26 60,22 90,25 120,20 150,18 180,20 210,16 240,18 270,14" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-dasharray="3,3"/>
+            <circle cx="270" cy="6" r="3.5" fill="#F97316" filter="url(#glow)"/>
+          </svg>
+          <div class="row">
+            <div class="block lb-block" style="flex:.65">Leaderboard + Tabs</div>
+            <div class="block fc-block" style="flex:.35">Flash Cards</div>
+          </div>
+        </div>
+      </div>
+      <div class="ccard-body">
+        <div class="ccard-label">D1 · The Stack</div>
+        <div class="ccard-name">Full-width linear flow</div>
+        <div class="ccard-desc">Node graph hero → enhanced chart → leaderboard/cards. Every section breathes. Mobile-first by default.</div>
+        <div class="pcon-grid">
+          <div class="pcon pros"><h5>Pros</h5><ul>
+            <li>Best mobile experience</li>
+            <li>Hero graph gets full attention</li>
+            <li>Cleanest scroll rhythm</li>
+          </ul></div>
+          <div class="pcon cons"><h5>Cons</h5><ul>
+            <li>Long page, lots of scrolling</li>
+            <li>Flash cards are below the fold</li>
+          </ul></div>
+        </div>
+        <a href="dashboard.html#D1" class="view-full-link" target="_blank">View full design</a>
+      </div>
+    </div>
+
+    <!-- D2 -->
+    <div class="ccard">
+      <div class="ccard-thumb">
+        <div class="tb">
+          <div class="block ng-block" style="height:90px;position:relative">
+            <div class="mini-node" style="width:16px;height:16px;background:#F97316;opacity:.9;top:18px;left:20%"></div>
+            <div class="mini-node" style="width:11px;height:11px;background:#fbbf24;opacity:.7;top:32px;left:42%"></div>
+            <div class="mini-node" style="width:20px;height:20px;background:#F97316;opacity:.85;top:10px;left:60%"></div>
+            <div class="mini-node" style="width:9px;height:9px;background:#34d399;opacity:.65;top:40px;left:76%"></div>
+            Graph Dominant Hero
+            <!-- floating cards overlay -->
+            <div style="position:absolute;bottom:6px;right:8px;display:flex;gap:3px">
+              <div style="width:40px;height:22px;border-radius:4px;background:rgba(249,115,22,.15);border:1px solid rgba(249,115,22,.3);display:flex;align-items:center;justify-content:center;font-size:.42rem;color:#F97316;font-family:'Geologica',sans-serif;font-weight:700">🔥 94</div>
+              <div style="width:40px;height:22px;border-radius:4px;background:rgba(250,42,82,.12);border:1px solid rgba(250,42,82,.25);display:flex;align-items:center;justify-content:center;font-size:.42rem;color:#FA2A52;font-family:'Geologica',sans-serif;font-weight:700">❄️ ▼6</div>
+            </div>
+          </div>
+          <div class="block chart-block" style="height:22px">Slim Chart Strip</div>
+          <div style="display:flex;gap:3px;flex:1;overflow:hidden">
+            <div class="block lb-block" style="min-width:90px">Tile 1</div>
+            <div class="block lb-block" style="min-width:90px">Tile 2</div>
+            <div class="block lb-block" style="min-width:90px">Tile 3 →</div>
+          </div>
+        </div>
+      </div>
+      <div class="ccard-body">
+        <div class="ccard-label">D2 · Graph Dominant</div>
+        <div class="ccard-name">Immersive node hero</div>
+        <div class="ccard-desc">Graph takes 55% of viewport. Flash cards float inside the graph. Slim chart strip. Horizontal tile leaderboard.</div>
+        <div class="pcon-grid">
+          <div class="pcon pros"><h5>Pros</h5><ul>
+            <li>Most visually dramatic</li>
+            <li>Flash cards always visible</li>
+            <li>Feels like a real product</li>
+          </ul></div>
+          <div class="pcon cons"><h5>Cons</h5><ul>
+            <li>Less chart detail visible</li>
+            <li>Horizontal leaderboard scrolls oddly on mobile</li>
+          </ul></div>
+        </div>
+        <a href="dashboard.html#D2" class="view-full-link" target="_blank">View full design</a>
+      </div>
+    </div>
+
+    <!-- D3 -->
+    <div class="ccard">
+      <div class="ccard-thumb">
+        <div class="tb">
+          <div class="row" style="height:20px;flex:none">
+            <div class="block kpi-block">KPI</div>
+            <div class="block kpi-block">KPI</div>
+            <div class="block kpi-block">KPI</div>
+            <div class="block kpi-block">KPI</div>
+          </div>
+          <svg class="chart-svg" height="72">
+            <polyline points="0,55 30,42 60,36 90,48 120,28 150,20 180,32 210,16 240,24 270,12 300,8" fill="none" stroke="rgba(249,115,22,.12)" stroke-width="8"/>
+            <polyline class="mini-chart-line mini-glow" points="0,55 30,42 60,36 90,48 120,28 150,20 180,32 210,16 240,24 270,12 300,8" fill="none" stroke="#F97316" stroke-width="2.5"/>
+            <polyline points="0,58 30,50 60,44 90,50 120,38 150,30 180,38 210,26 240,30 270,22 300,18" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-dasharray="3,3"/>
+            <circle cx="68" cy="36" r="4" fill="rgba(52,211,153,.4)" stroke="#34d399" stroke-width="1"/>
+            <circle cx="142" cy="22" r="3.5" fill="rgba(249,115,22,.4)" stroke="#fbbf24" stroke-width="1"/>
+            <circle cx="210" cy="16" r="4.5" fill="rgba(250,42,82,.3)" stroke="#FA2A52" stroke-width="1"/>
+            <circle cx="300" cy="8" r="4" fill="#F97316" filter="url(#glow)"/>
+          </svg>
+          <div class="row">
+            <div class="block ng-block" style="flex:.42">Graph (sm)</div>
+            <div class="block lb-block" style="flex:.58">Leaderboard</div>
+          </div>
+        </div>
+      </div>
+      <div class="ccard-body">
+        <div class="ccard-label">D3 · Chart Leads</div>
+        <div class="ccard-name">Data-first above the fold</div>
+        <div class="ccard-desc">4-metric KPI strip → full annotated chart above fold. Graph and leaderboard split side-by-side below.</div>
+        <div class="pcon-grid">
+          <div class="pcon pros"><h5>Pros</h5><ul>
+            <li>Best chart presentation</li>
+            <li>Event pins + delta badge immediately visible</li>
+            <li>Analyst-friendly layout</li>
+          </ul></div>
+          <div class="pcon cons"><h5>Cons</h5><ul>
+            <li>Node graph feels secondary</li>
+            <li>Less emotionally engaging entry</li>
+          </ul></div>
+        </div>
+        <a href="dashboard.html#D3" class="view-full-link" target="_blank">View full design</a>
+      </div>
+    </div>
+
+    <!-- D4 -->
+    <div class="ccard">
+      <div class="ccard-thumb">
+        <div class="tb">
+          <div class="row" style="height:18px;flex:none">
+            <div class="block flash-strip">🔥 ON FIRE</div>
+            <div class="block" style="background:rgba(250,42,82,.05);border-color:rgba(250,42,82,.12)">❄️ COOLING</div>
+            <div class="block" style="background:rgba(52,211,153,.04);border-color:rgba(52,211,153,.1)">⚡ GEM</div>
+          </div>
+          <div class="block lb-block" style="height:80px">Leaderboard Hero (full-width table)</div>
+          <div class="row">
+            <div class="block ng-block" style="flex:.38">Graph (sm)</div>
+            <div class="block chart-block" style="flex:.62">Chart (slim)</div>
+          </div>
+        </div>
+      </div>
+      <div class="ccard-body">
+        <div class="ccard-label">D4 · Leaderboard Hero</div>
+        <div class="ccard-name">Rankings above the fold</div>
+        <div class="ccard-desc">Flash strip at top → leaderboard fills top half → compact graph + chart side-by-side below. Operator-focused energy.</div>
+        <div class="pcon-grid">
+          <div class="pcon pros"><h5>Pros</h5><ul>
+            <li>Flash cards immediately visible</li>
+            <li>Leaderboard is the hero</li>
+            <li>Great for business owners</li>
+          </ul></div>
+          <div class="pcon cons"><h5>Cons</h5><ul>
+            <li>Graph loses visual weight</li>
+            <li>Chart detail compressed</li>
+          </ul></div>
+        </div>
+        <a href="dashboard.html#D4" class="view-full-link" target="_blank">View full design</a>
+      </div>
+    </div>
+
+    <!-- D5 -->
+    <div class="ccard">
+      <div class="ccard-thumb">
+        <div class="tb" style="flex-direction:row;padding:8px;gap:5px">
+          <div class="block ng-block" style="flex:.5;flex-direction:column;align-items:center;justify-content:center">
+            <div class="mini-node" style="width:14px;height:14px;background:#F97316;opacity:.9;top:30px;left:25%"></div>
+            <div class="mini-node" style="width:10px;height:10px;background:#fbbf24;opacity:.7;top:50px;left:55%"></div>
+            <div class="mini-node" style="width:18px;height:18px;background:#F97316;opacity:.85;top:15px;left:60%"></div>
+            <span style="position:relative;z-index:1">Graph (persistent)</span>
+          </div>
+          <div style="flex:.5;display:flex;flex-direction:column;gap:4px">
+            <div class="block chart-block" style="flex:.35">Chart</div>
+            <div class="block lb-block" style="flex:.45">Leaderboard</div>
+            <div class="block fc-block" style="flex:.2">Cards</div>
+          </div>
+        </div>
+      </div>
+      <div class="ccard-body">
+        <div class="ccard-label">D5 · Split Screen</div>
+        <div class="ccard-name">Persistent graph sidebar</div>
+        <div class="ccard-desc">Left 50% = node graph stays fixed as you scroll. Right 50% = chart → leaderboard → flash cards stacked.</div>
+        <div class="pcon-grid">
+          <div class="pcon pros"><h5>Pros</h5><ul>
+            <li>Graph always in view</li>
+            <li>Most "app-like" feeling</li>
+            <li>Strong desktop experience</li>
+          </ul></div>
+          <div class="pcon cons"><h5>Cons</h5><ul>
+            <li>Breaks on mobile</li>
+            <li>Right column feels cramped</li>
+          </ul></div>
+        </div>
+        <a href="dashboard.html#D5" class="view-full-link" target="_blank">View full design</a>
+      </div>
+    </div>
+
+  </div><!-- /concept-grid -->
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 2: FEED CONCEPTS
+═══════════════════════════════════════════════════════════════ -->
+<section class="gsec" id="sec-feed">
+  <div class="sec-head">
+    <div class="sec-kicker">Daily News Feed · 5 Concepts</div>
+    <h2 class="sec-title">How do we serve the daily story?</h2>
+    <p class="sec-sub">Five layout approaches for the /pulse/feed Daily News Feed page. Daily summary hero + infinite scroll of curated articles.</p>
+  </div>
+
+  <div class="concept-grid">
+
+    <!-- F1 -->
+    <div class="ccard recommended">
+      <div class="ccard-thumb">
+        <div class="ccard-rec-badge">Recommended</div>
+        <div class="tb">
+          <div class="block" style="height:40px;background:linear-gradient(135deg,rgba(249,115,22,.08),transparent);border-color:rgba(249,115,22,.15)">
+            "Today in Philadelphia" · Signal Badge · Date
+          </div>
+          <div class="row" style="height:60px">
+            <div class="block" style="flex:.5;background:rgba(249,115,22,.06);border-color:rgba(249,115,22,.15);font-size:.46rem">Highlight 1 — headline + insight + why it matters</div>
+            <div style="display:flex;flex-direction:column;gap:3px;flex:.5">
+              <div class="block" style="flex:1;font-size:.46rem">Highlight 2</div>
+              <div class="block" style="flex:1;font-size:.46rem">Highlight 3</div>
+            </div>
+          </div>
+          <div class="row" style="height:20px;flex:none">
+            <div class="block" style="font-size:.44rem">Filter: All</div>
+            <div class="block" style="font-size:.44rem;background:rgba(249,115,22,.06)">Openings</div>
+            <div class="block" style="font-size:.44rem">Closures</div>
+            <div class="block" style="font-size:.44rem">Opinions</div>
+          </div>
+          <div class="row" style="gap:3px;flex:1">
+            <div class="block lb-block" style="flex:1;font-size:.44rem">Article card</div>
+            <div class="block lb-block" style="flex:1;font-size:.44rem">Article card</div>
+          </div>
+        </div>
+      </div>
+      <div class="ccard-body">
+        <div class="ccard-label">F1 · Summary Hero</div>
+        <div class="ccard-name">2-col highlight grid + feed</div>
+        <div class="ccard-desc">Summary hero at top with 2-3 column highlight grid, then filter bar, then infinite scroll article feed.</div>
+        <div class="pcon-grid">
+          <div class="pcon pros"><h5>Pros</h5><ul>
+            <li>Immediate editorial feel</li>
+            <li>Highlights get proper visual weight</li>
+            <li>Cleanest progression down the page</li>
+          </ul></div>
+          <div class="pcon cons"><h5>Cons</h5><ul>
+            <li>Feed starts low on page</li>
+            <li>Grid can look sparse on slow news days</li>
+          </ul></div>
+        </div>
+        <a href="feed.html#F1" class="view-full-link" target="_blank">View full design</a>
+      </div>
+    </div>
+
+    <!-- F2 -->
+    <div class="ccard">
+      <div class="ccard-thumb">
+        <div class="tb" style="flex-direction:row;gap:5px">
+          <div style="flex:.4;display:flex;flex-direction:column;gap:4px">
+            <div class="block" style="height:30px;background:rgba(249,115,22,.05);border-color:rgba(249,115,22,.15);font-size:.42rem">Signal Badge · Date</div>
+            <div class="block" style="flex:1;background:rgba(249,115,22,.06);border-color:rgba(249,115,22,.12);font-size:.44rem">Top 5 Highlights (sticky, expands on click)</div>
+          </div>
+          <div style="flex:.6;display:flex;flex-direction:column;gap:3px">
+            <div class="block lb-block" style="height:38px;font-size:.44rem">Article card · source · signal chip</div>
+            <div class="block lb-block" style="height:38px;font-size:.44rem">Article card · source · signal chip</div>
+            <div class="block lb-block" style="height:38px;font-size:.44rem">Article card · source · signal chip ↓</div>
+          </div>
+        </div>
+      </div>
+      <div class="ccard-body">
+        <div class="ccard-label">F2 · Side by Side</div>
+        <div class="ccard-name">Sticky highlights + live feed</div>
+        <div class="ccard-desc">40% sticky left column with top 5 highlights. 60% right column scrolls the article feed. Both always visible.</div>
+        <div class="pcon-grid">
+          <div class="pcon pros"><h5>Pros</h5><ul>
+            <li>Context always in view while browsing</li>
+            <li>Strong desktop newspaper feel</li>
+          </ul></div>
+          <div class="pcon cons"><h5>Cons</h5><ul>
+            <li>Sticky left breaks on mobile</li>
+            <li>Left column is underused on slow days</li>
+          </ul></div>
+        </div>
+        <a href="feed.html#F2" class="view-full-link" target="_blank">View full design</a>
+      </div>
+    </div>
+
+    <!-- F3 -->
+    <div class="ccard">
+      <div class="ccard-thumb">
+        <div class="tb">
+          <div class="block" style="height:30px;background:linear-gradient(135deg,rgba(249,115,22,.06),transparent);border-color:rgba(249,115,22,.12)">
+            "Today in Philadelphia" hero header
+          </div>
+          <div class="row" style="height:22px;flex:none;gap:3px">
+            <div class="block" style="background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.25);font-size:.48rem;color:#F97316">#1 Fishtown Surge</div>
+            <div class="block lb-block" style="font-size:.48rem">#2 Closures</div>
+            <div class="block lb-block" style="font-size:.48rem">#3 Chef Move</div>
+            <div class="block lb-block" style="font-size:.48rem">#4 Award</div>
+            <div class="block lb-block" style="font-size:.48rem">#5 …</div>
+          </div>
+          <div class="block" style="flex:1;background:rgba(249,115,22,.04);border-color:rgba(249,115,22,.1);font-size:.5rem">
+            Expanded pill content — headline + foodie insight + why it matters + "Based on 7 articles"
+          </div>
+          <div class="row" style="gap:3px;height:30px;flex:none">
+            <div class="block lb-block" style="flex:1;font-size:.44rem">Article</div>
+            <div class="block lb-block" style="flex:1;font-size:.44rem">Article</div>
+            <div class="block lb-block" style="flex:1;font-size:.44rem">Article →</div>
+          </div>
+        </div>
+      </div>
+      <div class="ccard-body">
+        <div class="ccard-label">F3 · Briefing First</div>
+        <div class="ccard-name">5 expandable pills + feed</div>
+        <div class="ccard-desc">Five clickable pills for each top story. Click any pill to expand its full editorial insight. Feed scrolls below.</div>
+        <div class="pcon-grid">
+          <div class="pcon pros"><h5>Pros</h5><ul>
+            <li>Most interactive, gamified</li>
+            <li>Highlights feel like breaking news</li>
+          </ul></div>
+          <div class="pcon cons"><h5>Cons</h5><ul>
+            <li>Requires JS interaction to get value</li>
+            <li>Less scannable than card grid</li>
+          </ul></div>
+        </div>
+        <a href="feed.html#F3" class="view-full-link" target="_blank">View full design</a>
+      </div>
+    </div>
+
+    <!-- F4 -->
+    <div class="ccard">
+      <div class="ccard-thumb">
+        <div class="tb">
+          <div class="block" style="height:55px;background:rgba(249,115,22,.07);border-color:rgba(249,115,22,.2);font-size:.5rem">
+            🔥 Top Highlight (large hero card) — headline + ForkFox insight + 2-sentence why-it-matters
+          </div>
+          <div class="row" style="height:38px">
+            <div class="block lb-block" style="flex:1;font-size:.44rem">#2 Highlight</div>
+            <div class="block lb-block" style="flex:1;font-size:.44rem">#3 Highlight</div>
+            <div class="block lb-block" style="flex:1;font-size:.44rem">#4 · #5</div>
+          </div>
+          <div class="block" style="height:20px;flex:none;background:rgba(249,115,22,.04);border-style:dashed;font-size:.46rem">↑ Slide up to reveal article feed</div>
+          <div class="row" style="gap:3px;flex:1">
+            <div class="block lb-block" style="flex:1;font-size:.42rem">Article</div>
+            <div class="block lb-block" style="flex:1;font-size:.42rem">Article</div>
+          </div>
+        </div>
+      </div>
+      <div class="ccard-body">
+        <div class="ccard-label">F4 · The Digest</div>
+        <div class="ccard-name">Hero insight + slide-up feed</div>
+        <div class="ccard-desc">Large #1 hero highlight card. Sub-grid for #2-5. Feed panel slides up from below on scroll, like a drawer.</div>
+        <div class="pcon-grid">
+          <div class="pcon pros"><h5>Pros</h5><ul>
+            <li>Top story gets full editorial treatment</li>
+            <li>Slide-up panel is satisfying UX</li>
+          </ul></div>
+          <div class="pcon cons"><h5>Cons</h5><ul>
+            <li>Slide-up can feel tricky on mobile</li>
+            <li>Highlights 2-5 get less attention</li>
+          </ul></div>
+        </div>
+        <a href="feed.html#F4" class="view-full-link" target="_blank">View full design</a>
+      </div>
+    </div>
+
+    <!-- F5 -->
+    <div class="ccard">
+      <div class="ccard-thumb">
+        <div class="tb">
+          <div class="block" style="height:25px;flex:none;font-size:.48rem;background:rgba(249,115,22,.04);border-color:rgba(249,115,22,.12)">
+            "Today in Philadelphia" · signal badge
+          </div>
+          <div class="row" style="height:20px;flex:none;gap:3px">
+            <div class="block" style="background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.3);font-size:.48rem;color:#F97316">Today's Brief</div>
+            <div class="block lb-block" style="font-size:.48rem">All Articles</div>
+            <div class="block lb-block" style="font-size:.48rem">Openings</div>
+            <div class="block lb-block" style="font-size:.48rem">Closures</div>
+            <div class="block lb-block" style="font-size:.48rem">Trending</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px;padding-top:2px">
+            <div class="block" style="height:42px;background:rgba(249,115,22,.06);border-color:rgba(249,115,22,.15);font-size:.5rem">Highlight 1 (large) — editorial insight + why it matters</div>
+            <div class="row" style="gap:3px;flex:1">
+              <div class="block lb-block" style="flex:1;font-size:.44rem">Highlight 2</div>
+              <div class="block lb-block" style="flex:1;font-size:.44rem">Highlight 3</div>
+              <div class="block lb-block" style="flex:1;font-size:.44rem">Highlight 4</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ccard-body">
+        <div class="ccard-label">F5 · Tabbed</div>
+        <div class="ccard-name">Today's Brief | All | By signal</div>
+        <div class="ccard-desc">Tabs: Today's Brief / All Articles / Openings / Closures / Trending. Each tab shows a different filtered view.</div>
+        <div class="pcon-grid">
+          <div class="pcon pros"><h5>Pros</h5><ul>
+            <li>Users self-segment by interest</li>
+            <li>Operators go straight to Openings/Closures</li>
+          </ul></div>
+          <div class="pcon cons"><h5>Cons</h5><ul>
+            <li>Editorial summary gets buried in Tab 1</li>
+            <li>5 tabs can feel cluttered on mobile</li>
+          </ul></div>
+        </div>
+        <a href="feed.html#F5" class="view-full-link" target="_blank">View full design</a>
+      </div>
+    </div>
+
+  </div><!-- /concept-grid -->
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECTION 3: OPTIMIZED PICKS
+═══════════════════════════════════════════════════════════════ -->
+<section class="gsec" id="sec-optimized">
+  <div class="sec-head">
+    <div class="sec-kicker">Optimized Picks · 3 Hybrid Concepts</div>
+    <h2 class="sec-title">The best of everything, assembled.</h2>
+    <p class="sec-sub">Based on your feedback — node graph is essential, chart needs 5 live elements, leaderboard is the business hook, flash cards are the editorial voice — here's how I'd build it.</p>
+  </div>
+
+  <div class="opt-intro">
+    <div class="opt-intro-icon">⚡</div>
+    <div class="opt-intro-text">
+      <h3>The synthesis</h3>
+      <p>D1's structure + D2's floating flash card energy + D3's full chart treatment + D4's flash-first operator hook. Two dashboard variants (consumer-forward vs. operator-forward) + one feed page optimized. All three work together as a system.</p>
+    </div>
+  </div>
+
+  <div class="opt-stack">
+
+    <!-- O1: THE SIGNAL -->
+    <div class="opt-card pick1">
+      <div class="opt-card-header">
+        <div class="opt-number">O1</div>
+        <div class="opt-header-text">
+          <div class="opt-title">The Signal — Dashboard</div>
+          <div class="opt-subtitle">D1 stack · D3 chart detail · D2 flash cards · full leaderboard. Consumer + operator balance.</div>
+        </div>
+        <div class="opt-verdict">My Pick</div>
+      </div>
+      <div class="opt-mock">
+        <div class="opt-mock-frame">
+          <!-- NAV -->
+          <div class="o1-nav">
+            <div class="o1-nav-brand"><b>Fork</b>Fox Pulse</div>
+            <div class="o1-nav-links">
+              <span class="o1-nav-link">The Dish</span>
+              <span class="o1-nav-link">Carte</span>
+              <span class="o1-nav-link active">Pulse</span>
+              <span class="o1-nav-link">Business</span>
+            </div>
+            <div class="o1-city-toggle">
+              <div class="o1-cb a">PHL</div>
+              <div class="o1-cb">SF</div>
+              <div class="o1-cb">NYC</div>
+            </div>
+          </div>
+
+          <!-- NODE GRAPH HERO -->
+          <div class="o1-graph">
+            <div class="o1-graph-label">Philadelphia Food Scene</div>
+            <div class="o1-live-badge"><div class="o1-dot"></div> 9 restaurants trending</div>
+            <!-- neighborhood labels -->
+            <div class="nh-label" style="top:14px;left:12%">Fishtown</div>
+            <div class="nh-label" style="top:60%;left:8%">Old City</div>
+            <div class="nh-label" style="top:10px;left:55%">Center City</div>
+            <div class="nh-label" style="top:65%;left:62%">South Philly</div>
+            <!-- SVG edges -->
+            <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+              <line class="mini-edge" x1="18%" y1="35%" x2="35%" y2="55%" stroke="rgba(249,115,22,.18)" stroke-width="1"/>
+              <line class="mini-edge" x1="35%" y1="55%" x2="55%" y2="38%" stroke="rgba(249,115,22,.12)" stroke-width="1"/>
+              <line class="mini-edge" x1="55%" y1="38%" x2="72%" y2="52%" stroke="rgba(251,191,36,.15)" stroke-width="1"/>
+              <line class="mini-edge" x1="72%" y1="52%" x2="85%" y2="38%" stroke="rgba(249,115,22,.1)" stroke-width="1"/>
+              <line class="mini-edge" x1="18%" y1="35%" x2="55%" y2="38%" stroke="rgba(52,211,153,.1)" stroke-width="1"/>
+              <line class="mini-edge" x1="40%" y1="25%" x2="55%" y2="38%" stroke="rgba(249,115,22,.14)" stroke-width="1"/>
+            </svg>
+            <!-- nodes -->
+            <div class="mn" style="width:22px;height:22px;background:#F97316;top:28%;left:16%;box-shadow:0 0 12px rgba(249,115,22,.6)"></div>
+            <div class="mn" style="width:14px;height:14px;background:#fbbf24;top:48%;left:33%;box-shadow:0 0 6px rgba(251,191,36,.4)"></div>
+            <div class="mn" style="width:18px;height:18px;background:#F97316;top:30%;left:53%;box-shadow:0 0 10px rgba(249,115,22,.5)"></div>
+            <div class="mn" style="width:10px;height:10px;background:#34d399;top:46%;left:70%;box-shadow:0 0 5px rgba(52,211,153,.4)"></div>
+            <div class="mn" style="width:16px;height:16px;background:#fbbf24;top:30%;left:82%;box-shadow:0 0 8px rgba(251,191,36,.5)"></div>
+            <div class="mn" style="width:12px;height:12px;background:#F97316;top:18%;left:38%;box-shadow:0 0 7px rgba(249,115,22,.4)"></div>
+          </div>
+
+          <!-- CHART ZONE -->
+          <div class="o1-chart-zone">
+            <div class="o1-chart-header">
+              <div class="o1-chart-title">Philadelphia Buzz Index · 90 days</div>
+              <div class="o1-delta-badge">↑ 23% vs last month</div>
+              <div class="o1-legend">
+                <div class="o1-leg-item"><div class="o1-leg-line" style="background:#F97316"></div> Buzz</div>
+                <div class="o1-leg-item"><div class="o1-leg-dash"></div> 7-day avg</div>
+              </div>
+              <div class="o1-chart-compare">+ Compare SF</div>
+            </div>
+            <svg class="chart-svg" height="58" viewBox="0 0 400 58">
+              <defs>
+                <linearGradient id="cgrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#F97316" stop-opacity=".18"/>
+                  <stop offset="100%" stop-color="#F97316" stop-opacity="0"/>
+                </linearGradient>
+                <filter id="glow2"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <!-- gradient area fill -->
+              <polygon points="0,50 40,44 80,40 120,46 160,30 200,24 240,34 280,18 320,22 360,12 400,8 400,58 0,58" fill="url(#cgrad)"/>
+              <!-- primary glow line -->
+              <polyline class="mini-chart-line" points="0,50 40,44 80,40 120,46 160,30 200,24 240,34 280,18 320,22 360,12 400,8" fill="none" stroke="#F97316" stroke-width="2" filter="url(#glow2)"/>
+              <!-- 7d MA dashed -->
+              <polyline points="0,52 40,48 80,45 120,48 160,38 200,32 240,36 280,26 320,28 360,20 400,16" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1.2" stroke-dasharray="4,3"/>
+              <!-- event pins -->
+              <circle cx="80" cy="40" r="4" fill="rgba(52,211,153,.5)" stroke="#34d399" stroke-width="1.5">
+                <title>Laser Wolf opens Kensington location</title>
+              </circle>
+              <circle cx="200" cy="24" r="4" fill="rgba(251,191,36,.5)" stroke="#fbbf24" stroke-width="1.5">
+                <title>Vernick Fish wins James Beard</title>
+              </circle>
+              <circle cx="320" cy="22" r="3.5" fill="rgba(250,42,82,.4)" stroke="#FA2A52" stroke-width="1.5">
+                <title>Suraya closes east side</title>
+              </circle>
+              <!-- glowing endpoint -->
+              <circle cx="400" cy="8" r="4.5" fill="#F97316" filter="url(#glow2)"/>
+              <circle cx="400" cy="8" r="7" fill="none" stroke="rgba(249,115,22,.3)" stroke-width="1.5">
+                <animate attributeName="r" values="5;10;5" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="stroke-opacity" values=".5;0;.5" dur="2s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
+          </div>
+
+          <!-- FLASH STRIP -->
+          <div class="o1-flash-strip">
+            <div class="o1-fc fire">
+              <div class="o1-fc-icon">🔥</div>
+              <div class="o1-fc-label">On Fire</div>
+              <div class="o1-fc-name">Vernick Fish</div>
+              <div class="o1-fc-score">Buzz 94 · ↑84% this week</div>
+            </div>
+            <div class="o1-fc cool">
+              <div class="o1-fc-icon">❄️</div>
+              <div class="o1-fc-label">Cooling Fast</div>
+              <div class="o1-fc-name">Zahav</div>
+              <div class="o1-fc-score">Buzz 61 · ↓22% this week</div>
+            </div>
+            <div class="o1-fc gem">
+              <div class="o1-fc-icon">⚡</div>
+              <div class="o1-fc-label">Overlooked Gem</div>
+              <div class="o1-fc-name">Suraya</div>
+              <div class="o1-fc-score">Dish 97 · underreported</div>
+            </div>
+          </div>
+
+          <!-- LEADERBOARD -->
+          <div class="o1-lb-zone">
+            <div class="o1-lb-main">
+              <div class="o1-lb-tabs">
+                <div class="o1-lb-tab a">Trending</div>
+                <div class="o1-lb-tab">Fast Movers</div>
+                <div class="o1-lb-tab">Cooling</div>
+                <div class="o1-lb-tab">New</div>
+              </div>
+              <!-- rows -->
+              <div class="o1-lb-row">
+                <div class="o1-rank">1</div>
+                <div class="o1-badge up">▲3</div>
+                <div style="flex:1;min-width:0">
+                  <div class="o1-rest-name">Vernick Fish</div>
+                  <div class="o1-rest-sub">Fishtown · American</div>
+                </div>
+                <div class="o1-score-bar"><div class="o1-score-fill" style="width:94%"></div></div>
+                <div class="o1-vel pos">+84%</div>
+                <div class="o1-unlock">Unlock full →</div>
+              </div>
+              <div class="o1-lb-row">
+                <div class="o1-rank">2</div>
+                <div class="o1-badge nw">NEW</div>
+                <div style="flex:1;min-width:0">
+                  <div class="o1-rest-name">Laser Wolf</div>
+                  <div class="o1-rest-sub">Kensington · Israeli</div>
+                </div>
+                <div class="o1-score-bar"><div class="o1-score-fill" style="width:88%"></div></div>
+                <div class="o1-vel pos">+61%</div>
+                <div class="o1-unlock">Unlock full →</div>
+              </div>
+              <div class="o1-lb-row">
+                <div class="o1-rank">3</div>
+                <div class="o1-badge up">▲1</div>
+                <div style="flex:1;min-width:0">
+                  <div class="o1-rest-name">Kalaya</div>
+                  <div class="o1-rest-sub">South Philly · Thai</div>
+                </div>
+                <div class="o1-score-bar"><div class="o1-score-fill" style="width:82%"></div></div>
+                <div class="o1-vel pos">+38%</div>
+                <div class="o1-unlock">Unlock full →</div>
+              </div>
+              <div class="o1-lb-row">
+                <div class="o1-rank">4</div>
+                <div class="o1-badge dn">▼2</div>
+                <div style="flex:1;min-width:0">
+                  <div class="o1-rest-name">Zahav</div>
+                  <div class="o1-rest-sub">Old City · Israeli</div>
+                </div>
+                <div class="o1-score-bar"><div class="o1-score-fill" style="width:61%;background:#FA2A52"></div></div>
+                <div class="o1-vel neg">−22%</div>
+                <div class="o1-unlock">Unlock full →</div>
+              </div>
+            </div>
+          </div>
+        </div><!-- /opt-mock-frame -->
+      </div><!-- /opt-mock -->
+      <div class="opt-rationale">
+        <div class="rationale-col">
+          <h5>Why this works</h5>
+          <ul>
+            <li>Graph hero grabs the eye — cities, neighborhoods, relationships all visible immediately</li>
+            <li>5-element chart (glow line + dashed MA + event pins + delta badge + city compare) stays fresh every day</li>
+            <li>Flash cards are the editorial personality — On Fire / Cooling / Overlooked Gem is the Suraya moment daily</li>
+            <li>Leaderboard tabs give operators the Fast Movers / Cooling data they're obsessed with</li>
+            <li>Every row ends with "Unlock full →" — the upsell is baked in, not bolted on</li>
+          </ul>
+        </div>
+        <div class="rationale-col">
+          <h5>What I'd steal from other designs</h5>
+          <ul>
+            <li>From D2: let the flash cards hover inside the node graph at larger viewports</li>
+            <li>From D3: add the 4-metric KPI strip (articles today / avg buzz / top city / fast movers count) between graph and chart</li>
+            <li>From D5: offer a "Focus mode" toggle that pins the graph to the left rail on desktop</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- O2: BUSINESS EDGE -->
+    <div class="opt-card pick2">
+      <div class="opt-card-header">
+        <div class="opt-number">O2</div>
+        <div class="opt-header-text">
+          <div class="opt-title">Business Edge — Dashboard</div>
+          <div class="opt-subtitle">Flash strip leads → medium graph → 50/50 chart + leaderboard. Operator-first energy, converts to paid.</div>
+        </div>
+        <div class="opt-verdict">Operator Alt</div>
+      </div>
+      <div class="opt-mock">
+        <div class="opt-mock-frame">
+          <!-- NAV -->
+          <div class="o2-nav">
+            <div class="o2-nav-brand"><b>Fork</b>Fox Pulse</div>
+            <div style="margin-left:auto;font-size:.52rem;font-weight:700;padding:.2rem .6rem;border-radius:4px;background:rgba(249,115,22,.12);color:#F97316;font-family:'Geologica',sans-serif">Philadelphia ▾</div>
+          </div>
+          <!-- FLASH ALERT STRIP — above the fold, first thing operators see -->
+          <div class="o2-alert-strip">
+            <div class="o2-alert fire">
+              <div class="o2-alert-icon">🔥</div>
+              <div class="o2-alert-label">On Fire</div>
+              <div class="o2-alert-name">Vernick Fish</div>
+              <div class="o2-alert-cta">Buzz 94 · ↑84% · Unlock insight →</div>
+            </div>
+            <div class="o2-alert cool">
+              <div class="o2-alert-icon">❄️</div>
+              <div class="o2-alert-label">Cooling Fast</div>
+              <div class="o2-alert-name">Zahav</div>
+              <div class="o2-alert-cta">Buzz 61 · ↓22% · See why →</div>
+            </div>
+            <div class="o2-alert gem">
+              <div class="o2-alert-icon">⚡</div>
+              <div class="o2-alert-label">Overlooked Gem</div>
+              <div class="o2-alert-name">Suraya</div>
+              <div class="o2-alert-cta">Dish 97 · press gap → unlock →</div>
+            </div>
+          </div>
+          <!-- MEDIUM NODE GRAPH -->
+          <div class="o2-graph">
+            <div class="o2-graph-label">Philadelphia · Restaurant Relationship Graph</div>
+            <svg style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+              <line x1="18%" y1="40%" x2="38%" y2="60%" stroke="rgba(249,115,22,.18)" stroke-width="1"/>
+              <line x1="38%" y1="60%" x2="60%" y2="42%" stroke="rgba(249,115,22,.12)" stroke-width="1"/>
+              <line x1="60%" y1="42%" x2="78%" y2="58%" stroke="rgba(251,191,36,.15)" stroke-width="1"/>
+            </svg>
+            <div class="mn" style="width:20px;height:20px;background:#F97316;top:30%;left:16%;box-shadow:0 0 12px rgba(249,115,22,.6)"></div>
+            <div class="mn" style="width:13px;height:13px;background:#fbbf24;top:52%;left:36%;box-shadow:0 0 6px rgba(251,191,36,.4)"></div>
+            <div class="mn" style="width:16px;height:16px;background:#F97316;top:32%;left:58%;box-shadow:0 0 9px rgba(249,115,22,.5)"></div>
+            <div class="mn" style="width:10px;height:10px;background:#34d399;top:50%;left:76%;box-shadow:0 0 5px rgba(52,211,153,.4)"></div>
+          </div>
+          <!-- SPLIT: CHART + LEADERBOARD -->
+          <div class="o2-split">
+            <div class="o2-chart-col">
+              <div class="o2-chart-label">Buzz Index · 90d</div>
+              <svg width="100%" height="65" viewBox="0 0 200 65">
+                <polyline points="0,55 25,48 50,42 75,50 100,32 125,24 150,36 175,16 200,10" fill="none" stroke="rgba(249,115,22,.12)" stroke-width="6"/>
+                <polyline class="mini-chart-line" points="0,55 25,48 50,42 75,50 100,32 125,24 150,36 175,16 200,10" fill="none" stroke="#F97316" stroke-width="2"/>
+                <polyline points="0,58 25,52 50,47 75,52 100,40 125,34 150,40 175,28 200,22" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-dasharray="3,2"/>
+                <circle cx="50" cy="42" r="3.5" fill="rgba(52,211,153,.5)" stroke="#34d399" stroke-width="1.2"/>
+                <circle cx="125" cy="24" r="3.5" fill="rgba(251,191,36,.5)" stroke="#fbbf24" stroke-width="1.2"/>
+                <circle cx="200" cy="10" r="4" fill="#F97316"/>
+              </svg>
+            </div>
+            <div class="o2-lb-col">
+              <div class="o2-lb-label">Leaderboard <span class="o2-lb-count">30 restaurants</span></div>
+              <div class="o2-lb-row">
+                <div class="o2-rank">1</div>
+                <div class="o2-badge up">▲3</div>
+                <div class="o2-name">Vernick Fish</div>
+                <div class="o2-score">94</div>
+                <div class="o2-unlock">Unlock →</div>
+              </div>
+              <div class="o2-lb-row">
+                <div class="o2-rank">2</div>
+                <div class="o2-badge nw">NEW</div>
+                <div class="o2-name">Laser Wolf</div>
+                <div class="o2-score">88</div>
+                <div class="o2-unlock">Unlock →</div>
+              </div>
+              <div class="o2-lb-row">
+                <div class="o2-rank">3</div>
+                <div class="o2-badge up">▲1</div>
+                <div class="o2-name">Kalaya</div>
+                <div class="o2-score">82</div>
+                <div class="o2-unlock">Unlock →</div>
+              </div>
+              <div class="o2-lb-row">
+                <div class="o2-rank">4</div>
+                <div class="o2-badge dn">▼2</div>
+                <div class="o2-name">Zahav</div>
+                <div class="o2-score" style="color:#FA2A52">61</div>
+                <div class="o2-unlock">Unlock →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="opt-rationale">
+        <div class="rationale-col">
+          <h5>Why this works</h5>
+          <ul>
+            <li>Business owners see "On Fire / Cooling / Gem" before they see anything else — the CTA is in their face from second one</li>
+            <li>Flash strip turns the three cards into an alert system, not just design decoration</li>
+            <li>50/50 split keeps chart detail and rankings visible simultaneously — no scrolling required</li>
+            <li>"Unlock →" on every leaderboard row drives free→paid conversion</li>
+          </ul>
+        </div>
+        <div class="rationale-col">
+          <h5>Best for</h5>
+          <ul>
+            <li>If the primary goal is converting restaurant owners to paid tiers</li>
+            <li>If you want the "above the fold" experience to be urgency, not beauty</li>
+            <li>Could A/B test O1 vs O2 — O1 for consumer audience, O2 for /business referral traffic</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- OF1: THE BRIEF (FEED) -->
+    <div class="opt-card pick3">
+      <div class="opt-card-header">
+        <div class="opt-number">OF</div>
+        <div class="opt-header-text">
+          <div class="opt-title">The Brief — Optimized Feed Page</div>
+          <div class="opt-subtitle">F1 hero + F3 expandable insight depth + F5 signal filters + infinite scroll. Every element earns its place.</div>
+        </div>
+        <div class="opt-verdict">Feed Pick</div>
+      </div>
+      <div class="opt-mock">
+        <div class="opt-mock-frame">
+          <!-- NAV -->
+          <div class="of1-nav">
+            <div class="of1-nav-brand"><b>Fork</b>Fox Pulse</div>
+            <div style="margin-left:auto;display:flex;gap:5px;align-items:center">
+              <span style="font-size:.52rem;color:rgba(255,255,255,.3);font-family:'Geologica',sans-serif">Feed</span>
+              <span style="font-size:.52rem;color:rgba(255,255,255,.18);font-family:'Geologica',sans-serif">|</span>
+              <a href="#" style="font-size:.52rem;color:#F97316;font-family:'Geologica',sans-serif;font-weight:700;text-decoration:none">← Dashboard</a>
+            </div>
+          </div>
+          <!-- HERO -->
+          <div class="of1-hero">
+            <div class="of1-signal-badge"><div class="of1-signal-dot"></div> Heating Up</div>
+            <div class="of1-hero-title">Today in Philadelphia Food</div>
+            <div class="of1-hero-date">Friday, May 16 · 14 articles today · 9:15am update</div>
+          </div>
+          <!-- TOP 5 HIGHLIGHTS -->
+          <div class="of1-highlights">
+            <div class="of1-hl-label">Today's Top 5 Signals</div>
+            <div class="of1-hl-row">
+              <div class="of1-hl-num">1</div>
+              <div class="of1-hl-body">
+                <div class="of1-hl-headline">Fishtown had its best 7-day stretch in 6 months</div>
+                <div class="of1-hl-insight">ForkFox: Three simultaneous expansions + zero closures = rare neighborhood momentum. If you're thinking about opening in Philly, Fishtown is the clearest signal right now.</div>
+                <div class="of1-hl-meta">Based on 5 articles · Foodie: where to book · Owner: where to lease</div>
+              </div>
+            </div>
+            <div class="of1-hl-row">
+              <div class="of1-hl-num">2</div>
+              <div class="of1-hl-body">
+                <div class="of1-hl-headline">James Beard semifinalist announcements dominated the week</div>
+                <div class="of1-hl-insight">ForkFox: Award buzz doesn't always mean waitlist-worthy — Suraya has a 97 Dish score and still has 5pm availability every night.</div>
+                <div class="of1-hl-meta">Based on 3 articles</div>
+              </div>
+            </div>
+            <div class="of1-hl-row">
+              <div class="of1-hl-num">3</div>
+              <div class="of1-hl-body">
+                <div class="of1-hl-headline">Zahav closing early on Sundays — the first signal of menu fatigue?</div>
+                <div class="of1-hl-insight">ForkFox: Sunday early-close is often the first operational tell before a broader schedule reduction. Watch this.</div>
+                <div class="of1-hl-meta">Based on 2 articles</div>
+              </div>
+            </div>
+          </div>
+          <!-- FILTERS -->
+          <div class="of1-filters">
+            <div class="of1-filter a">All</div>
+            <div class="of1-filter">Openings</div>
+            <div class="of1-filter">Closures</div>
+            <div class="of1-filter">Awards</div>
+            <div class="of1-filter">Opinions</div>
+            <div class="of1-filter">Trends</div>
+          </div>
+          <!-- ARTICLE FEED -->
+          <div class="of1-feed">
+            <div class="of1-feed-label">All articles today · sorted by signal strength</div>
+            <div class="of1-article">
+              <div class="of1-signal-chip opening">OPENING</div>
+              <div class="of1-article-body">
+                <div class="of1-article-source">Eater Philadelphia · Fishtown</div>
+                <div class="of1-article-headline">Vernick Fish expands reservation capacity ahead of summer season</div>
+                <div class="of1-article-link">↗ Read at Eater Philadelphia</div>
+              </div>
+            </div>
+            <div class="of1-article">
+              <div class="of1-signal-chip award">AWARD</div>
+              <div class="of1-article-body">
+                <div class="of1-article-source">Philadelphia Inquirer · Center City</div>
+                <div class="of1-article-headline">Zahav, Kalaya, and Friday Saturday Sunday named James Beard semifinalists</div>
+                <div class="of1-article-link">↗ Read at Philadelphia Inquirer</div>
+              </div>
+            </div>
+            <div class="of1-article">
+              <div class="of1-signal-chip opinion">OPINION</div>
+              <div class="of1-article-body">
+                <div class="of1-article-source">Foobooz · South Philly</div>
+                <div class="of1-article-headline">South Philly's BYOB scene is outpacing every other neighborhood right now</div>
+                <div class="of1-article-link">↗ Read at Foobooz</div>
+              </div>
+            </div>
+            <div class="of1-article">
+              <div class="of1-signal-chip closure">CLOSURE</div>
+              <div class="of1-article-body">
+                <div class="of1-article-source">Eater Philadelphia · Old City</div>
+                <div class="of1-article-headline">Zahav reducing Sunday hours starting June — no statement from team</div>
+                <div class="of1-article-link">↗ Read at Eater Philadelphia</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="opt-rationale">
+        <div class="rationale-col">
+          <h5>Why this works</h5>
+          <ul>
+            <li>"Today in Philadelphia Food" reads like a real media product — not a dashboard</li>
+            <li>Top 5 highlights give foodies editorial context before they dive into the feed</li>
+            <li>ForkFox insight bullets (the Suraya play, the Sunday-close flag) are the proprietary differentiator</li>
+            <li>Signal-type chips let operators filter to just Openings or Closures in one click</li>
+            <li>Every article links out — no republishing, no copyright risk</li>
+          </ul>
+        </div>
+        <div class="rationale-col">
+          <h5>What I'd steal</h5>
+          <ul>
+            <li>From F2: make the top 3 highlights sticky on desktop as a left sidebar</li>
+            <li>From F3: let each highlight expand with a click to show all supporting articles</li>
+            <li>From F5: add a "Openings only" tab above the feed for operators who don't care about opinions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /opt-stack -->
+</section>
+
+<script>
+function switchTab(name, btn) {
+  document.querySelectorAll('.gsec').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+</body>
+</html>

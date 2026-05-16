@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForkFox Pulse — Dashboard Gallery</title>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#050505;color:#fff;font-family:'Inter',sans-serif;overflow-x:hidden}
+h1,h2,h3,h4{font-family:'Geologica',sans-serif}
+
+.gallery-header{padding:3rem 2rem 2rem;text-align:center;border-bottom:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(249,115,22,.04),transparent)}
+.gallery-header h1{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;letter-spacing:-.03em;margin-bottom:.5rem}
+.gallery-header h1 span{color:#F97316}
+.gallery-header p{color:rgba(255,255,255,.45);font-size:.9rem;max-width:520px;margin:0 auto}
+
+.nav-pills{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;padding:1.2rem 2rem;background:#0a0a0a;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.05)}
+.np{padding:.4rem 1rem;border-radius:100px;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.55);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none;font-family:'Geologica',sans-serif}
+.np:hover,.np.active{background:#F97316;border-color:#F97316;color:#fff}
+
+.ds{padding:4rem 2rem;border-bottom:1px solid rgba(255,255,255,.04);max-width:1400px;margin:0 auto}
+.dlabel{display:inline-flex;align-items:center;gap:.5rem;padding:.3rem .9rem;border-radius:100px;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.25);color:#F97316;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.8rem;font-family:'Geologica',sans-serif}
+.dtitle{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:900;letter-spacing:-.03em;margin-bottom:.4rem}
+.dsub{color:rgba(255,255,255,.4);font-size:.88rem;margin-bottom:1.8rem;max-width:580px;line-height:1.6}
+.pf{border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;background:#0a0a0a;margin-bottom:1.5rem;position:relative}
+
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.cc{padding:1.1rem 1.3rem;border-radius:10px;border:1px solid rgba(255,255,255,.07)}
+.cc.p{background:rgba(52,211,153,.05);border-color:rgba(52,211,153,.14)}
+.cc.c{background:rgba(250,42,82,.05);border-color:rgba(250,42,82,.14)}
+.cc h4{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.7rem;font-family:'Geologica',sans-serif}
+.cc.p h4{color:#34d399}.cc.c h4{color:#FA2A52}
+.cc ul{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+.cc li{font-size:.8rem;color:rgba(255,255,255,.6);line-height:1.5;padding-left:.9rem;position:relative}
+.cc li::before{content:'';position:absolute;left:0;top:.6em;width:4px;height:4px;border-radius:50%}
+.cc.p li::before{background:#34d399}.cc.c li::before{background:#FA2A52}
+
+/* ── SHARED MINI COMPONENTS ─────────────────────────────────── */
+.mn{display:flex;align-items:center;justify-content:space-between;padding:.65rem 1.4rem;background:rgba(10,10,10,.95);border-bottom:1px solid rgba(255,255,255,.06)}
+.mbrand{font-family:'Geologica',sans-serif;font-size:.9rem;font-weight:800;color:#fff}
+.mbrand span{color:#F97316}
+.mcta{padding:.35rem .85rem;border-radius:100px;background:#FA2A52;color:#fff;font-size:.68rem;font-weight:700;font-family:'Geologica',sans-serif}
+.ctoggle{display:flex;gap:.3rem}
+.cb{padding:.25rem .7rem;border-radius:100px;font-size:.62rem;font-weight:700;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.45);background:transparent;cursor:pointer;font-family:'Geologica',sans-serif;transition:all .2s}
+.cb.a{background:#F97316;border-color:#F97316;color:#fff}
+
+/* Node graph shared */
+@keyframes nf{0%,100%{transform:translate(0,0)}33%{transform:translate(2px,-3px)}66%{transform:translate(-2px,2px)}}
+@keyframes ep{0%,100%{stroke-opacity:.12}50%{stroke-opacity:.35}}
+@keyframes dp{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(52,211,153,.6)}50%{opacity:.7;box-shadow:0 0 0 5px rgba(52,211,153,0)}}
+.ng{animation:nf 4s ease-in-out infinite}.ng:nth-child(2){animation-delay:-.9s;animation-duration:5.2s}.ng:nth-child(3){animation-delay:-1.7s;animation-duration:4.6s}.ng:nth-child(4){animation-delay:-2.5s;animation-duration:6s}.ng:nth-child(5){animation-delay:-3.2s;animation-duration:3.9s}.ng:nth-child(6){animation-delay:-1.3s;animation-duration:5.5s}
+.el{animation:ep 3s ease-in-out infinite}.el:nth-child(2){animation-delay:-.6s}.el:nth-child(3){animation-delay:-1.2s}.el:nth-child(4){animation-delay:-1.8s}.el:nth-child(5){animation-delay:-2.4s}
+@keyframes dd{from{stroke-dashoffset:600}to{stroke-dashoffset:0}}
+.cl{stroke-dasharray:600;stroke-dashoffset:600;animation:dd 2.2s ease forwards .4s}
+@keyframes gp{0%,100%{filter:drop-shadow(0 0 3px #F97316)}50%{filter:drop-shadow(0 0 10px #F97316)}}
+.ce{animation:gp 2s infinite 2.6s}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Leaderboard shared */
+.lb-row{display:flex;align-items:center;gap:.7rem;padding:.5rem .8rem;border-radius:7px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);cursor:pointer;transition:all .2s}
+.lb-row:hover{background:rgba(255,255,255,.055);border-color:rgba(249,115,22,.18)}
+.lb-rank{font-family:'Geologica',sans-serif;font-size:.9rem;font-weight:900;color:rgba(255,255,255,.2);width:1.2rem;text-align:center;flex-shrink:0}
+.lb-badge{font-size:.56rem;font-weight:700;padding:.1rem .4rem;border-radius:100px;font-family:'Geologica',sans-serif;flex-shrink:0}
+.up{background:rgba(52,211,153,.15);color:#34d399}.dn{background:rgba(250,42,82,.15);color:#FA2A52}.nw{background:rgba(249,115,22,.15);color:#F97316}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:.75rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-sub{font-size:.6rem;color:rgba(255,255,255,.35)}
+.lb-bar-wrap{width:54px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;flex-shrink:0}
+.lb-bar{height:4px;border-radius:2px;background:#F97316}
+.lb-vel{font-size:.64rem;font-weight:700;font-family:'Geologica',sans-serif;width:2.8rem;text-align:right;flex-shrink:0}
+.lb-hint{font-size:.58rem;color:rgba(255,255,255,.3);flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-left:.4rem}
+.lb-cta{font-size:.58rem;color:#F97316;font-weight:600;white-space:nowrap;flex-shrink:0;padding-left:.4rem}
+
+/* Flash cards */
+.fc{padding:.9rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,.07)}
+.fc.fire{background:rgba(249,115,22,.07);border-color:rgba(249,115,22,.2)}
+.fc.cool{background:rgba(250,42,82,.07);border-color:rgba(250,42,82,.2)}
+.fc.gem{background:rgba(52,211,153,.05);border-color:rgba(52,211,153,.18)}
+.fc-icon{font-size:1.1rem;margin-bottom:.35rem}
+.fc-label{font-size:.58rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.25rem;font-family:'Geologica',sans-serif}
+.fc.fire .fc-label{color:#F97316}.fc.cool .fc-label{color:#FA2A52}.fc.gem .fc-label{color:#34d399}
+.fc-name{font-size:.82rem;font-weight:700;color:#fff;font-family:'Geologica',sans-serif;margin-bottom:.12rem}
+.fc-desc{font-size:.67rem;color:rgba(255,255,255,.48);line-height:1.4}
+.fc-score{font-size:1.3rem;font-weight:900;font-family:'Geologica',sans-serif;float:right;margin-top:-.25rem}
+.fc.fire .fc-score{color:#F97316}.fc.cool .fc-score{color:#FA2A52}.fc.gem .fc-score{color:#34d399}
+
+/* Tabs */
+.tabs{display:flex;gap:.3rem;margin-bottom:.8rem}
+.tab{padding:.3rem .75rem;border-radius:100px;font-size:.62rem;font-weight:600;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);cursor:pointer;font-family:'Geologica',sans-serif;transition:all .2s}
+.tab.a{background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.3);color:#F97316}
+
+/* KPI chips */
+.kpi{padding:.65rem .9rem;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}
+.kpi-val{font-family:'Geologica',sans-serif;font-size:1.5rem;font-weight:900;line-height:1}
+.kpi-val.o{color:#F97316}.kpi-val.r{color:#FA2A52}.kpi-val.g{color:#34d399}
+.kpi-lbl{font-size:.56rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.06em;margin-top:.25rem}
+
+/* live badge */
+.live-badge{display:inline-flex;align-items:center;gap:.45rem;padding:.4rem 1rem;border-radius:100px;background:rgba(10,10,10,.85);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(10px);font-size:.68rem;font-weight:700;font-family:'Geologica',sans-serif;color:rgba(255,255,255,.8)}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#34d399;animation:dp 2s infinite}
+</style>
+</head>
+<body>
+
+<div class="gallery-header">
+  <h1>ForkFox <span>Pulse</span> — Dashboard Gallery</h1>
+  <p>5 layout concepts for the Intelligence Dashboard. Node graph · Trend chart · Leaderboard · Flash cards. Pick one or mix elements.</p>
+</div>
+
+<div class="nav-pills">
+  <a href="#d1" class="np active">D1 — The Stack</a>
+  <a href="#d2" class="np">D2 — Graph Dominant</a>
+  <a href="#d3" class="np">D3 — Chart Leads</a>
+  <a href="#d4" class="np">D4 — Leaderboard Hero</a>
+  <a href="#d5" class="np">D5 — Split Screen</a>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     D1 — THE STACK (Recommended)
+     Node graph → Chart → Leaderboard+Cards. Clean top-down.
+══════════════════════════════════════════════════════════════ -->
+<section class="ds" id="d1">
+  <div class="dlabel">D1 · Recommended</div>
+  <h2 class="dtitle">The Stack</h2>
+  <p class="dsub">Node graph full-width at top. Trend chart below. Leaderboard and flash cards side-by-side at the bottom. Linear, discoverable flow — every section is given full breathing room.</p>
+
+  <div class="pf">
+    <div class="mn">
+      <div class="mbrand">Fork<span>Fox</span> Pulse</div>
+      <div class="ctoggle"><button class="cb a">Philadelphia</button><button class="cb">SF</button><button class="cb">NYC</button></div>
+      <div class="mcta">Join Beta</div>
+    </div>
+
+    <!-- Node Graph Zone -->
+    <div style="position:relative;height:300px;background:radial-gradient(ellipse at 50% 50%,rgba(249,115,22,.06),transparent 70%),#0a0a0a;overflow:hidden">
+      <div style="position:absolute;top:1rem;left:1.4rem"><div class="live-badge"><span class="live-dot"></span>Live · Philadelphia · 8 trending</div></div>
+      <svg viewBox="0 0 900 260" style="position:absolute;inset:0;width:100%;height:100%" xmlns="http://www.w3.org/2000/svg">
+        <defs><filter id="go"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+        <!-- Edges -->
+        <line class="el" x1="450" y1="130" x2="270" y2="80" stroke="#F97316" stroke-width="1.5"/><line class="el" x1="450" y1="130" x2="630" y2="75" stroke="#F97316" stroke-width="1"/><line class="el" x1="450" y1="130" x2="310" y2="190" stroke="#fbbf24" stroke-width="1"/><line class="el" x1="450" y1="130" x2="600" y2="200" stroke="#FA2A52" stroke-width="1"/><line class="el" x1="270" y1="80" x2="150" y2="150" stroke="#F97316" stroke-width=".8"/><line class="el" x1="630" y1="75" x2="760" y2="155" stroke="#fbbf24" stroke-width=".8"/>
+        <!-- Neighborhood labels -->
+        <text x="100" y="55" fill="rgba(255,255,255,.15)" font-size="10" font-family="Inter" font-weight="600" letter-spacing="1.5">FISHTOWN</text>
+        <text x="650" y="50" fill="rgba(255,255,255,.15)" font-size="10" font-family="Inter" font-weight="600" letter-spacing="1.5">RITTENHOUSE</text>
+        <text x="530" y="235" fill="rgba(255,255,255,.15)" font-size="10" font-family="Inter" font-weight="600" letter-spacing="1.5">SOUTH PHILLY</text>
+        <!-- Nodes -->
+        <g class="ng" filter="url(#go)"><circle cx="450" cy="130" r="34" fill="rgba(249,115,22,.14)" stroke="#F97316" stroke-width="2"/><circle cx="450" cy="130" r="21" fill="#F97316" opacity=".9"/><text x="450" y="134" text-anchor="middle" fill="#fff" font-size="7.5" font-family="Geologica,sans-serif" font-weight="800">VERNICK</text><text x="450" y="176" text-anchor="middle" fill="#F97316" font-size="7.5" font-family="Geologica,sans-serif" font-weight="700">↑ +84%</text></g>
+        <g class="ng" filter="url(#go)"><circle cx="270" cy="80" r="24" fill="rgba(249,115,22,.12)" stroke="#F97316" stroke-width="1.5"/><circle cx="270" cy="80" r="15" fill="#F97316" opacity=".8"/><text x="270" y="83" text-anchor="middle" fill="#fff" font-size="7" font-family="Geologica,sans-serif" font-weight="800">ZAHAV</text><text x="270" y="113" text-anchor="middle" fill="#F97316" font-size="7" font-family="Geologica,sans-serif" font-weight="600">↑ +61%</text></g>
+        <g class="ng"><circle cx="630" cy="75" r="18" fill="rgba(251,191,36,.1)" stroke="#fbbf24" stroke-width="1.5"/><circle cx="630" cy="75" r="11" fill="#fbbf24" opacity=".75"/><text x="630" y="78" text-anchor="middle" fill="#0a0a0a" font-size="6.5" font-family="Geologica,sans-serif" font-weight="800">SURAYA</text><text x="630" y="103" text-anchor="middle" fill="#fbbf24" font-size="7" font-family="Geologica,sans-serif" font-weight="600">Stable</text></g>
+        <g class="ng"><circle cx="600" cy="200" r="15" fill="rgba(250,42,82,.1)" stroke="#FA2A52" stroke-width="1.5"/><circle cx="600" cy="200" r="9" fill="#FA2A52" opacity=".7"/><text x="600" y="203" text-anchor="middle" fill="#fff" font-size="5.5" font-family="Geologica,sans-serif" font-weight="800">MULHERIN'S</text><text x="600" y="225" text-anchor="middle" fill="#FA2A52" font-size="7" font-family="Geologica,sans-serif" font-weight="600">↓ −38%</text></g>
+        <g class="ng"><circle cx="310" cy="190" r="14" fill="rgba(251,191,36,.08)" stroke="#fbbf24" stroke-width="1"/><circle cx="310" cy="190" r="9" fill="#fbbf24" opacity=".65"/><text x="310" y="193" text-anchor="middle" fill="#0a0a0a" font-size="5.5" font-family="Geologica,sans-serif" font-weight="800">BEDDIA</text></g>
+        <g class="ng"><circle cx="760" cy="155" r="13" fill="rgba(52,211,153,.1)" stroke="#34d399" stroke-width="1.5"/><circle cx="760" cy="155" r="8" fill="#34d399" opacity=".8"/><text x="760" y="158" text-anchor="middle" fill="#0a0a0a" font-size="5.5" font-family="Geologica,sans-serif" font-weight="800">LASER W.</text><text x="760" y="179" text-anchor="middle" fill="#34d399" font-size="7" font-family="Geologica,sans-serif" font-weight="600">NEW</text></g>
+        <!-- Legend -->
+        <g transform="translate(20,235)"><circle cx="6" cy="5" r="5" fill="#F97316" opacity=".85"/><text x="16" y="9" fill="rgba(255,255,255,.35)" font-size="9" font-family="Inter">Trending</text><circle cx="80" cy="5" r="5" fill="#34d399" opacity=".85"/><text x="90" y="9" fill="rgba(255,255,255,.35)" font-size="9" font-family="Inter">Rising</text><circle cx="144" cy="5" r="5" fill="#fbbf24" opacity=".85"/><text x="154" y="9" fill="rgba(255,255,255,.35)" font-size="9" font-family="Inter">Stable</text><circle cx="204" cy="5" r="5" fill="#FA2A52" opacity=".85"/><text x="214" y="9" fill="rgba(255,255,255,.35)" font-size="9" font-family="Inter">Fading</text></g>
+      </svg>
+    </div>
+
+    <!-- Chart Zone -->
+    <div style="padding:1rem 1.4rem;border-top:1px solid rgba(255,255,255,.05);background:#0a0a0a">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem">
+        <div style="font-size:.72rem;font-weight:700;color:rgba(255,255,255,.45);font-family:'Geologica',sans-serif;text-transform:uppercase;letter-spacing:.06em">Philadelphia Scene Momentum · 90 Days</div>
+        <div style="display:flex;gap:.4rem">
+          <button class="cb a" style="font-size:.58rem;padding:.2rem .6rem">Philly</button>
+          <button class="cb" style="font-size:.58rem;padding:.2rem .6rem">+ Compare SF</button>
+        </div>
+      </div>
+      <div style="position:relative;height:100px;border-radius:8px;background:rgba(255,255,255,.025);overflow:hidden">
+        <svg viewBox="0 0 900 90" style="width:100%;height:100%" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#F97316" stop-opacity=".5"/><stop offset="100%" stop-color="#FA2A52" stop-opacity=".9"/></linearGradient><linearGradient id="lg2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#F97316" stop-opacity=".12"/><stop offset="100%" stop-color="#F97316" stop-opacity="0"/></linearGradient><filter id="gl"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+          <line x1="0" y1="70" x2="900" y2="70" stroke="rgba(255,255,255,.04)" stroke-width="1"/><line x1="0" y1="50" x2="900" y2="50" stroke="rgba(255,255,255,.04)" stroke-width="1"/><line x1="0" y1="30" x2="900" y2="30" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+          <!-- fill -->
+          <path d="M0,62 C100,58 180,52 280,46 S420,40 520,35 S660,28 760,22 S840,16 900,12 L900,80 L0,80Z" fill="url(#lg2)"/>
+          <!-- glow line -->
+          <path class="cl" d="M0,62 C100,58 180,52 280,46 S420,40 520,35 S660,28 760,22 S840,16 900,12" fill="none" stroke="url(#lg1)" stroke-width="2.5" stroke-linecap="round" filter="url(#gl)"/>
+          <!-- 7d MA dashed -->
+          <path d="M0,65 C100,62 180,57 280,52 S420,47 520,42 S660,36 760,30 S840,24 900,20" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1" stroke-dasharray="4,4"/>
+          <!-- Event pins -->
+          <circle cx="320" cy="46" r="4" fill="#34d399" opacity=".85"/><line x1="320" y1="46" x2="320" y2="70" stroke="#34d399" stroke-width=".8" stroke-dasharray="2,2" opacity=".4"/>
+          <circle cx="580" cy="35" r="4" fill="#FA2A52" opacity=".85"/><line x1="580" y1="35" x2="580" y2="70" stroke="#FA2A52" stroke-width=".8" stroke-dasharray="2,2" opacity=".4"/>
+          <circle cx="760" cy="22" r="4" fill="#F97316" opacity=".85"/><line x1="760" y1="22" x2="760" y2="70" stroke="#F97316" stroke-width=".8" stroke-dasharray="2,2" opacity=".4"/>
+          <!-- end dot -->
+          <circle class="ce" cx="900" cy="12" r="5" fill="#FA2A52"/>
+          <!-- x axis -->
+          <text x="0" y="88" fill="rgba(255,255,255,.2)" font-size="8" font-family="Inter">Feb</text><text x="210" y="88" fill="rgba(255,255,255,.2)" font-size="8" font-family="Inter">Mar</text><text x="430" y="88" fill="rgba(255,255,255,.2)" font-size="8" font-family="Inter">Apr</text><text x="650" y="88" fill="rgba(255,255,255,.2)" font-size="8" font-family="Inter">May</text>
+        </svg>
+        <div style="position:absolute;top:.5rem;right:.8rem;display:flex;align-items:center;gap:.5rem">
+          <span style="font-family:'Geologica',sans-serif;font-size:.95rem;font-weight:900;color:#34d399">↑23%</span>
+          <span style="font-size:.62rem;color:rgba(255,255,255,.4)">vs last month</span>
+        </div>
+        <div style="position:absolute;bottom:.5rem;right:.8rem;display:flex;gap:.8rem">
+          <div style="display:flex;align-items:center;gap:.3rem"><span style="width:18px;height:2px;background:#FA2A52;opacity:.8;display:inline-block;border-radius:1px"></span><span style="font-size:.58rem;color:rgba(255,255,255,.3)">Buzz</span></div>
+          <div style="display:flex;align-items:center;gap:.3rem"><span style="width:14px;border-top:1.5px dashed rgba(255,255,255,.3);display:inline-block"></span><span style="font-size:.58rem;color:rgba(255,255,255,.3)">7d avg</span></div>
+          <div style="display:flex;align-items:center;gap:.3rem"><span style="width:8px;height:8px;border-radius:50%;background:#34d399;display:inline-block"></span><span style="font-size:.58rem;color:rgba(255,255,255,.3)">Opening</span></div>
+          <div style="display:flex;align-items:center;gap:.3rem"><span style="width:8px;height:8px;border-radius:50%;background:#FA2A52;display:inline-block"></span><span style="font-size:.58rem;color:rgba(255,255,255,.3)">Closure</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leaderboard + Cards -->
+    <div style="display:grid;grid-template-columns:1fr 260px;border-top:1px solid rgba(255,255,255,.05)">
+      <div style="padding:1rem 1.4rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem">
+          <div class="tabs">
+            <button class="tab a">Trending</button>
+            <button class="tab">Fast Movers</button>
+            <button class="tab">Cooling</button>
+            <button class="tab">New</button>
+          </div>
+          <div style="display:flex;gap:.3rem">
+            <button class="cb a" style="font-size:.58rem;padding:.2rem .55rem">7d</button>
+            <button class="cb" style="font-size:.58rem;padding:.2rem .55rem">30d</button>
+            <button class="cb" style="font-size:.58rem;padding:.2rem .55rem">90d</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:.4rem">
+          <div class="lb-row"><span class="lb-rank">1</span><span class="lb-badge up">▲3</span><div class="lb-info"><div class="lb-name">Vernick Fish</div><div class="lb-sub">Fishtown · American</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:94%"></div></div><span style="font-size:.62rem;color:rgba(255,255,255,.4);width:1.8rem;text-align:right">94</span><span class="lb-vel" style="color:#34d399">+84%</span><span class="lb-hint">Reservation expansion + 5 press hits in 7d</span><span class="lb-cta">Unlock →</span></div>
+          <div class="lb-row"><span class="lb-rank">2</span><span class="lb-badge up">▲1</span><div class="lb-info"><div class="lb-name">Zahav</div><div class="lb-sub">Rittenhouse · Israeli</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:88%"></div></div><span style="font-size:.62rem;color:rgba(255,255,255,.4);width:1.8rem;text-align:right">88</span><span class="lb-vel" style="color:#34d399">+61%</span><span class="lb-hint">15th anniversary menu revamp</span><span class="lb-cta">Unlock →</span></div>
+          <div class="lb-row"><span class="lb-rank">3</span><span class="lb-badge nw">NEW</span><div class="lb-info"><div class="lb-name">Laser Wolf</div><div class="lb-sub">Kensington · Israeli</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:76%"></div></div><span style="font-size:.62rem;color:rgba(255,255,255,.4);width:1.8rem;text-align:right">76</span><span class="lb-vel" style="color:#F97316">NEW</span><span class="lb-hint">Second location signed</span><span class="lb-cta">Unlock →</span></div>
+          <div class="lb-row"><span class="lb-rank">4</span><span class="lb-badge" style="background:rgba(255,255,255,.07);color:rgba(255,255,255,.4)">—</span><div class="lb-info"><div class="lb-name">Suraya</div><div class="lb-sub">Fishtown · Lebanese</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:71%;background:#fbbf24"></div></div><span style="font-size:.62rem;color:rgba(255,255,255,.4);width:1.8rem;text-align:right">71</span><span class="lb-vel" style="color:#fbbf24">+4%</span><span class="lb-hint">Terrace open · 6th season steady</span><span class="lb-cta">Unlock →</span></div>
+          <div class="lb-row"><span class="lb-rank">5</span><span class="lb-badge dn">▼2</span><div class="lb-info"><div class="lb-name">Mulherin's Sons</div><div class="lb-sub">NoLibs · Italian</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:52%;background:#FA2A52"></div></div><span style="font-size:.62rem;color:rgba(255,255,255,.4);width:1.8rem;text-align:right">52</span><span class="lb-vel" style="color:#FA2A52">−38%</span><span class="lb-hint">Hours cut twice in 60 days</span><span class="lb-cta">Unlock →</span></div>
+        </div>
+        <div style="margin-top:.8rem;font-size:.7rem;color:rgba(255,255,255,.25);text-align:center">See 20 more restaurants → <span style="color:#F97316;cursor:pointer">ForkFox for Business</span></div>
+      </div>
+      <div style="border-left:1px solid rgba(255,255,255,.06);padding:1rem;display:flex;flex-direction:column;gap:.6rem">
+        <div class="fc fire"><div class="fc-icon">🔥</div><span class="fc-score">↑94</span><div class="fc-label">On Fire</div><div class="fc-name">Vernick Fish</div><div class="fc-desc">8 mentions in 30 days. Buzz up 84%. ForkFox score: 94.</div></div>
+        <div class="fc cool"><div class="fc-icon">❄️</div><span class="fc-score">↓52</span><div class="fc-label">Cooling Fast</div><div class="fc-name">Mulherin's Sons</div><div class="fc-desc">Hours cut twice. Mentions down 38%. NoLibs anchor at risk.</div></div>
+        <div class="fc gem"><div class="fc-icon">⚡</div><span class="fc-score">91</span><div class="fc-label">Overlooked Gem</div><div class="fc-name">Suraya</div><div class="fc-desc">Dish score 91, underreported 2×. Outperforms its press coverage.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cg">
+    <div class="cc p"><h4>Strengths</h4><ul><li>Every section gets full width — nothing feels cramped or competing for space.</li><li>First-time visitors understand the page immediately — graph → trend → rankings.</li><li>Mobile-friendly: sections stack naturally, city toggle is always accessible.</li><li>Node graph sets the tone above the fold; the leaderboard converts restaurant owners below.</li></ul></div>
+    <div class="cc c"><h4>Watch-outs</h4><ul><li>The fold is busy — users need to scroll through 3 major sections before reaching the bottom CTAs.</li><li>No persistent element keeps restaurant owners anchored — they may leave after the graph.</li></ul></div>
+  </div>
+</section>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,.04)">
+
+
+<!-- ══════════════════════════════════════════════════════════
+     D2 — GRAPH DOMINANT
+     Node graph is 55% of page. Chart is slim. Leaderboard is horizontal tiles.
+══════════════════════════════════════════════════════════════ -->
+<section class="ds" id="d2">
+  <div class="dlabel">D2</div>
+  <h2 class="dtitle">Graph Dominant</h2>
+  <p class="dsub">The node graph owns most of the page. Flash cards float as badges inside the graph zone. The chart is a slim strip. The leaderboard is a horizontal scrolling row of compact tiles — lighter, faster, scroll-forward.</p>
+
+  <div class="pf" style="min-height:660px">
+    <div class="mn">
+      <div class="mbrand">Fork<span>Fox</span> Pulse</div>
+      <div class="ctoggle"><button class="cb a">Philadelphia</button><button class="cb">SF</button><button class="cb">NYC</button></div>
+      <div class="mcta">Join Beta</div>
+    </div>
+
+    <!-- Graph as hero -->
+    <div style="position:relative;height:380px;background:radial-gradient(ellipse at 45% 55%,rgba(249,115,22,.07),transparent 65%),#0a0a0a;overflow:hidden">
+      <div style="position:absolute;top:1rem;left:1.4rem"><div class="live-badge"><span class="live-dot"></span>Philadelphia · Live</div></div>
+
+      <!-- Flash cards floating in graph zone -->
+      <div style="position:absolute;top:1rem;right:1rem;display:flex;flex-direction:column;gap:.5rem;width:190px">
+        <div class="fc fire" style="padding:.7rem .85rem"><div style="display:flex;align-items:center;justify-content:space-between"><span class="fc-label" style="margin:0">🔥 On Fire</span><span class="fc-score" style="font-size:1rem;float:none">94</span></div><div class="fc-name" style="font-size:.75rem">Vernick Fish</div></div>
+        <div class="fc gem" style="padding:.7rem .85rem"><div style="display:flex;align-items:center;justify-content:space-between"><span class="fc-label" style="margin:0">⚡ Gem</span><span class="fc-score" style="font-size:1rem;float:none">91</span></div><div class="fc-name" style="font-size:.75rem">Suraya</div></div>
+        <div class="fc cool" style="padding:.7rem .85rem"><div style="display:flex;align-items:center;justify-content:space-between"><span class="fc-label" style="margin:0">❄️ Cooling</span><span class="fc-score" style="font-size:1rem;float:none">52</span></div><div class="fc-name" style="font-size:.75rem">Mulherin's</div></div>
+      </div>
+
+      <svg viewBox="0 0 700 340" style="position:absolute;inset:0;width:calc(100% - 210px);height:100%" xmlns="http://www.w3.org/2000/svg">
+        <defs><filter id="go2"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+        <line class="el" x1="350" y1="165" x2="200" y2="100" stroke="#F97316" stroke-width="1.5"/><line class="el" x1="350" y1="165" x2="500" y2="95" stroke="#F97316" stroke-width="1"/><line class="el" x1="350" y1="165" x2="230" y2="245" stroke="#fbbf24" stroke-width="1"/><line class="el" x1="350" y1="165" x2="490" y2="250" stroke="#FA2A52" stroke-width="1"/><line class="el" x1="200" y1="100" x2="100" y2="195" stroke="#F97316" stroke-width=".8"/>
+        <g class="ng" filter="url(#go2)"><circle cx="350" cy="165" r="38" fill="rgba(249,115,22,.13)" stroke="#F97316" stroke-width="2"/><circle cx="350" cy="165" r="24" fill="#F97316" opacity=".9"/><text x="350" y="169" text-anchor="middle" fill="#fff" font-size="8" font-family="Geologica,sans-serif" font-weight="800">VERNICK</text><text x="350" y="215" text-anchor="middle" fill="#F97316" font-size="8" font-family="Geologica,sans-serif" font-weight="700">↑ +84%</text></g>
+        <g class="ng" filter="url(#go2)"><circle cx="200" cy="100" r="26" fill="rgba(249,115,22,.11)" stroke="#F97316" stroke-width="1.5"/><circle cx="200" cy="100" r="16" fill="#F97316" opacity=".8"/><text x="200" y="103" text-anchor="middle" fill="#fff" font-size="7" font-family="Geologica,sans-serif" font-weight="800">ZAHAV</text><text x="200" y="134" text-anchor="middle" fill="#F97316" font-size="7" font-family="Geologica,sans-serif" font-weight="600">↑ +61%</text></g>
+        <g class="ng"><circle cx="500" cy="95" r="17" fill="rgba(52,211,153,.1)" stroke="#34d399" stroke-width="1.5"/><circle cx="500" cy="95" r="10" fill="#34d399" opacity=".8"/><text x="500" y="98" text-anchor="middle" fill="#0a0a0a" font-size="6.5" font-family="Geologica,sans-serif" font-weight="800">LASER W</text><text x="500" y="122" text-anchor="middle" fill="#34d399" font-size="7" font-family="Geologica,sans-serif" font-weight="600">NEW</text></g>
+        <g class="ng"><circle cx="230" cy="245" r="16" fill="rgba(251,191,36,.08)" stroke="#fbbf24" stroke-width="1"/><circle cx="230" cy="245" r="10" fill="#fbbf24" opacity=".65"/><text x="230" y="248" text-anchor="middle" fill="#0a0a0a" font-size="6" font-family="Geologica,sans-serif" font-weight="800">SURAYA</text></g>
+        <g class="ng"><circle cx="490" cy="250" r="14" fill="rgba(250,42,82,.1)" stroke="#FA2A52" stroke-width="1.5"/><circle cx="490" cy="250" r="9" fill="#FA2A52" opacity=".7"/><text x="490" y="253" text-anchor="middle" fill="#fff" font-size="5.5" font-family="Geologica,sans-serif" font-weight="800">MULHERIN</text></g>
+        <g class="ng"><circle cx="100" cy="195" r="11" fill="rgba(249,115,22,.07)" stroke="#F97316" stroke-width="1" stroke-opacity=".4"/><circle cx="100" cy="195" r="7" fill="#F97316" opacity=".5"/></g>
+      </svg>
+    </div>
+
+    <!-- Slim chart -->
+    <div style="padding:.7rem 1.4rem;border-top:1px solid rgba(255,255,255,.05);background:#0a0a0a">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem"><span style="font-size:.65rem;font-weight:700;color:rgba(255,255,255,.35);font-family:'Geologica',sans-serif;text-transform:uppercase;letter-spacing:.06em">90-Day Momentum</span><div style="display:flex;align-items:center;gap:.6rem"><span style="font-family:'Geologica',sans-serif;font-size:.9rem;font-weight:900;color:#34d399">↑23%</span><span style="font-size:.6rem;color:rgba(255,255,255,.3)">vs last month</span></div></div>
+      <div style="height:56px;position:relative;border-radius:6px;overflow:hidden;background:rgba(255,255,255,.02)">
+        <svg viewBox="0 0 900 50" style="width:100%;height:100%" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="lg3" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#F97316" stop-opacity=".5"/><stop offset="100%" stop-color="#FA2A52"/></linearGradient><filter id="gl2"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+          <path d="M0,38 C150,34 280,28 380,22 S580,16 700,10 S820,6 900,4" fill="none" stroke="url(#lg3)" stroke-width="2" stroke-linecap="round" filter="url(#gl2)"/>
+          <path d="M0,38 C150,34 280,28 380,22 S580,16 700,10 S820,6 900,4" fill="none" stroke="url(#lg3)" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="900" cy="4" r="4" fill="#FA2A52"/><circle cx="380" cy="22" r="3" fill="#34d399" opacity=".8"/><circle cx="620" cy="14" r="3" fill="#FA2A52" opacity=".7"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Horizontal leaderboard tiles -->
+    <div style="padding:.8rem 1.4rem;border-top:1px solid rgba(255,255,255,.05);overflow-x:auto">
+      <div style="display:flex;gap:.5rem;min-width:max-content">
+        <div style="padding:.7rem .9rem;border-radius:9px;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.2);min-width:140px"><div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem"><span style="font-size:.6rem;color:rgba(255,255,255,.3)">1</span><span class="lb-badge up">▲3</span></div><div style="font-size:.78rem;font-weight:700;color:#fff;font-family:'Geologica',sans-serif">Vernick Fish</div><div style="font-size:.6rem;color:rgba(255,255,255,.35);margin-bottom:.4rem">Fishtown</div><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Geologica',sans-serif;font-size:1rem;font-weight:900;color:#F97316">94</span><span style="font-size:.65rem;color:#34d399;font-weight:700">+84%</span></div></div>
+        <div style="padding:.7rem .9rem;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);min-width:140px"><div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem"><span style="font-size:.6rem;color:rgba(255,255,255,.3)">2</span><span class="lb-badge up">▲1</span></div><div style="font-size:.78rem;font-weight:700;color:#fff;font-family:'Geologica',sans-serif">Zahav</div><div style="font-size:.6rem;color:rgba(255,255,255,.35);margin-bottom:.4rem">Rittenhouse</div><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Geologica',sans-serif;font-size:1rem;font-weight:900;color:#F97316">88</span><span style="font-size:.65rem;color:#34d399;font-weight:700">+61%</span></div></div>
+        <div style="padding:.7rem .9rem;border-radius:9px;background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.2);min-width:140px"><div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem"><span style="font-size:.6rem;color:rgba(255,255,255,.3)">3</span><span class="lb-badge nw">NEW</span></div><div style="font-size:.78rem;font-weight:700;color:#fff;font-family:'Geologica',sans-serif">Laser Wolf</div><div style="font-size:.6rem;color:rgba(255,255,255,.35);margin-bottom:.4rem">Kensington</div><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Geologica',sans-serif;font-size:1rem;font-weight:900;color:#34d399">76</span><span style="font-size:.65rem;color:#F97316;font-weight:700">NEW</span></div></div>
+        <div style="padding:.7rem .9rem;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);min-width:140px"><div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem"><span style="font-size:.6rem;color:rgba(255,255,255,.3)">4</span><span class="lb-badge" style="background:rgba(255,255,255,.07);color:rgba(255,255,255,.35)">—</span></div><div style="font-size:.78rem;font-weight:700;color:#fff;font-family:'Geologica',sans-serif">Suraya</div><div style="font-size:.6rem;color:rgba(255,255,255,.35);margin-bottom:.4rem">Fishtown</div><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Geologica',sans-serif;font-size:1rem;font-weight:900;color:#fbbf24">71</span><span style="font-size:.65rem;color:#fbbf24;font-weight:700">+4%</span></div></div>
+        <div style="padding:.7rem .9rem;border-radius:9px;background:rgba(250,42,82,.05);border:1px solid rgba(250,42,82,.15);min-width:140px"><div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem"><span style="font-size:.6rem;color:rgba(255,255,255,.3)">5</span><span class="lb-badge dn">▼2</span></div><div style="font-size:.78rem;font-weight:700;color:#fff;font-family:'Geologica',sans-serif">Mulherin's Sons</div><div style="font-size:.6rem;color:rgba(255,255,255,.35);margin-bottom:.4rem">NoLibs</div><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'Geologica',sans-serif;font-size:1rem;font-weight:900;color:#FA2A52">52</span><span style="font-size:.65rem;color:#FA2A52;font-weight:700">−38%</span></div></div>
+        <div style="padding:.7rem .9rem;border-radius:9px;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);min-width:140px;display:flex;align-items:center;justify-content:center"><span style="font-size:.7rem;color:#F97316;font-weight:600;font-family:'Geologica',sans-serif">See 20 more →</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cg">
+    <div class="cc p"><h4>Strengths</h4><ul><li>The graph dominates — this is the WOW moment, maxed out.</li><li>Flash cards inside the graph feel organic, not bolted-on.</li><li>Horizontal leaderboard is fast to scan and scroll-native on mobile.</li><li>Most shareable design — the full-screen graph screenshot is the viral moment.</li></ul></div>
+    <div class="cc c"><h4>Watch-outs</h4><ul><li>Horizontal leaderboard loses some data density vs. a full table — rank change and signal hints don't fit well.</li><li>Flash cards can feel hidden in the corner of the graph for users who don't explore.</li><li>The slim chart loses the "event annotation" feature that makes the chart fresh daily.</li></ul></div>
+  </div>
+</section>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,.04)">
+
+
+<!-- ══════════════════════════════════════════════════════════
+     D3 — CHART LEADS
+     Trend chart is the above-fold hero. Graph below. Leaderboard at bottom.
+══════════════════════════════════════════════════════════════ -->
+<section class="ds" id="d3">
+  <div class="dlabel">D3</div>
+  <h2 class="dtitle">Chart Leads</h2>
+  <p class="dsub">The trend chart owns above the fold — the most data-rich version with full event annotations. Node graph below, leaderboard + cards at bottom. Best for returning users who come to check the city's momentum first.</p>
+
+  <div class="pf" style="min-height:660px">
+    <div class="mn">
+      <div class="mbrand">Fork<span>Fox</span> Pulse</div>
+      <div class="ctoggle"><button class="cb a">Philadelphia</button><button class="cb">SF</button><button class="cb">NYC</button></div>
+      <div class="mcta">Join Beta</div>
+    </div>
+
+    <!-- KPI strip + Chart hero -->
+    <div style="padding:1.2rem 1.4rem;background:radial-gradient(ellipse at 40% 50%,rgba(249,115,22,.06),transparent 60%),#0a0a0a">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem;margin-bottom:1rem">
+        <div class="kpi"><div class="kpi-val o">+14</div><div class="kpi-lbl">Openings · 90d</div></div>
+        <div class="kpi"><div class="kpi-val r">−4</div><div class="kpi-lbl">Closures · 90d</div></div>
+        <div class="kpi"><div class="kpi-val g">↑23%</div><div class="kpi-lbl">Buzz Index</div></div>
+        <div class="kpi"><div class="kpi-val o">8</div><div class="kpi-lbl">Trending Now</div></div>
+      </div>
+      <div style="position:relative;height:160px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);overflow:hidden">
+        <div style="position:absolute;top:.8rem;left:1rem;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.4);font-family:'Geologica',sans-serif;text-transform:uppercase;letter-spacing:.06em">Philadelphia Scene Momentum · 90 Days</div>
+        <svg viewBox="0 0 900 140" style="position:absolute;inset:0;width:100%;height:100%;padding:2rem 1rem .8rem" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="lg4" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#F97316" stop-opacity=".4"/><stop offset="100%" stop-color="#FA2A52"/></linearGradient><linearGradient id="lg5" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#F97316" stop-opacity=".12"/><stop offset="100%" stop-color="#F97316" stop-opacity="0"/></linearGradient><filter id="gl3"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+          <line x1="0" y1="110" x2="900" y2="110" stroke="rgba(255,255,255,.04)" stroke-width="1"/><line x1="0" y1="80" x2="900" y2="80" stroke="rgba(255,255,255,.04)" stroke-width="1"/><line x1="0" y1="50" x2="900" y2="50" stroke="rgba(255,255,255,.04)" stroke-width="1"/><line x1="0" y1="20" x2="900" y2="20" stroke="rgba(255,255,255,.04)" stroke-width="1"/>
+          <path d="M0,96 C120,90 220,82 340,72 S480,62 580,52 S700,40 800,28 S860,20 900,16 L900,120 L0,120Z" fill="url(#lg5)"/>
+          <path class="cl" d="M0,96 C120,90 220,82 340,72 S480,62 580,52 S700,40 800,28 S860,20 900,16" fill="none" stroke="url(#lg4)" stroke-width="2.5" stroke-linecap="round" filter="url(#gl3)"/>
+          <path d="M0,100 C120,95 220,88 340,80 S480,72 580,64 S700,55 800,45 S860,38 900,33" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1" stroke-dasharray="4,3"/>
+          <!-- Event pins with labels -->
+          <circle cx="300" cy="76" r="5" fill="#34d399" opacity=".9"/><line x1="300" y1="76" x2="300" y2="110" stroke="#34d399" stroke-width=".8" stroke-dasharray="2,2" opacity=".4"/>
+          <text x="300" y="127" text-anchor="middle" fill="rgba(52,211,153,0.6)" font-size="7.5" font-family="Inter">Laser Wolf</text>
+          <circle cx="560" cy="54" r="5" fill="#FA2A52" opacity=".9"/><line x1="560" y1="54" x2="560" y2="110" stroke="#FA2A52" stroke-width=".8" stroke-dasharray="2,2" opacity=".4"/>
+          <text x="560" y="127" text-anchor="middle" fill="rgba(250,42,82,0.6)" font-size="7.5" font-family="Inter">Chef departure</text>
+          <circle cx="760" cy="31" r="5" fill="#F97316" opacity=".9"/><line x1="760" y1="31" x2="760" y2="110" stroke="#F97316" stroke-width=".8" stroke-dasharray="2,2" opacity=".4"/>
+          <text x="760" y="127" text-anchor="middle" fill="rgba(249,115,22,0.6)" font-size="7.5" font-family="Inter">Vernick expands</text>
+          <circle class="ce" cx="900" cy="16" r="5.5" fill="#FA2A52"/>
+          <text x="0" y="136" fill="rgba(255,255,255,.2)" font-size="8" font-family="Inter">Feb</text><text x="220" y="136" fill="rgba(255,255,255,.2)" font-size="8" font-family="Inter">Mar</text><text x="440" y="136" fill="rgba(255,255,255,.2)" font-size="8" font-family="Inter">Apr</text><text x="660" y="136" fill="rgba(255,255,255,.2)" font-size="8" font-family="Inter">May</text>
+        </svg>
+        <div style="position:absolute;top:.8rem;right:1rem;display:flex;align-items:center;gap:.5rem">
+          <span style="font-family:'Geologica',sans-serif;font-size:1.1rem;font-weight:900;color:#34d399">↑23%</span>
+          <span style="font-size:.62rem;color:rgba(255,255,255,.35)">vs last month</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compact graph + leaderboard side by side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(255,255,255,.05)">
+      <div style="position:relative;height:240px;background:radial-gradient(ellipse at 50% 50%,rgba(249,115,22,.05),transparent 70%),#0a0a0a;overflow:hidden;border-right:1px solid rgba(255,255,255,.05)">
+        <div style="position:absolute;top:.8rem;left:.8rem"><div class="live-badge" style="font-size:.6rem;padding:.3rem .8rem"><span class="live-dot" style="width:6px;height:6px"></span>Node Map</div></div>
+        <svg viewBox="0 0 420 210" style="position:absolute;inset:0;width:100%;height:100%" xmlns="http://www.w3.org/2000/svg">
+          <defs><filter id="go3"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+          <line class="el" x1="210" y1="105" x2="130" y2="65" stroke="#F97316" stroke-width="1.2"/><line class="el" x1="210" y1="105" x2="290" y2="60" stroke="#F97316" stroke-width="1"/><line class="el" x1="210" y1="105" x2="150" y2="155" stroke="#fbbf24" stroke-width="1"/><line class="el" x1="210" y1="105" x2="290" y2="155" stroke="#FA2A52" stroke-width="1"/>
+          <g class="ng" filter="url(#go3)"><circle cx="210" cy="105" r="26" fill="rgba(249,115,22,.13)" stroke="#F97316" stroke-width="2"/><circle cx="210" cy="105" r="16" fill="#F97316" opacity=".9"/><text x="210" y="108" text-anchor="middle" fill="#fff" font-size="6.5" font-family="Geologica,sans-serif" font-weight="800">VERNICK</text></g>
+          <g class="ng"><circle cx="130" cy="65" r="16" fill="rgba(249,115,22,.1)" stroke="#F97316" stroke-width="1.5"/><circle cx="130" cy="65" r="10" fill="#F97316" opacity=".8"/><text x="130" y="68" text-anchor="middle" fill="#fff" font-size="6" font-family="Geologica,sans-serif" font-weight="800">ZAHAV</text></g>
+          <g class="ng"><circle cx="290" cy="60" r="12" fill="rgba(52,211,153,.1)" stroke="#34d399" stroke-width="1.5"/><circle cx="290" cy="60" r="7" fill="#34d399" opacity=".8"/><text x="290" y="63" text-anchor="middle" fill="#0a0a0a" font-size="5.5" font-family="Geologica,sans-serif" font-weight="800">L.WOLF</text></g>
+          <g class="ng"><circle cx="150" cy="155" r="11" fill="rgba(251,191,36,.08)" stroke="#fbbf24" stroke-width="1"/><circle cx="150" cy="155" r="7" fill="#fbbf24" opacity=".65"/><text x="150" y="158" text-anchor="middle" fill="#0a0a0a" font-size="5.5" font-family="Geologica,sans-serif" font-weight="800">SURAYA</text></g>
+          <g class="ng"><circle cx="290" cy="155" r="11" fill="rgba(250,42,82,.1)" stroke="#FA2A52" stroke-width="1.5"/><circle cx="290" cy="155" r="7" fill="#FA2A52" opacity=".7"/><text x="290" y="158" text-anchor="middle" fill="#fff" font-size="5.5" font-family="Geologica,sans-serif" font-weight="800">MULH.</text></g>
+        </svg>
+      </div>
+      <div style="padding:.8rem 1rem;display:flex;flex-direction:column;gap:.4rem;overflow:hidden">
+        <div class="tabs" style="margin-bottom:.5rem"><button class="tab a">Trending</button><button class="tab">Fast Movers</button><button class="tab">Cooling</button></div>
+        <div class="lb-row" style="padding:.4rem .65rem"><span class="lb-rank" style="font-size:.8rem">1</span><span class="lb-badge up">▲3</span><div class="lb-info"><div class="lb-name" style="font-size:.7rem">Vernick Fish</div><div class="lb-sub">Fishtown</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:94%"></div></div><span class="lb-vel" style="color:#34d399">+84%</span></div>
+        <div class="lb-row" style="padding:.4rem .65rem"><span class="lb-rank" style="font-size:.8rem">2</span><span class="lb-badge up">▲1</span><div class="lb-info"><div class="lb-name" style="font-size:.7rem">Zahav</div><div class="lb-sub">Rittenhouse</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:88%"></div></div><span class="lb-vel" style="color:#34d399">+61%</span></div>
+        <div class="lb-row" style="padding:.4rem .65rem"><span class="lb-rank" style="font-size:.8rem">3</span><span class="lb-badge nw">NEW</span><div class="lb-info"><div class="lb-name" style="font-size:.7rem">Laser Wolf</div><div class="lb-sub">Kensington</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:76%;background:#34d399"></div></div><span class="lb-vel" style="color:#F97316">NEW</span></div>
+        <div class="lb-row" style="padding:.4rem .65rem"><span class="lb-rank" style="font-size:.8rem">4</span><span class="lb-badge" style="background:rgba(255,255,255,.07);color:rgba(255,255,255,.35)">—</span><div class="lb-info"><div class="lb-name" style="font-size:.7rem">Suraya</div><div class="lb-sub">Fishtown</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:71%;background:#fbbf24"></div></div><span class="lb-vel" style="color:#fbbf24">+4%</span></div>
+        <div class="lb-row" style="padding:.4rem .65rem"><span class="lb-rank" style="font-size:.8rem">5</span><span class="lb-badge dn">▼2</span><div class="lb-info"><div class="lb-name" style="font-size:.7rem">Mulherin's</div><div class="lb-sub">NoLibs</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:52%;background:#FA2A52"></div></div><span class="lb-vel" style="color:#FA2A52">−38%</span></div>
+      </div>
+    </div>
+
+    <!-- Flash cards at bottom -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;padding:.9rem 1.4rem;border-top:1px solid rgba(255,255,255,.05)">
+      <div class="fc fire"><div class="fc-icon">🔥</div><span class="fc-score">↑94</span><div class="fc-label">On Fire</div><div class="fc-name">Vernick Fish</div><div class="fc-desc">8 mentions in 30 days. Buzz up 84%.</div></div>
+      <div class="fc cool"><div class="fc-icon">❄️</div><span class="fc-score">↓52</span><div class="fc-label">Cooling Fast</div><div class="fc-name">Mulherin's Sons</div><div class="fc-desc">Hours cut twice in 60 days. −38% buzz.</div></div>
+      <div class="fc gem"><div class="fc-icon">⚡</div><span class="fc-score">91</span><div class="fc-label">Overlooked Gem</div><div class="fc-name">Suraya</div><div class="fc-desc">Dish score 91, underreported 2×.</div></div>
+    </div>
+  </div>
+
+  <div class="cg">
+    <div class="cc p"><h4>Strengths</h4><ul><li>The chart with event pins is the most data-rich version — and it's the first thing you see.</li><li>KPI row immediately orients the visitor before they look at anything else.</li><li>Best for repeat users who come to check the city's momentum score.</li><li>The event annotations make every day's chart genuinely different from yesterday's.</li></ul></div>
+    <div class="cc c"><h4>Watch-outs</h4><ul><li>The node graph below the chart may feel secondary — loses some of its WOW impact.</li><li>Data-forward first impression could feel cold for casual foodie visitors.</li><li>More cognitive load above the fold — four KPIs + big chart before anything visual.</li></ul></div>
+  </div>
+</section>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,.04)">
+
+
+<!-- ══════════════════════════════════════════════════════════
+     D4 — LEADERBOARD HERO
+     Ranked table is the top half. Flash cards are a sticky top strip.
+     Node graph is a compact side element. Chart at bottom.
+══════════════════════════════════════════════════════════════ -->
+<section class="ds" id="d4">
+  <div class="dlabel">D4</div>
+  <h2 class="dtitle">Leaderboard Hero</h2>
+  <p class="dsub">Restaurant owners come for the rankings. The leaderboard dominates the top half — more rows, more data per row, the paid CTA on every line. Flash cards are a sticky strip at the very top. Node graph is compact right-rail. Chart anchors the bottom.</p>
+
+  <div class="pf" style="min-height:680px">
+    <!-- Flash strip at very top -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid rgba(255,255,255,.06)">
+      <div style="padding:.6rem 1rem;display:flex;align-items:center;gap:.6rem;background:rgba(249,115,22,.05);border-right:1px solid rgba(255,255,255,.06)"><span style="font-size:.9rem">🔥</span><div><div style="font-size:.6rem;font-weight:700;color:#F97316;font-family:'Geologica',sans-serif;text-transform:uppercase;letter-spacing:.05em">On Fire</div><div style="font-size:.72rem;font-weight:700;color:#fff">Vernick Fish <span style="color:#34d399">↑94</span></div></div></div>
+      <div style="padding:.6rem 1rem;display:flex;align-items:center;gap:.6rem;background:rgba(52,211,153,.04);border-right:1px solid rgba(255,255,255,.06)"><span style="font-size:.9rem">⚡</span><div><div style="font-size:.6rem;font-weight:700;color:#34d399;font-family:'Geologica',sans-serif;text-transform:uppercase;letter-spacing:.05em">Overlooked Gem</div><div style="font-size:.72rem;font-weight:700;color:#fff">Suraya <span style="color:#34d399">91</span></div></div></div>
+      <div style="padding:.6rem 1rem;display:flex;align-items:center;gap:.6rem;background:rgba(250,42,82,.05)"><span style="font-size:.9rem">❄️</span><div><div style="font-size:.6rem;font-weight:700;color:#FA2A52;font-family:'Geologica',sans-serif;text-transform:uppercase;letter-spacing:.05em">Cooling Fast</div><div style="font-size:.72rem;font-weight:700;color:#fff">Mulherin's <span style="color:#FA2A52">↓52</span></div></div></div>
+    </div>
+
+    <div class="mn" style="padding:.55rem 1.4rem">
+      <div class="mbrand">Fork<span>Fox</span> Pulse</div>
+      <div class="ctoggle"><button class="cb a">Philadelphia</button><button class="cb">SF</button><button class="cb">NYC</button></div>
+      <div style="display:flex;gap:.3rem">
+        <button class="cb a" style="font-size:.58rem;padding:.2rem .55rem">7d</button>
+        <button class="cb" style="font-size:.58rem;padding:.2rem .55rem">30d</button>
+        <button class="cb" style="font-size:.58rem;padding:.2rem .55rem">90d</button>
+      </div>
+    </div>
+
+    <!-- Main: full leaderboard + compact graph -->
+    <div style="display:grid;grid-template-columns:1fr 220px;flex:1">
+      <div style="padding:1rem 1.4rem;border-right:1px solid rgba(255,255,255,.05)">
+        <div class="tabs" style="margin-bottom:.8rem"><button class="tab a">Trending</button><button class="tab">Fast Movers</button><button class="tab">Cooling</button><button class="tab">New on Radar</button></div>
+        <div style="display:flex;flex-direction:column;gap:.4rem">
+          <div class="lb-row"><span class="lb-rank">1</span><span class="lb-badge up">▲3</span><div class="lb-info"><div class="lb-name">Vernick Fish</div><div class="lb-sub">Fishtown · American</div></div><div class="lb-bar-wrap" style="width:70px"><div class="lb-bar" style="width:94%"></div></div><span style="font-size:.65rem;color:rgba(255,255,255,.5);width:1.8rem;text-align:right;font-weight:700">94</span><span class="lb-vel" style="color:#34d399">+84%</span><span class="lb-hint" style="font-size:.6rem">Reservation expansion · 5 press hits in 7d</span><span class="lb-cta" style="font-size:.6rem">Unlock full breakdown →</span></div>
+          <div class="lb-row"><span class="lb-rank">2</span><span class="lb-badge up">▲1</span><div class="lb-info"><div class="lb-name">Zahav</div><div class="lb-sub">Rittenhouse · Israeli</div></div><div class="lb-bar-wrap" style="width:70px"><div class="lb-bar" style="width:88%"></div></div><span style="font-size:.65rem;color:rgba(255,255,255,.5);width:1.8rem;text-align:right;font-weight:700">88</span><span class="lb-vel" style="color:#34d399">+61%</span><span class="lb-hint" style="font-size:.6rem">15th anniversary menu revamp generating coverage</span><span class="lb-cta" style="font-size:.6rem">Unlock full breakdown →</span></div>
+          <div class="lb-row"><span class="lb-rank">3</span><span class="lb-badge nw">NEW</span><div class="lb-info"><div class="lb-name">Laser Wolf</div><div class="lb-sub">Kensington · Israeli</div></div><div class="lb-bar-wrap" style="width:70px"><div class="lb-bar" style="width:76%;background:#34d399"></div></div><span style="font-size:.65rem;color:rgba(255,255,255,.5);width:1.8rem;text-align:right;font-weight:700">76</span><span class="lb-vel" style="color:#F97316">NEW</span><span class="lb-hint" style="font-size:.6rem">Second location signed · entering leaderboard</span><span class="lb-cta" style="font-size:.6rem">Unlock full breakdown →</span></div>
+          <div class="lb-row"><span class="lb-rank">4</span><span class="lb-badge" style="background:rgba(255,255,255,.07);color:rgba(255,255,255,.35)">—</span><div class="lb-info"><div class="lb-name">Suraya</div><div class="lb-sub">Fishtown · Lebanese</div></div><div class="lb-bar-wrap" style="width:70px"><div class="lb-bar" style="width:71%;background:#fbbf24"></div></div><span style="font-size:.65rem;color:rgba(255,255,255,.5);width:1.8rem;text-align:right;font-weight:700">71</span><span class="lb-vel" style="color:#fbbf24">+4%</span><span class="lb-hint" style="font-size:.6rem">Consistent · terrace open · underreported vs quality</span><span class="lb-cta" style="font-size:.6rem">Unlock full breakdown →</span></div>
+          <div class="lb-row"><span class="lb-rank">5</span><span class="lb-badge dn">▼2</span><div class="lb-info"><div class="lb-name">Pizzeria Beddia</div><div class="lb-sub">Fishtown · Pizza</div></div><div class="lb-bar-wrap" style="width:70px"><div class="lb-bar" style="width:68%;background:#fbbf24"></div></div><span style="font-size:.65rem;color:rgba(255,255,255,.5);width:1.8rem;text-align:right;font-weight:700">68</span><span class="lb-vel" style="color:#fbbf24">−2%</span><span class="lb-hint" style="font-size:.6rem">10th anniversary coverage · slight slowdown</span><span class="lb-cta" style="font-size:.6rem">Unlock full breakdown →</span></div>
+          <div class="lb-row"><span class="lb-rank">6</span><span class="lb-badge dn">▼4</span><div class="lb-info"><div class="lb-name">Mulherin's Sons</div><div class="lb-sub">NoLibs · Italian</div></div><div class="lb-bar-wrap" style="width:70px"><div class="lb-bar" style="width:52%;background:#FA2A52"></div></div><span style="font-size:.65rem;color:rgba(255,255,255,.5);width:1.8rem;text-align:right;font-weight:700">52</span><span class="lb-vel" style="color:#FA2A52">−38%</span><span class="lb-hint" style="font-size:.6rem">Hours cut twice in 60 days · concern signal</span><span class="lb-cta" style="font-size:.6rem">Unlock full breakdown →</span></div>
+          <div style="text-align:center;padding:.6rem 0;font-size:.7rem;color:rgba(255,255,255,.25)">Showing 6 of 30 · <span style="color:#F97316;cursor:pointer">See all restaurants → ForkFox for Business</span></div>
+        </div>
+      </div>
+
+      <!-- Compact node graph -->
+      <div style="padding:.8rem;display:flex;flex-direction:column;gap:.6rem">
+        <div style="font-size:.65rem;font-weight:700;color:rgba(255,255,255,.35);font-family:'Geologica',sans-serif;text-transform:uppercase;letter-spacing:.06em">City Map</div>
+        <div style="position:relative;flex:1;min-height:200px;border-radius:8px;background:radial-gradient(ellipse at 50% 50%,rgba(249,115,22,.06),transparent 70%),rgba(255,255,255,.02);overflow:hidden">
+          <svg viewBox="0 0 200 200" style="width:100%;height:100%" xmlns="http://www.w3.org/2000/svg">
+            <defs><filter id="go4"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+            <line class="el" x1="100" y1="100" x2="65" y2="60" stroke="#F97316" stroke-width="1.2"/><line class="el" x1="100" y1="100" x2="140" y2="55" stroke="#fbbf24" stroke-width="1"/><line class="el" x1="100" y1="100" x2="70" y2="145" stroke="#FA2A52" stroke-width="1"/><line class="el" x1="100" y1="100" x2="145" y2="140" stroke="#34d399" stroke-width="1"/>
+            <g class="ng" filter="url(#go4)"><circle cx="100" cy="100" r="20" fill="rgba(249,115,22,.14)" stroke="#F97316" stroke-width="1.5"/><circle cx="100" cy="100" r="12" fill="#F97316" opacity=".9"/><text x="100" y="103" text-anchor="middle" fill="#fff" font-size="5.5" font-family="Geologica,sans-serif" font-weight="800">VERNICK</text></g>
+            <g class="ng"><circle cx="65" cy="60" r="12" fill="rgba(249,115,22,.1)" stroke="#F97316" stroke-width="1.2"/><circle cx="65" cy="60" r="7" fill="#F97316" opacity=".8"/><text x="65" y="63" text-anchor="middle" fill="#fff" font-size="5" font-family="Geologica,sans-serif" font-weight="800">ZAHAV</text></g>
+            <g class="ng"><circle cx="140" cy="55" r="9" fill="rgba(251,191,36,.08)" stroke="#fbbf24" stroke-width="1"/><circle cx="140" cy="55" r="6" fill="#fbbf24" opacity=".7"/><text x="140" y="58" text-anchor="middle" fill="#0a0a0a" font-size="4.5" font-family="Geologica,sans-serif" font-weight="800">SURAYA</text></g>
+            <g class="ng"><circle cx="70" cy="145" r="9" fill="rgba(250,42,82,.1)" stroke="#FA2A52" stroke-width="1"/><circle cx="70" cy="145" r="6" fill="#FA2A52" opacity=".7"/></g>
+            <g class="ng"><circle cx="145" cy="140" r="8" fill="rgba(52,211,153,.1)" stroke="#34d399" stroke-width="1"/><circle cx="145" cy="140" r="5" fill="#34d399" opacity=".8"/></g>
+          </svg>
+        </div>
+        <div style="font-size:.6rem;color:rgba(255,255,255,.25);text-align:center;line-height:1.5">Node size = buzz score<br>Color = trajectory</div>
+      </div>
+    </div>
+
+    <!-- Slim chart at bottom -->
+    <div style="padding:.7rem 1.4rem;border-top:1px solid rgba(255,255,255,.05);background:#0a0a0a">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem"><span style="font-size:.65rem;font-weight:700;color:rgba(255,255,255,.35);font-family:'Geologica',sans-serif;text-transform:uppercase;letter-spacing:.06em">90-Day City Momentum</span><span style="font-family:'Geologica',sans-serif;font-size:.9rem;font-weight:900;color:#34d399">↑23%</span></div>
+      <div style="height:50px;border-radius:6px;overflow:hidden;background:rgba(255,255,255,.02)"><svg viewBox="0 0 900 44" style="width:100%;height:100%" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lg6" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#F97316" stop-opacity=".4"/><stop offset="100%" stop-color="#FA2A52"/></linearGradient><filter id="gl4"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M0,34 C150,30 280,24 380,18 S580,12 700,7 S820,3 900,1" fill="none" stroke="url(#lg6)" stroke-width="2" stroke-linecap="round" filter="url(#gl4)"/><circle cx="900" cy="1" r="4" fill="#FA2A52"/><circle cx="340" cy="19" r="3" fill="#34d399" opacity=".8"/></svg></div>
+    </div>
+  </div>
+
+  <div class="cg">
+    <div class="cc p"><h4>Strengths</h4><ul><li>Restaurant owners see the leaderboard immediately — this is designed for them.</li><li>The "Unlock full breakdown" CTA on every row is the most aggressive paid conversion path.</li><li>Flash strip at top ensures the insight cards are never missed, even by quick visitors.</li><li>More leaderboard rows visible above the fold than any other layout.</li></ul></div>
+    <div class="cc c"><h4>Watch-outs</h4><ul><li>Foodie consumers (the larger audience) may not feel spoken to — heavy data focus.</li><li>The node graph feels demoted to a sidebar widget rather than a centrepiece.</li><li>Less visually dramatic — the page feels more like a SaaS dashboard than a food product.</li></ul></div>
+  </div>
+</section>
+<hr style="border:none;border-top:1px solid rgba(255,255,255,.04)">
+
+
+<!-- ══════════════════════════════════════════════════════════
+     D5 — SPLIT SCREEN
+     Left half = node graph full height. Right half = chart + leaderboard + cards.
+══════════════════════════════════════════════════════════════ -->
+<section class="ds" id="d5">
+  <div class="dlabel">D5</div>
+  <h2 class="dtitle">Split Screen</h2>
+  <p class="dsub">Left half is the node graph — persistent, full height, always visible. Right half scrolls independently with chart at top, leaderboard in middle, flash cards at bottom. Desktop-forward. The graph never leaves your sight.</p>
+
+  <div class="pf" style="min-height:660px">
+    <div class="mn">
+      <div class="mbrand">Fork<span>Fox</span> Pulse</div>
+      <div class="ctoggle"><button class="cb a">Philadelphia</button><button class="cb">SF</button><button class="cb">NYC</button></div>
+      <div class="mcta">Join Beta</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;min-height:600px">
+      <!-- Left: Node graph -->
+      <div style="position:relative;background:radial-gradient(ellipse at 50% 50%,rgba(249,115,22,.07),transparent 65%),#0a0a0a;overflow:hidden;border-right:1px solid rgba(255,255,255,.06)">
+        <div style="position:absolute;top:1rem;left:1rem"><div class="live-badge"><span class="live-dot"></span>Live · 8 trending</div></div>
+        <svg viewBox="0 0 560 560" style="position:absolute;inset:0;width:100%;height:100%" xmlns="http://www.w3.org/2000/svg">
+          <defs><filter id="go5"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+          <line class="el" x1="280" y1="280" x2="170" y2="175" stroke="#F97316" stroke-width="1.5"/><line class="el" x1="280" y1="280" x2="400" y2="170" stroke="#F97316" stroke-width="1"/><line class="el" x1="280" y1="280" x2="185" y2="385" stroke="#fbbf24" stroke-width="1"/><line class="el" x1="280" y1="280" x2="390" y2="390" stroke="#FA2A52" stroke-width="1"/><line class="el" x1="170" y1="175" x2="90" y2="270" stroke="#F97316" stroke-width=".8"/><line class="el" x1="400" y1="170" x2="480" y2="275" stroke="#fbbf24" stroke-width=".8"/>
+          <text x="60" y="130" fill="rgba(255,255,255,.12)" font-size="10" font-family="Inter" font-weight="600" letter-spacing="1.5">FISHTOWN</text>
+          <text x="390" y="125" fill="rgba(255,255,255,.12)" font-size="10" font-family="Inter" font-weight="600" letter-spacing="1.5">RITTENHOUSE</text>
+          <text x="320" y="490" fill="rgba(255,255,255,.12)" font-size="10" font-family="Inter" font-weight="600" letter-spacing="1.5">SOUTH PHILLY</text>
+          <g class="ng" filter="url(#go5)"><circle cx="280" cy="280" r="38" fill="rgba(249,115,22,.14)" stroke="#F97316" stroke-width="2"/><circle cx="280" cy="280" r="24" fill="#F97316" opacity=".9"/><text x="280" y="284" text-anchor="middle" fill="#fff" font-size="8" font-family="Geologica,sans-serif" font-weight="800">VERNICK</text><text x="280" y="330" text-anchor="middle" fill="#F97316" font-size="8" font-family="Geologica,sans-serif" font-weight="700">↑ +84%</text></g>
+          <g class="ng" filter="url(#go5)"><circle cx="170" cy="175" r="26" fill="rgba(249,115,22,.11)" stroke="#F97316" stroke-width="1.5"/><circle cx="170" cy="175" r="16" fill="#F97316" opacity=".8"/><text x="170" y="178" text-anchor="middle" fill="#fff" font-size="7" font-family="Geologica,sans-serif" font-weight="800">ZAHAV</text><text x="170" y="208" text-anchor="middle" fill="#F97316" font-size="7" font-family="Geologica,sans-serif" font-weight="600">↑ +61%</text></g>
+          <g class="ng"><circle cx="400" cy="170" r="18" fill="rgba(52,211,153,.1)" stroke="#34d399" stroke-width="1.5"/><circle cx="400" cy="170" r="11" fill="#34d399" opacity=".8"/><text x="400" y="173" text-anchor="middle" fill="#0a0a0a" font-size="6.5" font-family="Geologica,sans-serif" font-weight="800">LASER W.</text><text x="400" y="199" text-anchor="middle" fill="#34d399" font-size="7">NEW</text></g>
+          <g class="ng"><circle cx="185" cy="385" r="16" fill="rgba(251,191,36,.08)" stroke="#fbbf24" stroke-width="1"/><circle cx="185" cy="385" r="10" fill="#fbbf24" opacity=".65"/><text x="185" y="388" text-anchor="middle" fill="#0a0a0a" font-size="6" font-family="Geologica,sans-serif" font-weight="800">SURAYA</text></g>
+          <g class="ng"><circle cx="390" cy="390" r="15" fill="rgba(250,42,82,.1)" stroke="#FA2A52" stroke-width="1.5"/><circle cx="390" cy="390" r="9" fill="#FA2A52" opacity=".7"/><text x="390" y="393" text-anchor="middle" fill="#fff" font-size="5.5" font-family="Geologica,sans-serif" font-weight="800">MULHERIN</text></g>
+          <g class="ng"><circle cx="90" cy="270" r="10" fill="rgba(249,115,22,.07)" stroke="#F97316" stroke-width="1" stroke-opacity=".4"/><circle cx="90" cy="270" r="6" fill="#F97316" opacity=".5"/></g>
+          <g class="ng"><circle cx="480" cy="275" r="10" fill="rgba(251,191,36,.07)" stroke="#fbbf24" stroke-width="1" stroke-opacity=".4"/><circle cx="480" cy="275" r="6" fill="#fbbf24" opacity=".5"/></g>
+          <g transform="translate(20,525)"><circle cx="6" cy="5" r="5" fill="#F97316" opacity=".85"/><text x="15" y="9" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">Trending</text><circle cx="75" cy="5" r="5" fill="#34d399" opacity=".85"/><text x="84" y="9" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">Rising</text><circle cx="134" cy="5" r="5" fill="#fbbf24" opacity=".85"/><text x="143" y="9" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">Stable</text><circle cx="190" cy="5" r="5" fill="#FA2A52" opacity=".85"/><text x="199" y="9" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">Fading</text></g>
+        </svg>
+      </div>
+
+      <!-- Right: Chart + Leaderboard + Cards -->
+      <div style="display:flex;flex-direction:column;overflow:hidden">
+        <!-- Chart -->
+        <div style="padding:1rem;border-bottom:1px solid rgba(255,255,255,.05)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem"><span style="font-size:.65rem;font-weight:700;color:rgba(255,255,255,.35);font-family:'Geologica',sans-serif;text-transform:uppercase;letter-spacing:.06em">90-Day Momentum</span><span style="font-family:'Geologica',sans-serif;font-size:.9rem;font-weight:900;color:#34d399">↑23%</span></div>
+          <div style="height:80px;border-radius:7px;overflow:hidden;background:rgba(255,255,255,.025)"><svg viewBox="0 0 500 72" style="width:100%;height:100%" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lg7" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#F97316" stop-opacity=".4"/><stop offset="100%" stop-color="#FA2A52"/></linearGradient><filter id="gl5"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><line x1="0" y1="55" x2="500" y2="55" stroke="rgba(255,255,255,.04)" stroke-width="1"/><line x1="0" y1="35" x2="500" y2="35" stroke="rgba(255,255,255,.04)" stroke-width="1"/><path d="M0,52 C80,48 150,42 220,36 S340,28 420,20 S470,14 500,10 L500,65 L0,65Z" fill="rgba(249,115,22,.08)"/><path class="cl" d="M0,52 C80,48 150,42 220,36 S340,28 420,20 S470,14 500,10" fill="none" stroke="url(#lg7)" stroke-width="2" stroke-linecap="round" filter="url(#gl5)"/><path d="M0,55 C80,52 150,47 220,42 S340,36 420,29 S470,23 500,19" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="1" stroke-dasharray="3,3"/><circle cx="195" cy="37" r="3.5" fill="#34d399" opacity=".85"/><circle cx="360" cy="26" r="3.5" fill="#FA2A52" opacity=".85"/><circle cx="500" cy="10" r="4.5" fill="#FA2A52"/></svg></div>
+        </div>
+        <!-- Leaderboard -->
+        <div style="padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.05);flex:1">
+          <div class="tabs" style="margin-bottom:.6rem"><button class="tab a">Trending</button><button class="tab">Fast Movers</button><button class="tab">Cooling</button></div>
+          <div style="display:flex;flex-direction:column;gap:.35rem">
+            <div class="lb-row" style="padding:.4rem .65rem"><span class="lb-rank" style="font-size:.8rem">1</span><span class="lb-badge up">▲3</span><div class="lb-info"><div class="lb-name" style="font-size:.72rem">Vernick Fish</div><div class="lb-sub">Fishtown</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:94%"></div></div><span class="lb-vel" style="color:#34d399">+84%</span><span class="lb-cta" style="font-size:.58rem">Unlock →</span></div>
+            <div class="lb-row" style="padding:.4rem .65rem"><span class="lb-rank" style="font-size:.8rem">2</span><span class="lb-badge up">▲1</span><div class="lb-info"><div class="lb-name" style="font-size:.72rem">Zahav</div><div class="lb-sub">Rittenhouse</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:88%"></div></div><span class="lb-vel" style="color:#34d399">+61%</span><span class="lb-cta" style="font-size:.58rem">Unlock →</span></div>
+            <div class="lb-row" style="padding:.4rem .65rem"><span class="lb-rank" style="font-size:.8rem">3</span><span class="lb-badge nw">NEW</span><div class="lb-info"><div class="lb-name" style="font-size:.72rem">Laser Wolf</div><div class="lb-sub">Kensington</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:76%;background:#34d399"></div></div><span class="lb-vel" style="color:#F97316">NEW</span><span class="lb-cta" style="font-size:.58rem">Unlock →</span></div>
+            <div class="lb-row" style="padding:.4rem .65rem"><span class="lb-rank" style="font-size:.8rem">4</span><span class="lb-badge" style="background:rgba(255,255,255,.07);color:rgba(255,255,255,.35)">—</span><div class="lb-info"><div class="lb-name" style="font-size:.72rem">Suraya</div><div class="lb-sub">Fishtown</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:71%;background:#fbbf24"></div></div><span class="lb-vel" style="color:#fbbf24">+4%</span><span class="lb-cta" style="font-size:.58rem">Unlock →</span></div>
+            <div class="lb-row" style="padding:.4rem .65rem"><span class="lb-rank" style="font-size:.8rem">5</span><span class="lb-badge dn">▼2</span><div class="lb-info"><div class="lb-name" style="font-size:.72rem">Mulherin's Sons</div><div class="lb-sub">NoLibs</div></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:52%;background:#FA2A52"></div></div><span class="lb-vel" style="color:#FA2A52">−38%</span><span class="lb-cta" style="font-size:.58rem">Unlock →</span></div>
+          </div>
+        </div>
+        <!-- Flash cards -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;padding:.8rem 1rem">
+          <div class="fc fire" style="padding:.75rem .85rem"><div class="fc-icon" style="font-size:.9rem">🔥</div><div class="fc-label" style="font-size:.55rem">On Fire</div><div class="fc-name" style="font-size:.72rem">Vernick Fish</div><div class="fc-desc" style="font-size:.6rem">+84% buzz · 94 score</div></div>
+          <div class="fc cool" style="padding:.75rem .85rem"><div class="fc-icon" style="font-size:.9rem">❄️</div><div class="fc-label" style="font-size:.55rem">Cooling</div><div class="fc-name" style="font-size:.72rem">Mulherin's</div><div class="fc-desc" style="font-size:.6rem">Hours cut · −38%</div></div>
+          <div class="fc gem" style="padding:.75rem .85rem"><div class="fc-icon" style="font-size:.9rem">⚡</div><div class="fc-label" style="font-size:.55rem">Gem</div><div class="fc-name" style="font-size:.72rem">Suraya</div><div class="fc-desc" style="font-size:.6rem">Score 91 · underreported</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cg">
+    <div class="cc p"><h4>Strengths</h4><ul><li>The graph never leaves your sight — it's a persistent live map while you browse the data.</li><li>Clicking a node on the left can filter the leaderboard on the right (great interaction to build).</li><li>Both audiences are served simultaneously — graph for foodies, leaderboard for owners.</li><li>Feels like a proper intelligence product — not a blog with charts.</li></ul></div>
+    <div class="cc c"><h4>Watch-outs</h4><ul><li>Completely breaks on mobile — requires a fundamentally different mobile layout.</li><li>The right panel feels cramped — chart, leaderboard, and cards compete for height.</li><li>More complex to build correctly than any other layout.</li></ul></div>
+  </div>
+</section>
+
+
+<div style="padding:3rem 2rem;text-align:center;border-top:1px solid rgba(255,255,255,.04)">
+  <div style="font-family:'Geologica',sans-serif;font-size:1.1rem;font-weight:800;margin-bottom:.4rem">Fork<span style="color:#F97316">Fox</span> Pulse — Dashboard Gallery</div>
+  <div style="font-size:.78rem;color:rgba(255,255,255,.3);max-width:480px;margin:0 auto .4rem;line-height:1.6">Internal design review. Not deployed. Pick a direction or mix elements across designs.</div>
+  <div style="font-size:.72rem;color:rgba(249,115,22,.6);margin-bottom:1.5rem">My recommendation: D1 (The Stack) for the base layout · steal D2's floating flash cards · and D3's full chart detail as an optional toggle.</div>
+  <div style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap">
+    <a href="#d1" class="np">D1 · The Stack</a><a href="#d2" class="np">D2 · Graph Dominant</a><a href="#d3" class="np">D3 · Chart Leads</a><a href="#d4" class="np">D4 · Leaderboard Hero</a><a href="#d5" class="np">D5 · Split Screen</a>
+  </div>
+</div>
+
+<script>
+const pills = document.querySelectorAll('.np');
+const sections = ['d1','d2','d3','d4','d5'].map(id => document.getElementById(id));
+function updatePills() {
+  let cur = '';
+  sections.forEach(s => { if (window.scrollY + 100 >= s.offsetTop) cur = s.id; });
+  pills.forEach(p => p.classList.toggle('active', p.getAttribute('href') === '#' + cur));
+}
+window.addEventListener('scroll', updatePills, {passive:true});
+document.querySelectorAll('.ctoggle').forEach(t => {
+  t.querySelectorAll('.cb').forEach(b => b.addEventListener('click', () => {
+    t.querySelectorAll('.cb').forEach(x => x.classList.remove('a'));
+    b.classList.add('a');
+  }));
+});
+document.querySelectorAll('.tabs').forEach(t => {
+  t.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => {
+    t.querySelectorAll('.tab').forEach(x => x.classList.remove('a'));
+    b.classList.add('a');
+  }));
+});
+</script>
+</body>
+</html>
